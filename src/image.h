@@ -18,8 +18,18 @@ public:
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		compression_params.push_back(95);
 	}
-	void saveImage() {cv::imwrite(filename_.c_str(), image, compression_params);};
-	template<typename T> T getPixelAt(std::vector<int> position);
+
+	Image(int rows, int cols, std::string filename) {
+		filename_ = filename;
+		image = cv::Mat::zeros(rows, cols, CV_8U);
+		dimensions.push_back(image.rows);
+		dimensions.push_back(image.cols);
+		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+		compression_params.push_back(95);
+	}
+	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
+	template<typename T> T getPixelAt(int row, int col);
+	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
 private:
 	cv::Mat image;
@@ -29,14 +39,14 @@ private:
 };
 
 template<typename T>
-T Image::getPixelAt(std::vector<int> position) {
+T Image::getPixelAt(int row, int col) {
 
-	if (position[0] > dimensions[0]-1 || position[0] < 0)
+	if (row > dimensions[0]-1 || row < 0)
 		return 0;
-	else if (position[1] > dimensions[1]-1 || position[1] < 0)
+	else if (col > dimensions[1]-1 || col < 0)
 		return 0;
 	else {
-		return image.at<T>(position[0], position[1]);
+		return image.at<T>(row, col);
 	}
 }
 
