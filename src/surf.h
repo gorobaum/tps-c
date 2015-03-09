@@ -10,6 +10,7 @@
 
 namespace tps {
 
+// code from http://docs.opencv.org/doc/tutorials/features2d/feature_homography/feature_homography.html
 class Surf
 {
 public:
@@ -19,6 +20,8 @@ public:
 		detector(minHessian) {}
 	void run(bool createFeatureImage);
 	void saveFeatureImage();
+	std::vector<cv::Point2f> getReferenceKeypoints() {return referenceKeypoints;};
+	std::vector<cv::Point2f> getTargetKeypoints() {return targetKeypoints;};
 private:
 	Image referenceImage_;
 	Image targetImage_;
@@ -27,9 +30,11 @@ private:
 	cv::SurfDescriptorExtractor extractor;
 	cv::FlannBasedMatcher matcher;
 	// Data structures
-	cv::Mat descriptors_object, descriptors_scene;
-	std::vector<cv::KeyPoint> keypoints_object, keypoints_scene;
+	cv::Mat descriptors_ref, descriptors_tar;
+	std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;
 	std::vector<cv::DMatch> good_matches;
+	std::vector<cv::Point2f> referenceKeypoints;
+  std::vector<cv::Point2f> targetKeypoints;
 
 	void detectFeatures();
 	void extractDescriptors();

@@ -6,7 +6,7 @@ include_directories (src)
 find_package(OpenCV REQUIRED)
 
 add_executable(tps
-	src/tps.cxx
+	src/main.cxx
   src/surf.cxx)
 
 target_link_libraries (tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS})
