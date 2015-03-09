@@ -1,16 +1,12 @@
 #include "image.h"
 #include "surf.h"
+#include "tps.h"
 
 #include <string>
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <cstdio>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
-#include <opencv2/nonfree/features2d.hpp>
 
 int main(int argc, char** argv) {
 	if (argc < 3) {
