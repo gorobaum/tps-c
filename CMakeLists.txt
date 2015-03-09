@@ -6,7 +6,8 @@ include_directories (src)
 find_package(OpenCV REQUIRED)
 
 add_executable(tps
-	src/tps.cxx)
+	src/tps.cxx
+  src/surf.cxx)
 
 target_link_libraries (tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS})
 list( APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -Wall -g")

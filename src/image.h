@@ -8,11 +8,15 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+namespace tps {
+
 class Image {
 public:
 	Image(std::string filename) {
 		filename_ = filename;
 		image = cv::imread(filename_, CV_LOAD_IMAGE_GRAYSCALE);
+	  if( !image.data )
+  	{ std::cout << " --(!) Error reading images form file" << filename << std::endl; }
 		dimensions.push_back(image.rows);
 		dimensions.push_back(image.cols);
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -32,6 +36,7 @@ public:
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
 private:
+	friend class Surf;
 	cv::Mat image;
 	std::vector<int> dimensions;
 	std::string filename_;
@@ -49,5 +54,7 @@ T Image::getPixelAt(int row, int col) {
 		return image.at<T>(row, col);
 	}
 }
+
+} // namespace
 
 #endif
