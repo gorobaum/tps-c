@@ -12,16 +12,20 @@ class TPS
 public:
 	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints) :
 		referenceKeypoints_(referenceKeypoints),
-		targetKeypoints_(targetKeypoints) {}
+		targetKeypoints_(targetKeypoints) {
+			solutionX = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
+			solutionY = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
+		}
 	void run();
 private:
 	std::vector<cv::Point2f> referenceKeypoints_;
 	std::vector<cv::Point2f> targetKeypoints_;
-	void createLinearSystems();
-	void createLinearSystem(std::vector<cv::Point2f> referenceKeypoints_, std::vector<float> coordinate);
+	cv::Mat solutionX;
+	cv::Mat solutionY;
+	void findSolutions();
+	cv::Mat createMatrixA();
 	float computeRSquared(int x, int xi, int y, int yi);
-	void solveLinearSystems();
-	void solveLinearSystem(cv::Mat A, cv::Mat b, cv::Mat& x);
+	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
 };
 
 } // namespace

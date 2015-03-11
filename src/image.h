@@ -32,15 +32,21 @@ public:
 		compression_params.push_back(95);
 	}
 	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
-	template<typename T> T getPixelAt(int row, int col);
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
+	template<typename T> T getPixelAt(int row, int col);
+	template<typename T> T bilinearInterpolation(float row, float col);
+	template<typename T> T NNInterpolation(float row, float col);
 private:
 	friend class Surf;
 	cv::Mat image;
 	std::vector<int> dimensions;
 	std::string filename_;
 	std::vector<int> compression_params;
+	int getNearestInteger(float number) {
+	if ((number - floor(number)) <= 0.5) return floor(number);
+	return floor(number) + 1.0;
+}
 };
 
 template<typename T>
@@ -53,6 +59,30 @@ T Image::getPixelAt(int row, int col) {
 	else {
 		return image.at<T>(row, col);
 	}
+}
+
+template<typename T>
+T Image::bilinearInterpolation(float row, float col) {
+	int u = trunc(row);
+	int v = trunc(col);
+	uchar pixelOne = getPixelAt<uchar>(u, v);
+	uchar pixelTwo = getPixelAt<uchar>(u+1, v);
+	uchar pixelThree = getPixelAt<uchar>(u, v+1);
+	uchar pixelFour = getPixelAt<uchar>(u+1, v+1);
+
+	T interpolation = (u+1-row)*(v+1-col)*pixelOne
+												+ (row-u)*(v+1-col)*pixelTwo 
+												+ (u+1-row)*(col-v)*pixelThree
+												+ (row-u)*(col-v)*pixelFour;
+	return interpolation;
+}
+
+template<typename T>
+T Image::NNInterpolation(float row, float col) {
+	int nearRow = getNearestInteger(row);
+	int nearCol = getNearestInteger(col);
+	T aux = getPixelAt<uchar>(nearRow, nearCol);
+	return aux;
 }
 
 } // namespace
