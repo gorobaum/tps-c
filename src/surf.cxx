@@ -23,9 +23,6 @@ void tps::Surf::matchDescriptors() {
     if( dist > max_dist ) max_dist = dist;
   }
 
-  printf("-- Max dist : %f \n", max_dist );
-  printf("-- Min dist : %f \n", min_dist );
-
   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 
   for( int i = 0; i < descriptors_ref.rows; i++ )

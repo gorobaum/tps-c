@@ -20,11 +20,19 @@ int main(int argc, char** argv) {
 
   int minHessian = 400;
 
+  double surfExecTime = (double)cv::getTickCount();
   tps::Surf surf = tps::Surf(referenceImage, targetImage, minHessian);
   surf.run(true);
+  surfExecTime = ((double)cv::getTickCount() - surfExecTime)/cv::getTickFrequency();
+  std::cout << "Surf execution time: " << surfExecTime << std::endl;
 
+  double tpsExecTime = (double)cv::getTickCount();
   tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, outputName);
   tps.run();
+  tpsExecTime = ((double)cv::getTickCount() - tpsExecTime)/cv::getTickFrequency();
+  std::cout << "TPS execution time: " << tpsExecTime << std::endl;
+
+	std::cout << "Total execution time: " << tpsExecTime+surfExecTime << std::endl << std::endl;  
 
   return 0;
 }
