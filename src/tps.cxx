@@ -12,8 +12,10 @@ void tps::TPS::run() {
 			aux.at<float>(0) = 1.0;
 			aux.at<float>(1) = x;
 			aux.at<float>(2) = y;
-			for (uint i = 3; i < referenceKeypoints_.size()+3; i++)
-				aux.at<float>(i) = computeRSquared(x, referenceKeypoints_[i-3].x, y, referenceKeypoints_[i-3].y);
+			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
+				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
+				if (r != 0.0) aux.at<float>(i) = r*log(r);
+			}
 			double newX = aux.dot(solutionX);
 			double newY = aux.dot(solutionY);
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
