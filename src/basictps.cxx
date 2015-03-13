@@ -1,9 +1,9 @@
-#include "tps.h"
+#include "basictps.h"
 
 #include <cmath>
 #include <iostream>
 
-void tps::TPS::run() {
+void tps::BasicTPS::run() {
 	findSolutions();
 	std::vector<int> dimensions = registredImage.getDimensions();
 	for (int x = 0; x < dimensions[0]; x++)
@@ -24,7 +24,7 @@ void tps::TPS::run() {
 		registredImage.save();
 }
 
-void tps::TPS::findSolutions() {
+void tps::BasicTPS::findSolutions() {
 	cv::Mat A = createMatrixA();
 
 	cv::Mat bx = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
@@ -38,17 +38,13 @@ void tps::TPS::findSolutions() {
 	solutionY = solveLinearSystem(A, by);
 }
 
-float tps::TPS::computeRSquared(int x, int xi, int y, int yi) {
-	return pow(x-xi,2) + pow(y-yi,2);
-}
-
-cv::Mat tps::TPS::solveLinearSystem(cv::Mat A, cv::Mat b) {
+cv::Mat tps::BasicTPS::solveLinearSystem(cv::Mat A, cv::Mat b) {
 	cv::Mat solution = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 	cv::solve(A, b, solution, cv::DECOMP_EIG);
 	return solution;
 }
 
-cv::Mat tps::TPS::createMatrixA() {
+cv::Mat tps::BasicTPS::createMatrixA() {
 	cv::Mat A = cv::Mat::zeros(referenceKeypoints_.size()+3,referenceKeypoints_.size()+3, CV_32F);
 
 	for (uint j = 0; j < referenceKeypoints_.size(); j++) {

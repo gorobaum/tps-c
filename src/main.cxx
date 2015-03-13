@@ -1,6 +1,6 @@
 #include "image.h"
 #include "surf.h"
-#include "tps.h"
+#include "basictps.h"
 
 #include <string>
 #include <iostream>
@@ -26,13 +26,13 @@ int main(int argc, char** argv) {
   surfExecTime = ((double)cv::getTickCount() - surfExecTime)/cv::getTickFrequency();
   std::cout << "Surf execution time: " << surfExecTime << std::endl;
 
-  double tpsExecTime = (double)cv::getTickCount();
-  tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, outputName);
+  double basicTpsExecTime = (double)cv::getTickCount();
+  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "basicReg.png");
   tps.run();
-  tpsExecTime = ((double)cv::getTickCount() - tpsExecTime)/cv::getTickFrequency();
-  std::cout << "TPS execution time: " << tpsExecTime << std::endl;
+  basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-	std::cout << "Total execution time: " << tpsExecTime+surfExecTime << std::endl << std::endl;  
+	std::cout << "Total execution time: " << basicTpsExecTime+surfExecTime << std::endl << std::endl;  
 
   return 0;
 }

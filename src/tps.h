@@ -20,18 +20,18 @@ public:
 			solutionX = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 			solutionY = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 		}
-	void run();
-private:
+	virtual void run() = 0;
+protected:
 	std::vector<cv::Point2f> referenceKeypoints_;
 	std::vector<cv::Point2f> targetKeypoints_;
 	tps::Image targetImage_;
 	tps::Image registredImage;
 	cv::Mat solutionX;
 	cv::Mat solutionY;
-	void findSolutions();
-	cv::Mat createMatrixA();
-	float computeRSquared(int x, int xi, int y, int yi);
-	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
+	virtual void findSolutions() = 0;
+	virtual cv::Mat createMatrixA() = 0;
+ 	float computeRSquared(int x, int xi, int y, int yi) {return pow(x-xi,2) + pow(y-yi,2);};
+	virtual cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b) = 0;
 };
 
 } // namespace

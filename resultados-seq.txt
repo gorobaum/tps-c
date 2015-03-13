@@ -1,0 +1,80 @@
+Surf execution time: 0.161813
+TPS execution time: 0.272452
+Total execution time: 0.434265
+
+Surf execution time: 0.165492
+TPS execution time: 0.282747
+Total execution time: 0.448239
+
+Surf execution time: 0.16333
+TPS execution time: 0.317946
+Total execution time: 0.481276
+
+Surf execution time: 0.178307
+TPS execution time: 0.284417
+Total execution time: 0.462724
+
+Surf execution time: 0.178481
+TPS execution time: 0.305141
+Total execution time: 0.483621
+
+Surf execution time: 0.199724
+TPS execution time: 0.330896
+Total execution time: 0.530619
+
+Surf execution time: 0.207198
+TPS execution time: 0.297123
+Total execution time: 0.504321
+
+Surf execution time: 0.164007
+TPS execution time: 0.28545
+Total execution time: 0.449457
+
+Surf execution time: 0.213011
+TPS execution time: 0.389662
+Total execution time: 0.602674
+
+Surf execution time: 0.187116
+TPS execution time: 0.309811
+Total execution time: 0.496927
+
+Surf execution time: 0.192914
+TPS execution time: 0.362482
+Total execution time: 0.555396
+
+Surf execution time: 0.172719
+TPS execution time: 0.323376
+Total execution time: 0.496095
+
+Surf execution time: 0.173006
+TPS execution time: 0.355475
+Total execution time: 0.52848
+
+Surf execution time: 0.209698
+TPS execution time: 0.285382
+Total execution time: 0.49508
+
+Surf execution time: 0.1659
+TPS execution time: 0.387047
+Total execution time: 0.552947
+
+Surf execution time: 0.168486
+TPS execution time: 0.297539
+Total execution time: 0.466025
+
+Surf execution time: 0.190836
+TPS execution time: 0.315939
+Total execution time: 0.506775
+
+Surf execution time: 0.225066
+TPS execution time: 0.28839
+Total execution time: 0.513455
+
+Surf execution time: 0.176244
+TPS execution time: 0.320332
+Total execution time: 0.496576
+
+Surf execution time: 0.173932
+TPS execution time: 0.280859
+Total execution time: 0.45479
+
