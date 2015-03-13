@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   tps::Surf surf = tps::Surf(referenceImage, targetImage, minHessian);
   surf.run(true);
 
-  tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints());
+  tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage);
   tps.run();
 
   return 0;

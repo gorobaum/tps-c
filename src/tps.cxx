@@ -5,7 +5,21 @@
 
 void tps::TPS::run() {
 	findSolutions();
-	
+	std::vector<int> dimensions = registredImage.getDimensions();
+	for (int x = 0; x < dimensions[0]; x++)
+		for (int y = 0; y < dimensions[0]; y++) {
+			cv::Mat aux = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
+			aux.at<float>(0) = 1.0;
+			aux.at<float>(1) = x;
+			aux.at<float>(2) = y;
+			for (uint i = 3; i < referenceKeypoints_.size()+3; i++)
+				aux.at<float>(i) = computeRSquared(x, referenceKeypoints_[i-3].x, y, referenceKeypoints_[i-3].y);
+			double newX = aux.dot(solutionX);
+			double newY = aux.dot(solutionY);
+			double value = targetImage_.bilinearInterpolation<float>(newX, newY);
+			// std::cout << "newX = " << newX << std::endl;
+			// std::cin >> value;
+		}
 }
 
 void tps::TPS::findSolutions() {
@@ -20,6 +34,17 @@ void tps::TPS::findSolutions() {
 
 	solutionX = solveLinearSystem(A, bx);
 	solutionY = solveLinearSystem(A, by);
+
+	// for (uint i = 0; i < referenceKeypoints_.size(); i++) {
+	// 	std::cout << "referenceKeypoints_ = " << referenceKeypoints_[i].x << " targetKeypoints_ =" << targetKeypoints_[i].x << std::endl;
+	// 	std::cout << "referenceKeypoints_ = " << referenceKeypoints_[i].y << " targetKeypoints_ =" << targetKeypoints_[i].y << std::endl;
+	// }
+
+	// for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+	// 	std::cout << "bx = " << bx.at<float>(i) << std::endl;
+
+	// for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+	// 	std::cout << "solutionX = " << solutionX.at<float>(i) << std::endl;
 }
 
 float tps::TPS::computeRSquared(int x, int xi, int y, int yi) {
@@ -35,20 +60,27 @@ cv::Mat tps::TPS::solveLinearSystem(cv::Mat A, cv::Mat b) {
 cv::Mat tps::TPS::createMatrixA() {
 	cv::Mat A = cv::Mat::zeros(referenceKeypoints_.size()+3,referenceKeypoints_.size()+3, CV_32F);
 
-	for (uint j = 3; j < referenceKeypoints_.size()+3; j++) {
-		A.at<float>(0,j) = 1;
-		A.at<float>(1,j) = referenceKeypoints_[j-3].x;
-		A.at<float>(2,j) = referenceKeypoints_[j-3].y;
+	for (uint j = 0; j < referenceKeypoints_.size(); j++) {
+		A.at<float>(0,j+3) = 1;
+		A.at<float>(1,j+3) = referenceKeypoints_[j].x;
+		A.at<float>(2,j+3) = referenceKeypoints_[j].y;
 		A.at<float>(j+3,0) = 1;
-		A.at<float>(j+3,1) = referenceKeypoints_[j-3].x;
-		A.at<float>(j+3,2) = referenceKeypoints_[j-3].y;
+		A.at<float>(j+3,1) = referenceKeypoints_[j].x;
+		A.at<float>(j+3,2) = referenceKeypoints_[j].y;
 	}
 
-	for (uint i = 3; i < referenceKeypoints_.size()+3; i++)
-		for (uint j = 3; j < referenceKeypoints_.size()+3; j++) {
-			float r = computeRSquared(referenceKeypoints_[i-3].x, referenceKeypoints_[j-3].x, referenceKeypoints_[i-3].y, referenceKeypoints_[j-3].y);
-			if (r != 0) A.at<float>(i,j) = r*log(r);
+	for (uint i = 0; i < referenceKeypoints_.size(); i++)
+		for (uint j = 0; j < referenceKeypoints_.size(); j++) {
+			float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);
+			if (r != 0) A.at<float>(i+3,j+3) = r*log(r);
 		}
+
+	for (uint i = 0; i < referenceKeypoints_.size()+3; i++) {
+		for (uint j = 0; j < referenceKeypoints_.size()+3; j++) {
+			std::cout << A.at<float>(i,j) << " ";
+		}
+		std::cout << std::endl;
+	}
 
 	return A;
 }

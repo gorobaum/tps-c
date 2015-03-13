@@ -22,8 +22,7 @@ public:
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		compression_params.push_back(95);
 	}
-
-	Image(int rows, int cols, std::string filename) {
+	Image(int rows, int cols, const std::string& filename) {
 		filename_ = filename;
 		image = cv::Mat::zeros(rows, cols, CV_8U);
 		dimensions.push_back(image.rows);
@@ -34,6 +33,7 @@ public:
 	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
+	template<typename T> void changePixelAt(int row, int col, T value);
 	template<typename T> T getPixelAt(int row, int col);
 	template<typename T> T bilinearInterpolation(float row, float col);
 	template<typename T> T NNInterpolation(float row, float col);
@@ -49,9 +49,18 @@ private:
 }
 };
 
+template<typename T> void Image::changePixelAt(int row, int col, T value) {
+	if (row > dimensions[0]-1 || row < 0)
+		return 0;
+	else if (col > dimensions[1]-1 || col < 0)
+		return 0;
+	else {
+		image.at<T>(row, col) = value;
+	}
+}
+
 template<typename T>
 T Image::getPixelAt(int row, int col) {
-
 	if (row > dimensions[0]-1 || row < 0)
 		return 0;
 	else if (col > dimensions[1]-1 || col < 0)
