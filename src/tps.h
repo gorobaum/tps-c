@@ -30,7 +30,7 @@ protected:
 	cv::Mat solutionY;
 	virtual void findSolutions() = 0;
 	virtual cv::Mat createMatrixA() = 0;
- 	float computeRSquared(int x, int xi, int y, int yi) {return pow(x-xi,2) + pow(y-yi,2);};
+ 	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
 	virtual cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b) = 0;
 };
 

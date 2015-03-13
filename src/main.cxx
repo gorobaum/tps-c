@@ -1,6 +1,7 @@
 #include "image.h"
 #include "surf.h"
 #include "basictps.h"
+#include "optimizedtps.h"
 
 #include <string>
 #include <iostream>
@@ -32,7 +33,13 @@ int main(int argc, char** argv) {
   basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
   std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-	std::cout << "Total execution time: " << basicTpsExecTime+surfExecTime << std::endl << std::endl;  
+	double optTpsExecTime = (double)cv::getTickCount();
+  tps::OptimizedTPS otps = tps::OptimizedTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "optReg.png");
+  otps.run();
+  optTpsExecTime = ((double)cv::getTickCount() - optTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Optimized TPS execution time: " << optTpsExecTime << std::endl;
+
+	std::cout << "Total execution time: " << optTpsExecTime+surfExecTime << std::endl << std::endl;  
 
   return 0;
 }
