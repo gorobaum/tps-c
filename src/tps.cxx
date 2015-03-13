@@ -29,9 +29,9 @@ void tps::TPS::findSolutions() {
 
 	cv::Mat bx = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 	cv::Mat by = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-	for (uint i = 3; i < referenceKeypoints_.size()+3; i++) {
-		bx.at<float>(i) = targetKeypoints_[i-3].x;
-		by.at<float>(i) = targetKeypoints_[i-3].y;
+	for (uint i = 0; i < referenceKeypoints_.size(); i++) {
+		bx.at<float>(i+3) = targetKeypoints_[i].x;
+		by.at<float>(i+3) = targetKeypoints_[i].y;
 	}
 
 	solutionX = solveLinearSystem(A, bx);
