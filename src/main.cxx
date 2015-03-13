@@ -16,13 +16,14 @@ int main(int argc, char** argv) {
 
  	tps::Image referenceImage = tps::Image(argv[1]);
   tps::Image targetImage = tps::Image(argv[2]);
+  std::string outputName = argv[3];
 
   int minHessian = 400;
 
   tps::Surf surf = tps::Surf(referenceImage, targetImage, minHessian);
   surf.run(true);
 
-  tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage);
+  tps::TPS tps = tps::TPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, outputName);
   tps.run();
 
   return 0;

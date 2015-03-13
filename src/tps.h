@@ -12,11 +12,11 @@ namespace tps {
 class TPS
 {
 public:
-	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage) :
+	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
 		referenceKeypoints_(referenceKeypoints),
 		targetKeypoints_(targetKeypoints),
 		targetImage_(targetImage),
-		registredImage(targetImage.getDimensions()[0], targetImage.getDimensions()[1], "aeho.jpg") {
+		registredImage(targetImage.getDimensions()[0], targetImage.getDimensions()[1], outputName) {
 			solutionX = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 			solutionY = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 		}
