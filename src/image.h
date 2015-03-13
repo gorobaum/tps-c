@@ -50,13 +50,8 @@ private:
 };
 
 template<typename T> void Image::changePixelAt(int row, int col, T value) {
-	if (row > dimensions[0]-1 || row < 0)
-		return 0;
-	else if (col > dimensions[1]-1 || col < 0)
-		return 0;
-	else {
+	if (row >= 0 && row < dimensions[0]-1 && col >= 0 && col < dimensions[1]-1)
 		image.at<T>(row, col) = value;
-	}
 }
 
 template<typename T>

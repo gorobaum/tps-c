@@ -16,10 +16,10 @@ void tps::TPS::run() {
 				aux.at<float>(i) = computeRSquared(x, referenceKeypoints_[i-3].x, y, referenceKeypoints_[i-3].y);
 			double newX = aux.dot(solutionX);
 			double newY = aux.dot(solutionY);
-			double value = targetImage_.bilinearInterpolation<float>(newX, newY);
-			// std::cout << "newX = " << newX << std::endl;
-			// std::cin >> value;
+			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
+			registredImage.changePixelAt(x, y, value);
 		}
+		registredImage.save();
 }
 
 void tps::TPS::findSolutions() {
@@ -40,11 +40,15 @@ void tps::TPS::findSolutions() {
 	// 	std::cout << "referenceKeypoints_ = " << referenceKeypoints_[i].y << " targetKeypoints_ =" << targetKeypoints_[i].y << std::endl;
 	// }
 
-	// for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-	// 	std::cout << "bx = " << bx.at<float>(i) << std::endl;
+	// for (uint i = 0; i < referenceKeypoints_.size()+3; i++){
+	// std::cout << "bx = " << bx.at<float>(i) << std::endl;
+	// 	std::cout << "by = " << by.at<float>(i) << std::endl;
+	// }
 
-	// for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-	// 	std::cout << "solutionX = " << solutionX.at<float>(i) << std::endl;
+// 	for (uint i = 0; i < referenceKeypoints_.size()+3; i++){
+// 		std::cout << "solutionX = " << solutionX.at<float>(i) << std::endl;
+// 		std::cout << "solutionY = " << solutionY.at<float>(i) << std::endl;
+// 	}
 }
 
 float tps::TPS::computeRSquared(int x, int xi, int y, int yi) {
@@ -53,7 +57,7 @@ float tps::TPS::computeRSquared(int x, int xi, int y, int yi) {
 
 cv::Mat tps::TPS::solveLinearSystem(cv::Mat A, cv::Mat b) {
 	cv::Mat solution = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-	cv::solve(A, b, solution);
+	// std::cout << "solve = " << cv::solve(A, b, solution, cv::DECOMP_EIG) << std::endl;
 	return solution;
 }
 
@@ -72,12 +76,20 @@ cv::Mat tps::TPS::createMatrixA() {
 	for (uint i = 0; i < referenceKeypoints_.size(); i++)
 		for (uint j = 0; j < referenceKeypoints_.size(); j++) {
 			float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);
-			if (r != 0) A.at<float>(i+3,j+3) = r*log(r);
+			// if (i == 0) {
+			// 	std::cout << "referenceKeypoints_ = " << referenceKeypoints_[i].x << " targetKeypoints_ =" << referenceKeypoints_[j].x << std::endl;
+			// 	std::cout << "referenceKeypoints_ = " << referenceKeypoints_[i].y << " targetKeypoints_ =" << referenceKeypoints_[j].y << std::endl;
+			// 	std::cout << "r(" << i << "," << j << ") = " << r << std::endl;
+			// 	std::cout << "logr(" << i << "," << j << ") = " << log(r) << std::endl;
+			// 	std::cout << "r*logr(" << i << "," << j << ") = " << r*log(r) << std::endl;
+			// }
+			if (r != 0.0) A.at<float>(i+3,j+3) = r*log(r);
 		}
 
 	for (uint i = 0; i < referenceKeypoints_.size()+3; i++) {
+		std::cout << i << " : ";
 		for (uint j = 0; j < referenceKeypoints_.size()+3; j++) {
-			std::cout << A.at<float>(i,j) << " ";
+			std::cout << A.at<float>(i,j) << "|";
 		}
 		std::cout << std::endl;
 	}
