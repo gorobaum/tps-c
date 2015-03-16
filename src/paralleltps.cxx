@@ -7,28 +7,25 @@
 
 void tps::ParallelTPS::run() {
 	findSolutions();
-	int x, y;
-	cv::Mat aux;
 	std::vector<int> dimensions = registredImage.getDimensions();
 
-	#pragma omp parallel for private(y, aux)
-	for (x = 0; x < dimensions[0]; x++)
-		for (y = 0; y < dimensions[0]; y++) {
-			aux = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-			aux.at<float>(0) = 1.0;
-			aux.at<float>(1) = x;
-			aux.at<float>(2) = y;
+	#pragma omp parallel for collapse(2)
+	for (int x = 0; x < dimensions[0]; x++)
+		for (int y = 0; y < dimensions[1]; y++) {
+			double newX = solutionX.at<float>(0) + x*solutionX.at<float>(1) + y*solutionX.at<float>(2);
+			double newY = solutionY.at<float>(0) + x*solutionY.at<float>(1) + y*solutionY.at<float>(2);
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
 				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
-				if (r != 0.0) aux.at<float>(i+3) = r*log(r);
+				if (r != 0.0) {
+					newX += r*log(r) * solutionX.at<float>(i+3);
+					newY += r*log(r) * solutionY.at<float>(i+3);
+				}
 			}
-			double newX = aux.dot(solutionX);
-			double newY = aux.dot(solutionY);
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
 			registredImage.changePixelAt(x, y, value);
 		}
 
-		registredImage.save();
+	registredImage.save();
 }
 
 void tps::ParallelTPS::findSolutions() {
@@ -63,6 +60,7 @@ cv::Mat tps::ParallelTPS::createMatrixA() {
 		A.at<float>(j+3,2) = referenceKeypoints_[j].y;
 	}
 
+	#pragma omp parallel for
 	for (uint i = 0; i < referenceKeypoints_.size(); i++)
 		for (uint j = 0; j < referenceKeypoints_.size(); j++) {
 			float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);

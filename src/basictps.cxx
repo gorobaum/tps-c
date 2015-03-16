@@ -4,28 +4,37 @@
 #include <iostream>
 
 void tps::BasicTPS::run() {
+  double FSE = (double)cv::getTickCount();
 	findSolutions();
+  FSE = ((double)cv::getTickCount() - FSE)/cv::getTickFrequency();
+  std::cout << "findSolutions() execution time: " << FSE << std::endl;
+
+  double RUNTE = (double)cv::getTickCount();
 	std::vector<int> dimensions = registredImage.getDimensions();
 	for (int x = 0; x < dimensions[0]; x++)
-		for (int y = 0; y < dimensions[0]; y++) {
-			cv::Mat aux = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-			aux.at<float>(0) = 1.0;
-			aux.at<float>(1) = x;
-			aux.at<float>(2) = y;
+		for (int y = 0; y < dimensions[1]; y++) {
+			double newX = solutionX.at<float>(0) + x*solutionX.at<float>(1) + y*solutionX.at<float>(2);
+			double newY = solutionY.at<float>(0) + x*solutionY.at<float>(1) + y*solutionY.at<float>(2);
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
 				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
-				if (r != 0.0) aux.at<float>(i+3) = r*log(r);
+				if (r != 0.0) {
+					newX += r*log(r) * solutionX.at<float>(i+3);
+					newY += r*log(r) * solutionY.at<float>(i+3);
+				}
 			}
-			double newX = aux.dot(solutionX);
-			double newY = aux.dot(solutionY);
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
 			registredImage.changePixelAt(x, y, value);
 		}
 		registredImage.save();
+  RUNTE = ((double)cv::getTickCount() - RUNTE)/cv::getTickFrequency();
+  std::cout << "register() execution time: " << RUNTE << std::endl;
 }
 
 void tps::BasicTPS::findSolutions() {
+  double CMET = (double)cv::getTickCount();	
 	cv::Mat A = createMatrixA();
+  CMET = ((double)cv::getTickCount() - CMET)/cv::getTickFrequency();
+  std::cout << "createMatrixA() execution time: " << CMET << std::endl;
 
 	cv::Mat bx = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 	cv::Mat by = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
