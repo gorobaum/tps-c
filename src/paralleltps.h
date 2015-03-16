@@ -16,7 +16,7 @@ private:
 	void runThread(int tid);
 	cv::Mat createMatrixA();
 	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
-	unsigned numberOfThreads = std::thread::hardware_concurrency();
+	uint numberOfThreads = std::thread::hardware_concurrency();
 };
 
 } // namespace
