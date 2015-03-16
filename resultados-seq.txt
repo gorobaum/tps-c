@@ -78,3 +78,103 @@ Surf execution time: 0.173932
 TPS execution time: 0.280859
 Total execution time: 0.45479
 
+Surf execution time: 4.42321
+Basic TPS execution time: 0.770358
+Optimized TPS execution time: 0.778629
+Total execution time: 5.20184
+
+Surf execution time: 4.18602
+Basic TPS execution time: 0.807035
+Optimized TPS execution time: 0.903554
+Total execution time: 5.08957
+
+Surf execution time: 4.35823
+Basic TPS execution time: 0.70283
+Optimized TPS execution time: 0.703833
+Total execution time: 5.06206
+
+Surf execution time: 4.14009
+Basic TPS execution time: 0.700777
+Optimized TPS execution time: 0.707041
+Total execution time: 4.84713
+
+Surf execution time: 4.07031
+Basic TPS execution time: 0.720846
+Optimized TPS execution time: 0.681448
+Total execution time: 4.75175
+
+Surf execution time: 4.12076
+Basic TPS execution time: 0.672115
+Optimized TPS execution time: 0.670192
+Total execution time: 4.79095
+
+Surf execution time: 4.16936
+Basic TPS execution time: 0.695032
+Optimized TPS execution time: 0.685927
+Total execution time: 4.85528
+
+Surf execution time: 4.13607
+Basic TPS execution time: 0.688195
+Optimized TPS execution time: 0.703623
+Total execution time: 4.83969
+
+Surf execution time: 4.13424
+Basic TPS execution time: 0.6962
+Optimized TPS execution time: 0.676953
+Total execution time: 4.8112
+
+Surf execution time: 4.28566
+Basic TPS execution time: 0.730074
+Optimized TPS execution time: 0.71729
+Total execution time: 5.00295
+
+Surf execution time: 4.14045
+Basic TPS execution time: 0.700026
+Optimized TPS execution time: 0.728365
+Total execution time: 4.86882
+
+Surf execution time: 4.26575
+Basic TPS execution time: 0.716735
+Optimized TPS execution time: 0.727025
+Total execution time: 4.99278
+
+Surf execution time: 4.19588
+Basic TPS execution time: 0.703405
+Optimized TPS execution time: 0.687734
+Total execution time: 4.88361
+
+Surf execution time: 4.18028
+Basic TPS execution time: 0.758954
+Optimized TPS execution time: 0.710641
+Total execution time: 4.89093
+
+Surf execution time: 4.73806
+Basic TPS execution time: 0.775465
+Optimized TPS execution time: 0.873622
+Total execution time: 5.61169
+
+Surf execution time: 4.21464
+Basic TPS execution time: 0.850631
+Optimized TPS execution time: 1.03646
+Total execution time: 5.2511
+
+Surf execution time: 4.43314
+Basic TPS execution time: 0.827912
+Optimized TPS execution time: 0.760268
+Total execution time: 5.19341
+
+Surf execution time: 4.68549
+Basic TPS execution time: 0.726059
+Optimized TPS execution time: 0.798303
+Total execution time: 5.4838
+
+Surf execution time: 4.79565
+Basic TPS execution time: 0.804398
+Optimized TPS execution time: 0.725764
+Total execution time: 5.52142
+
+Surf execution time: 4.22254
+Basic TPS execution time: 1.01985
+Optimized TPS execution time: 0.905602
+Total execution time: 5.12814
+
