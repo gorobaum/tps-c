@@ -1,7 +1,7 @@
 #include "image.h"
 #include "surf.h"
 #include "basictps.h"
-#include "optimizedtps.h"
+#include "paralleltps.h"
 
 #include <string>
 #include <iostream>
@@ -30,12 +30,17 @@ int main(int argc, char** argv) {
 
   std::cout << "Starting Basic TPS execution...\n";
   double basicTpsExecTime = (double)cv::getTickCount();
-  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "basicReg.png");
+  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
   tps.run();
   basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
   std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-	std::cout << "Total execution time: " << optTpsExecTime+surfExecTime << std::endl << std::endl;  
+  std::cout << "Starting Parallel TPS execution...\n";
+  double pTpsExecTime = (double)cv::getTickCount();
+  tps::ParallelTPS ptps = tps::ParallelTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regParallel.png");
+  ptps.run();
+  pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
   return 0;
 }
