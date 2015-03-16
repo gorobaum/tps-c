@@ -1,29 +1,29 @@
 #include "paralleltps.h"
 
-#include <omp.h>
-
 #include <cmath>
 #include <iostream>
+
+void tps::ParallelTPS::runThread(int tid) {
+	std::vector<int> dimensions = registredImage.getDimensions();
+	int chunck = dimensions[0]/numberOfThreads;
+	std::cout << std::this_thread::get_id() << std::endl;
+	std::cout << chunck << std::endl;
+	std::cout << numberOfThreads << std::endl;
+
+}
 
 void tps::ParallelTPS::run() {
 	findSolutions();
 	std::vector<int> dimensions = registredImage.getDimensions();
+	std::vector<std::thread> th;
 
-	#pragma omp parallel for collapse(2)
-	for (int x = 0; x < dimensions[0]; x++)
-		for (int y = 0; y < dimensions[1]; y++) {
-			double newX = solutionX.at<float>(0) + x*solutionX.at<float>(1) + y*solutionX.at<float>(2);
-			double newY = solutionY.at<float>(0) + x*solutionY.at<float>(1) + y*solutionY.at<float>(2);
-			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
-				if (r != 0.0) {
-					newX += r*log(r) * solutionX.at<float>(i+3);
-					newY += r*log(r) * solutionY.at<float>(i+3);
-				}
-			}
-			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
-			registredImage.changePixelAt(x, y, value);
-		}
+	for (uint i = 0; i < numberOfThreads; ++i) {
+    th.push_back(std::thread(&tps::ParallelTPS::runThread, *this, i));
+  }
+
+  for(auto &t : th){
+    t.join();
+  }
 
 	registredImage.save();
 }
@@ -60,7 +60,6 @@ cv::Mat tps::ParallelTPS::createMatrixA() {
 		A.at<float>(j+3,2) = referenceKeypoints_[j].y;
 	}
 
-	#pragma omp parallel for
 	for (uint i = 0; i < referenceKeypoints_.size(); i++)
 		for (uint j = 0; j < referenceKeypoints_.size(); j++) {
 			float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);

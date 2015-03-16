@@ -28,12 +28,12 @@ int main(int argc, char** argv) {
   surfExecTime = ((double)cv::getTickCount() - surfExecTime)/cv::getTickFrequency();
   std::cout << "Surf execution time: " << surfExecTime << std::endl;
 
-  std::cout << "Starting Basic TPS execution...\n";
-  double basicTpsExecTime = (double)cv::getTickCount();
-  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
-  tps.run();
-  basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
-  std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
+  // std::cout << "Starting Basic TPS execution...\n";
+  // double basicTpsExecTime = (double)cv::getTickCount();
+  // tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
+  // tps.run();
+  // basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+  // std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
   std::cout << "Starting Parallel TPS execution...\n";
   double pTpsExecTime = (double)cv::getTickCount();
