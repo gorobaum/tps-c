@@ -1,0 +1,200 @@
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000165693
+findSolutions() execution time: 0.00392723
+register() execution time: 65.1354
+Basic TPS execution time: 65.142
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.6254
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000134806
+findSolutions() execution time: 0.00219475
+register() execution time: 67.3897
+Basic TPS execution time: 67.3946
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 30.0121
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000125003
+findSolutions() execution time: 0.00216317
+register() execution time: 66.8894
+Basic TPS execution time: 66.8935
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.4538
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000123874
+findSolutions() execution time: 0.00222709
+register() execution time: 69.4932
+Basic TPS execution time: 69.4979
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.4238
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000114861
+findSolutions() execution time: 0.00208606
+register() execution time: 65.3431
+Basic TPS execution time: 65.3468
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.1188
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000123444
+findSolutions() execution time: 0.00223115
+register() execution time: 64.1436
+Basic TPS execution time: 64.1476
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.7205
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000115786
+findSolutions() execution time: 0.00217165
+register() execution time: 62.7136
+Basic TPS execution time: 62.7175
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.0002
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.00011698
+findSolutions() execution time: 0.00208315
+register() execution time: 63.0625
+Basic TPS execution time: 63.0663
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.143
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000388755
+findSolutions() execution time: 0.00242989
+register() execution time: 64.9852
+Basic TPS execution time: 64.9914
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 29.1521
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000126961
+findSolutions() execution time: 0.00203433
+register() execution time: 62.9528
+Basic TPS execution time: 62.9568
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 27.9851
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000115463
+findSolutions() execution time: 0.002125
+register() execution time: 62.5799
+Basic TPS execution time: 62.5837
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 27.9277
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000115739
+findSolutions() execution time: 0.00203615
+register() execution time: 62.325
+Basic TPS execution time: 62.3288
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 27.8491
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000129936
+findSolutions() execution time: 0.00233438
+register() execution time: 62.8665
+Basic TPS execution time: 62.8707
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.4059
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000130751
+findSolutions() execution time: 0.00244307
+register() execution time: 62.765
+Basic TPS execution time: 62.7691
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.8316
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000159201
+findSolutions() execution time: 0.0025186
+register() execution time: 63.2295
+Basic TPS execution time: 63.234
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.0415
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000422617
+findSolutions() execution time: 0.00522809
+register() execution time: 62.5842
+Basic TPS execution time: 62.5933
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.9542
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000134851
+findSolutions() execution time: 0.0021665
+register() execution time: 66.7339
+Basic TPS execution time: 66.7386
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 31.3353
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000124011
+findSolutions() execution time: 0.002137
+register() execution time: 64.3209
+Basic TPS execution time: 64.3248
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.616
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000122349
+findSolutions() execution time: 0.00212464
+register() execution time: 63.3565
+Basic TPS execution time: 63.3604
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 28.6429
+=======================================================
+=======================================================
+Starting Basic TPS execution...
+createMatrixA() execution time: 0.000122662
+findSolutions() execution time: 0.00218637
+register() execution time: 66.24
+Basic TPS execution time: 66.2438
+
+Starting Parallel TPS execution...
+Parallel TPS execution time: 34.7599
+=======================================================

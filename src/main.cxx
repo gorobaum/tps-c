@@ -21,21 +21,15 @@ int main(int argc, char** argv) {
 
   int minHessian = 400;
 
-  std::cout << "Starting Surf execution...\n";
-  double surfExecTime = (double)cv::getTickCount();
   tps::Surf surf = tps::Surf(referenceImage, targetImage, minHessian);
   surf.run(true);
-  surfExecTime = ((double)cv::getTickCount() - surfExecTime)/cv::getTickFrequency();
-  std::cout << "Surf execution time: " << surfExecTime << std::endl;
 
-  // std::cout << "Starting Basic TPS execution...\n";
-  // double basicTpsExecTime = (double)cv::getTickCount();
-  // tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
-  // tps.run();
-  // basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
-  // std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
+  double basicTpsExecTime = (double)cv::getTickCount();
+  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
+  tps.run();
+  basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-  std::cout << "Starting Parallel TPS execution...\n";
   double pTpsExecTime = (double)cv::getTickCount();
   tps::ParallelTPS ptps = tps::ParallelTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regParallel.png");
   ptps.run();

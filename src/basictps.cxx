@@ -4,12 +4,8 @@
 #include <iostream>
 
 void tps::BasicTPS::run() {
-  double FSE = (double)cv::getTickCount();
 	findSolutions();
-  FSE = ((double)cv::getTickCount() - FSE)/cv::getTickFrequency();
-  std::cout << "findSolutions() execution time: " << FSE << std::endl;
 
-  double RUNTE = (double)cv::getTickCount();
 	std::vector<int> dimensions = registredImage.getDimensions();
 	for (int x = 0; x < dimensions[0]; x++)
 		for (int y = 0; y < dimensions[1]; y++) {
@@ -26,15 +22,10 @@ void tps::BasicTPS::run() {
 			registredImage.changePixelAt(x, y, value);
 		}
 		registredImage.save();
-  RUNTE = ((double)cv::getTickCount() - RUNTE)/cv::getTickFrequency();
-  std::cout << "register() execution time: " << RUNTE << std::endl;
 }
 
 void tps::BasicTPS::findSolutions() {
-  double CMET = (double)cv::getTickCount();	
 	cv::Mat A = createMatrixA();
-  CMET = ((double)cv::getTickCount() - CMET)/cv::getTickFrequency();
-  std::cout << "createMatrixA() execution time: " << CMET << std::endl;
 
 	cv::Mat bx = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 	cv::Mat by = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
