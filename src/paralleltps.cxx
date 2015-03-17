@@ -8,7 +8,8 @@ void tps::ParallelTPS::runThread(int tid) {
 	int chunck = dimensions[0]/numberOfThreads;
 	uint limit = (tid+1)*chunck;
 	if ((tid+1) == numberOfThreads) limit = dimensions[0];
-	for (uint x = tid*chunck; x < limit; x++)
+	for (uint x = tid*chunck; x < limit; x++) {
+		uchar* registredRow = registredImage.getRowPtr<uchar>(x);
 		for (int y = 0; y < dimensions[1]; y++) {
 			double newX = solutionX.at<float>(0) + x*solutionX.at<float>(1) + y*solutionX.at<float>(2);
 			double newY = solutionY.at<float>(0) + x*solutionY.at<float>(1) + y*solutionY.at<float>(2);
@@ -20,8 +21,9 @@ void tps::ParallelTPS::runThread(int tid) {
 				}
 			}
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
-			registredImage.changePixelAt(x, y, value);
+			registredRow[y] = value;
 		}
+	}
 }
 
 void tps::ParallelTPS::run() {

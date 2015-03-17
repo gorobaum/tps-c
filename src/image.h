@@ -33,6 +33,7 @@ public:
 	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
+	template<typename T> T* getRowPtr(int row) { return image.ptr<T>(row); };
 	template<typename T> void changePixelAt(int row, int col, T value);
 	template<typename T> T getPixelAt(int row, int col);
 	template<typename T> T bilinearInterpolation(float row, float col);

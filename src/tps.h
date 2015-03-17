@@ -12,7 +12,7 @@ namespace tps {
 class TPS
 {
 public:
-	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+	TPS(const std::vector<cv::Point2f>& referenceKeypoints, const std::vector<cv::Point2f>& targetKeypoints, tps::Image targetImage, std::string outputName) :
 		referenceKeypoints_(referenceKeypoints),
 		targetKeypoints_(targetKeypoints),
 		targetImage_(targetImage),
@@ -22,8 +22,8 @@ public:
 		}
 	virtual void run() = 0;
 protected:
-	std::vector<cv::Point2f> referenceKeypoints_;
-	std::vector<cv::Point2f> targetKeypoints_;
+	const std::vector<cv::Point2f> referenceKeypoints_;
+	const std::vector<cv::Point2f> targetKeypoints_;
 	tps::Image targetImage_;
 	tps::Image registredImage;
 	cv::Mat solutionX;
