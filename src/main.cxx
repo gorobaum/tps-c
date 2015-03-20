@@ -2,6 +2,7 @@
 #include "surf.h"
 #include "basictps.h"
 #include "paralleltps.h"
+#include "cudatps.h"
 
 #include <string>
 #include <iostream>
@@ -35,6 +36,12 @@ int main(int argc, char** argv) {
   ptps.run();
   pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
   std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
+
+  double cTpsExecTime = (double)cv::getTickCount();
+  tps::CudaTPS ctps = tps::CudaTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regParallel.png");
+  ctps.run();
+  cTpsExecTime = ((double)cv::getTickCount() - cTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Cuda TPS execution time: " << cTpsExecTime << std::endl;
 
   return 0;
 }

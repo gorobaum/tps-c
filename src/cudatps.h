@@ -18,7 +18,8 @@ private:
 	void freeResources();
 	void freeCudaResources();
 	float *imageCoord;
-	float *cImageCoord;
+	float *cudaImageCoord;
+	size_t pitch;
 };
 
 }
