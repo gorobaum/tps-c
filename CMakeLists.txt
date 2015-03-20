@@ -4,6 +4,7 @@ cmake_minimum_required (VERSION 2.8)
 project (tps)
 include_directories (src)
 find_package(OpenCV REQUIRED)
+find_package(CUDA QUIET REQUIRED)
 
 add_executable(tps
 	src/main.cxx
