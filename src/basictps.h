@@ -9,10 +9,6 @@ class BasicTPS : public TPS {
 using TPS::TPS;
 public:
 	void run();
-private:
-	void findSolutions() ;
-	cv::Mat createMatrixA() ;
-	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
 };
 
 } // namespace

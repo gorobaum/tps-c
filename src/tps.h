@@ -28,10 +28,10 @@ protected:
 	tps::Image registredImage;
 	cv::Mat solutionX;
 	cv::Mat solutionY;
-	virtual void findSolutions() = 0;
-	virtual cv::Mat createMatrixA() = 0;
+	void findSolutions();
+	cv::Mat createMatrixA();
  	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
-	virtual cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b) = 0;
+	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
 };
 
 } // namespace

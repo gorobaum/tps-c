@@ -12,10 +12,7 @@ using TPS::TPS;
 public:
 	void run();
 private:
-	void findSolutions();
-	void runThread(int tid);
-	cv::Mat createMatrixA();
-	cv::Mat solveLinearSystem(cv::Mat A, cv::Mat b);
+	void runThread(uint tid);
 	uint numberOfThreads = std::thread::hardware_concurrency();
 };
 
