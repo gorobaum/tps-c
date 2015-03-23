@@ -17,15 +17,8 @@ private:
 	void allocCudaResources();
 	void freeResources();
 	void freeCudaResources();
-  float* solutionPointer(cv::Mat solution);
-	float *imageCoordX;
-  float *imageCoordY;
+	float *imageCoord;
 	float *cudaImageCoord;
-  float *pSolutionX;
-  float *pSolutionY;
-  float *refKeyX;
-  float *refKeyY;
-  std::vector<int> dimensions;
 	size_t pitch;
 };
 
