@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
   double cTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS ctps = tps::CudaTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regParallel.png");
+  tps::CudaTPS ctps = tps::CudaTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regCuda.png");
   ctps.run();
   cTpsExecTime = ((double)cv::getTickCount() - cTpsExecTime)/cv::getTickFrequency();
   std::cout << "Cuda TPS execution time: " << cTpsExecTime << std::endl;

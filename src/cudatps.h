@@ -17,8 +17,16 @@ private:
 	void allocCudaResources();
 	void freeResources();
 	void freeCudaResources();
-	float *imageCoord;
+  void createCudaSolution();
+  void createCudaKeyPoint();
+	float *imageCoordX;
+  float *imageCoordY;
 	float *cudaImageCoord;
+  float *cudaSolutionX, *cudaSolutionY;
+  float *floatKeyX, *floatKeyY;
+  float *floatSolX, *floatSolY;
+  float *cudaKeyX, *cudaKeyY;
+  std::vector<int> dimensions;
 	size_t pitch;
 };
 

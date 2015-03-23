@@ -18,6 +18,7 @@ void tps::BasicTPS::run() {
 					newY += r*log(r) * solutionY.at<float>(i+3);
 				}
 			}
+			std::cout << "[" << x << "][" << y << "] = (" << newX << ")(" << newY << ")" << std::endl;
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
 			registredImage.changePixelAt(x, y, value);
 		}

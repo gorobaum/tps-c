@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -37,6 +38,7 @@ public:
 	template<typename T> T getPixelAt(int row, int col);
 	template<typename T> T bilinearInterpolation(float row, float col);
 	template<typename T> T NNInterpolation(float row, float col);
+	template<typename T> T* getPixelVector();
 private:
 	friend class Surf;
 	cv::Mat image;
@@ -87,6 +89,16 @@ T Image::NNInterpolation(float row, float col) {
 	int nearCol = getNearestInteger(col);
 	T aux = getPixelAt<uchar>(nearRow, nearCol);
 	return aux;
+}
+
+template<typename T> 
+T* Image::getPixelVector() {
+	T* vector = (T*)malloc(dimensions[1]*dimensions[0]*sizeof(T));
+  for (int x = 0; x < dimensions[0]; x++) {
+    T* row = image.ptr<T>(x);
+    for (int y = 0; y < dimensions[1]; y++) vector[x*dimensions[0]+y] = row[y];
+  }
+  return vector;
 }
 
 } // namespace
