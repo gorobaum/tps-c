@@ -27,7 +27,6 @@ private:
   float *floatSolX, *floatSolY;
   float *cudaKeyX, *cudaKeyY;
   std::vector<int> dimensions;
-	size_t pitch;
 };
 
 }

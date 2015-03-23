@@ -5,7 +5,7 @@
 
 void tps::BasicTPS::run() {
 	findSolutions();
-
+	std::cout << solutionX.at<float>(0) << " - " << solutionY.at<float>(0) << std::endl;
 	std::vector<int> dimensions = registredImage.getDimensions();
 	for (int x = 0; x < dimensions[0]; x++)
 		for (int y = 0; y < dimensions[1]; y++) {
