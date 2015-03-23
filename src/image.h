@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -31,12 +32,14 @@ public:
 		compression_params.push_back(95);
 	}
 	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
+  void save(std::string filename) {cv::imwrite(filename_.c_str(), image, compression_params);};
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
 	template<typename T> void changePixelAt(int row, int col, T value);
 	template<typename T> T getPixelAt(int row, int col);
 	template<typename T> T bilinearInterpolation(float row, float col);
 	template<typename T> T NNInterpolation(float row, float col);
+	template<typename T> T* getPixelVector();
 private:
 	friend class Surf;
 	cv::Mat image;
@@ -87,6 +90,16 @@ T Image::NNInterpolation(float row, float col) {
 	int nearCol = getNearestInteger(col);
 	T aux = getPixelAt<uchar>(nearRow, nearCol);
 	return aux;
+}
+
+template<typename T> 
+T* Image::getPixelVector() {
+	T* vector = (T*)malloc(dimensions[1]*dimensions[0]*sizeof(T));
+  for (int x = 0; x < dimensions[0]; x++) {
+    T* row = image.ptr<T>(x);
+    for (int y = 0; y < dimensions[1]; y++) vector[x*dimensions[0]+y] = row[y];
+  }
+  return vector;
 }
 
 } // namespace
