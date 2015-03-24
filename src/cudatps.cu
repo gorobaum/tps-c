@@ -6,7 +6,7 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(float* cudaImageCoord, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(float* cudaImageCoord, int height, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -16,8 +16,8 @@ __global__ void tpsCuda(float* cudaImageCoord, int width, float* solution, float
     float r = (x-cudaKeyX[i])*(x-cudaKeyX[i]) + (y-cudaKeyY[i])*(y-cudaKeyY[i]);
     newCoord += r*log(r) * solution[i+3];
   }
-  float* row = (float*)((float*)cudaImageCoord + x*width);
-  row[y] = newCoord;
+
+  cudaImageCoord[y*height+x] = newCoord;
 }
 
 
@@ -30,20 +30,25 @@ void tps::CudaTPS::run() {
   // int tpb = (1024 > dimensions[0] ? dimensions[0] : 1024);
 	// dim3 numBlocks( std::ceil(dimensions[0]*dimensions[1]/threadsPerBlock.x) , 1);
   dim3 threadsPerBlock(32, 32);
-  dim3 numBlocks(dimensions[1]/threadsPerBlock.x, dimensions[0]/threadsPerBlock.y);
+  dim3 numBlocks(dimensions[0]/threadsPerBlock.x, dimensions[1]/threadsPerBlock.y);
 
-	tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolutionX, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+
+  std::cout << numBlocks.x << std::endl;
+  std::cout << numBlocks.y << std::endl;
+  std::cout << dimensions[0] << std::endl;
+  std::cout << dimensions[1] << std::endl;
+	tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[0], cudaSolutionX, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaThreadSynchronize();
   cudaMemcpy(imageCoordX, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(float), cudaMemcpyDeviceToHost);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolutionY, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[0], cudaSolutionY, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaThreadSynchronize();
   cudaMemcpy(imageCoordY, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(float), cudaMemcpyDeviceToHost);
 
   for (int x = 0; x < dimensions[0]; x++)
     for (int y = 0; y < dimensions[1]; y++) {
-      float newX = imageCoordX[x*dimensions[0]+y];
-      float newY = imageCoordY[x*dimensions[0]+y];
-      std::cout << "[" << x << "][" << y << "] = (" << newX << ")(" << newY << ")" << std::endl;
+      float newX = imageCoordX[y*dimensions[0]+x];
+      float newY = imageCoordY[y*dimensions[0]+x];
+      // std::cout << "[" << x << "][" << y << "] = (" << newX << ")(" << newY << ")" << std::endl;
       uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
       registredImage.changePixelAt(x, y, value);
     }
