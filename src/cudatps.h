@@ -17,11 +17,12 @@ private:
 	void allocCudaResources();
 	void freeResources();
 	void freeCudaResources();
+  void callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks);
   void createCudaSolution();
   void createCudaKeyPoint();
-	float *imageCoordX;
-  float *imageCoordY;
-	float *cudaImageCoord;
+	double *imageCoordX;
+  double *imageCoordY;
+	double *cudaImageCoord;
   float *cudaSolutionX, *cudaSolutionY;
   float *floatKeyX, *floatKeyY;
   float *floatSolX, *floatSolY;
