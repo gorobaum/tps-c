@@ -6,19 +6,20 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(float* cudaImageCoord, int height, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(float* cudaImageCoord, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
 {
-  int row = blockDim.x*blockIdx.x + threadIdx.x;
-  int col = blockDim.y*blockIdx.y + threadIdx.y;
-  float newCoord = solution[0] + col*solution[1] + row*solution[2];
+  int x = blockDim.x*blockIdx.x + threadIdx.x;
+  int y = blockDim.y*blockIdx.y + threadIdx.y;
+  float newCoord = solution[0] + x*solution[1] + y*solution[2];
 
   for (uint i = 0; i < numOfKeys; i++) {
-    float r = (col-cudaKeyX[i])*(col-cudaKeyX[i]) + (row-cudaKeyY[i])*(row-cudaKeyY[i]);
+    float r = (x-cudaKeyX[i])*(x-cudaKeyX[i]) + (y-cudaKeyY[i])*(y-cudaKeyY[i]);
     newCoord += r*log(r) * solution[i+3];
   }
-
-  cudaImageCoord[col*height+row] = newCoord;
+  float* row = (float*)((float*)cudaImageCoord + x*width);
+  row[y] = newCoord;
 }
+
 
 void tps::CudaTPS::run() {
 	findSolutions();
@@ -28,12 +29,14 @@ void tps::CudaTPS::run() {
 
   // int tpb = (1024 > dimensions[0] ? dimensions[0] : 1024);
 	// dim3 numBlocks( std::ceil(dimensions[0]*dimensions[1]/threadsPerBlock.x) , 1);
-  dim3 threadsPerBlock(16, 16);
-  dim3 numBlocks(dimensions[0]/threadsPerBlock.x, dimensions[1]/threadsPerBlock.y);
+  dim3 threadsPerBlock(32, 32);
+  dim3 numBlocks(dimensions[1]/threadsPerBlock.x, dimensions[0]/threadsPerBlock.y);
 
-	tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[0], cudaSolutionX, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+	tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolutionX, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  cudaThreadSynchronize();
   cudaMemcpy(imageCoordX, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(float), cudaMemcpyDeviceToHost);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[0], cudaSolutionY, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolutionY, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  cudaThreadSynchronize();
   cudaMemcpy(imageCoordY, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(float), cudaMemcpyDeviceToHost);
 
   for (int x = 0; x < dimensions[0]; x++)
@@ -55,11 +58,6 @@ void tps::CudaTPS::run() {
 void tps::CudaTPS::allocResources() {
   imageCoordX = (float*)malloc(dimensions[0]*dimensions[1]*sizeof(float));
   imageCoordY = (float*)malloc(dimensions[0]*dimensions[1]*sizeof(float));
-  for (int x = 0; x < dimensions[0]; x++)
-    for (int y = 0; y < dimensions[1]; y++) {
-      imageCoordX[x*dimensions[0]+y] = 0.0;
-      imageCoordY[x*dimensions[0]+y] = 0.0;
-    }
   createCudaSolution();
   createCudaKeyPoint();
 }
