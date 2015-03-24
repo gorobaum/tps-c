@@ -27,8 +27,6 @@ void tps::CudaTPS::run() {
 	allocResources();
 	allocCudaResources();
 
-  // int tpb = (1024 > dimensions[0] ? dimensions[0] : 1024);
-	// dim3 numBlocks( std::ceil(dimensions[0]*dimensions[1]/threadsPerBlock.x) , 1);
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(dimensions[0]/threadsPerBlock.x, dimensions[1]/threadsPerBlock.y);
 
@@ -48,7 +46,6 @@ void tps::CudaTPS::run() {
     for (int y = 0; y < dimensions[1]; y++) {
       float newX = imageCoordX[x*dimensions[1]+y];
       float newY = imageCoordY[x*dimensions[1]+y];
-      // std::cout << "[" << x << "][" << y << "] = (" << newX << ")(" << newY << ")" << std::endl;
       uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
       registredImage.changePixelAt(x, y, value);
     }
