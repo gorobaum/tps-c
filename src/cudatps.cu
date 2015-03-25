@@ -6,7 +6,7 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(double* cudaImageCoord, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(double* cudaImageCoord, int width, int heigth, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -16,8 +16,8 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, float* solution, floa
     double r = (x-cudaKeyX[i])*(x-cudaKeyX[i]) + (y-cudaKeyY[i])*(y-cudaKeyY[i]);
     newCoord += r*log(r) * solution[i+3];
   }
-
-  cudaImageCoord[x*width+y] = newCoord;
+  if (x*width+y < width*heigth)
+    cudaImageCoord[x*width+y] = newCoord;
 }
 
 void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
@@ -25,8 +25,8 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
-  cudaThreadSynchronize();
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], dimensions[0], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  cudaDeviceSynchronize(); 
   cudaMemcpy(imageCoord, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -38,12 +38,12 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
 }
 
 void tps::CudaTPS::run() {
-	findSolutions();
-	dimensions = registredImage.getDimensions();
+	dimensions = registredImage.getDimensions(); 
+  findSolutions();
 	allocResources();
 	allocCudaResources();
 
-  dim3 threadsPerBlock(16, 16);
+  dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
 
   callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
