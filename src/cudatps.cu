@@ -6,7 +6,7 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(double* cudaImageCoord, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(double* cudaImageCoord, size_t pitch, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -17,7 +17,8 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, float* solution, floa
     newCoord += r*log(r) * solution[i+3];
   }
 
-  cudaImageCoord[x*width+y] = newCoord;
+  double* row = (double*)((double*)cudaImageCoord + x * pitch);
+  row[y] = newCoord;
 }
 
 void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
@@ -25,9 +26,9 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, cudaPitch, dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaThreadSynchronize();
-  cudaMemcpy(imageCoord, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double), cudaMemcpyDeviceToHost);
+  cudaMemcpy2D(imageCoord, hostPitch, cudaImageCoord, cudaPitch, dimensions[0]*sizeof(double), dimensions[1], cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsedTime;
@@ -87,10 +88,11 @@ void tps::CudaTPS::createCudaKeyPoint() {
     floatKeyX[i] = referenceKeypoints_[i].x;
     floatKeyY[i] = referenceKeypoints_[i].y;
   }
+  hostPitch = dimensions[0]*sizeof(double);
 }
 
 void tps::CudaTPS::allocCudaResources() {
-  cudaMalloc(&cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double));
+  cudaMallocPitch(&cudaImageCoord, &cudaPitch, dimensions[0]*sizeof(double), dimensions[1]);
   cudaMalloc(&cudaSolutionX, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMalloc(&cudaSolutionY, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMemcpy(cudaSolutionX, floatSolX, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);

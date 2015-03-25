@@ -27,6 +27,7 @@ private:
   float *floatKeyX, *floatKeyY;
   float *floatSolX, *floatSolY;
   float *cudaKeyX, *cudaKeyY;
+  size_t cudaPitch, hostPitch;
   std::vector<int> dimensions;
 };
 
