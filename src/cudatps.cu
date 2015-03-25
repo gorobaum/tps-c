@@ -6,7 +6,7 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(double* cudaImageCoord, size_t pitch, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(double* cudaImageCoord, int width, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -17,8 +17,7 @@ __global__ void tpsCuda(double* cudaImageCoord, size_t pitch, int width, float* 
     newCoord += r*log(r) * solution[i+3];
   }
 
-  double* row = (double*)((double*)cudaImageCoord + x * pitch);
-  row[y] = newCoord;
+  cudaImageCoord[x*width+y] = newCoord;
 }
 
 void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
@@ -26,9 +25,9 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, cudaPitch, dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaThreadSynchronize();
-  cudaMemcpy2D(imageCoord, hostPitch, cudaImageCoord, cudaPitch, dimensions[0]*sizeof(double), dimensions[1], cudaMemcpyDeviceToHost);
+  cudaMemcpy(imageCoord, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsedTime;
@@ -44,11 +43,13 @@ void tps::CudaTPS::run() {
 	allocResources();
 	allocCudaResources();
 
-  dim3 threadsPerBlock(32, 32);
-  dim3 numBlocks(dimensions[0]/threadsPerBlock.x, dimensions[1]/threadsPerBlock.y);
+  dim3 threadsPerBlock(16, 16);
+  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
 
   callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
   callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
+
+  std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
   for (int x = 0; x < dimensions[0]; x++)
     for (int y = 0; y < dimensions[1]; y++) {
@@ -88,11 +89,10 @@ void tps::CudaTPS::createCudaKeyPoint() {
     floatKeyX[i] = referenceKeypoints_[i].x;
     floatKeyY[i] = referenceKeypoints_[i].y;
   }
-  hostPitch = dimensions[0]*sizeof(double);
 }
 
 void tps::CudaTPS::allocCudaResources() {
-  cudaMallocPitch(&cudaImageCoord, &cudaPitch, dimensions[0]*sizeof(double), dimensions[1]);
+  cudaMalloc(&cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double));
   cudaMalloc(&cudaSolutionX, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMalloc(&cudaSolutionY, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMemcpy(cudaSolutionX, floatSolX, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
