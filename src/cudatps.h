@@ -21,6 +21,8 @@ private:
   void callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks);
   void createCudaSolution();
   void createCudaKeyPoint();
+  void kernelTotalOccupancy(int blockSize);
+  void kernelOcucpancy(int memorySize);
 	double *imageCoordX;
   double *imageCoordY;
 	double *cudaImageCoord;

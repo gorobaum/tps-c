@@ -20,12 +20,52 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int heigth, float* so
     cudaImageCoord[x*width+y] = newCoord;
 }
 
-void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
+void tps::CudaTPS::kernelOcucpancy(int memorySize) {
+  int blockSize;
+  // The launch configurator returned block size
+  int minGridSize;
+  // The minimum grid size needed to achieve the
+  // maximum occupancy for a full device
+  // launch
+  int gridSize;
+  // The actual grid size needed, based on input
+  // size
+  cudaOccupancyMaxPotentialBlockSize(&minGridSize, &blockSize, (void*)tpsCuda, 0, memorySize);
+  gridSize = (memorySize + blockSize - 1) / blockSize;
+  std::cout << "minGridSize: " << minGridSize << std::endl;
+  std::cout << "blockSize: " << blockSize << std::endl;
+  std::cout << "gridSize: " << gridSize << std::endl;
+}
+
+void tps::CudaTPS::kernelTotalOccupancy(int blockSize) {
+  int numBlocks;
+  // Occupancy in terms of active blocks
+  // These variables are used to convert occupancy to warps
+  int device;
+  cudaDeviceProp prop;
+  int activeWarps;
+  int maxWarps;
+
+  cudaGetDevice(&device);
+  cudaGetDeviceProperties(&prop, device);
+  cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks, tpsCuda, blockSize, 0);
+
+  activeWarps = numBlocks * blockSize / prop.warpSize;
+  maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+  std::cout << "Occupancy: " << (double)activeWarps / maxWarps * 100 << std::endl;
+  std::cout << "activeWarps: " << activeWarps << std::endl;
+  std::cout << "maxWarps: " << maxWarps << std::endl;
+  std::cout << "numBlocks: " << numBlocks << std::endl;
+  std::cout << "prop.warpSize: " << prop.warpSize << std::endl;
+  std::cout << "prop.maxThreadsPerMultiProcessor: " << prop.maxThreadsPerMultiProcessor << std::endl;
+}
+
+void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 blockSize, dim3 gridSize) {
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], dimensions[0], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<gridSize, blockSize>>>(cudaImageCoord, dimensions[1], dimensions[0], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaDeviceSynchronize(); 
   cudaMemcpy(imageCoord, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
@@ -43,11 +83,14 @@ void tps::CudaTPS::run() {
 	allocResources();
 	allocCudaResources();
 
-  dim3 threadsPerBlock(32, 32);
-  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
+  dim3 blockSize(32, 32);
+  dim3 gridSize(std::ceil(1.0*dimensions[0]/blockSize.x), std::ceil(1.0*dimensions[1]/blockSize.y));
 
-  callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
-  callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
+  kernelTotalOccupancy(blockSize.x*blockSize.y);
+  kernelOcucpancy(dimensions[0]*dimensions[1]);
+
+  callKernel(cudaSolutionX, imageCoordX, blockSize, gridSize);
+  callKernel(cudaSolutionY, imageCoordY, blockSize, gridSize);
 
   std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
