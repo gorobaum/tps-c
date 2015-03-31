@@ -17,12 +17,12 @@ public:
 		filename_ = filename;
 		image = cv::imread(filename_, CV_LOAD_IMAGE_GRAYSCALE);
 	  if( !image.data )
-  	{ std::cout << " --(!) Error reading images form file" << filename << std::endl; }
+      std::cout << " --(!) Error reading images form file" << filename << std::endl;
 		dimensions.push_back(image.rows);
 		dimensions.push_back(image.cols);
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		compression_params.push_back(95);
-	}
+	};
 	Image(int rows, int cols, const std::string& filename) {
 		filename_ = filename;
 		image = cv::Mat::zeros(rows, cols, CV_8U);
@@ -40,7 +40,9 @@ public:
 	template<typename T> T NNInterpolation(float row, float col);
 	template<typename T> T* getPixelVector();
 private:
-	friend class Surf;
+	friend class FeatureDetector;
+  friend class FeatureFactory;
+  friend class Surf;
 	cv::Mat image;
 	std::vector<int> dimensions;
 	std::string filename_;

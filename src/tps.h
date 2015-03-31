@@ -19,7 +19,7 @@ public:
 		registredImage(targetImage.getDimensions()[0], targetImage.getDimensions()[1], outputName) {
 			solutionX = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
 			solutionY = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-		}
+		};
 	virtual void run() = 0;
 protected:
 	std::vector<cv::Point2f> referenceKeypoints_;
