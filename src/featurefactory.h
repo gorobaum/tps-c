@@ -1,6 +1,8 @@
 #ifndef TPS_FEATURE_FACTORY_H_
 #define TPS_FEATURE_FACTORY_H_
 
+#include "featuredetector.h"
+
 namespace tps {
 	
 class FeatureFactory : public FeatureDetector {
@@ -11,9 +13,15 @@ public:
   void run(bool createFeatureImage);
   void saveFeatureImage();
 private:
+  std::vector<float> applySenoidalDeformationTo(float x, float y);
+  std::vector<cv::DMatch> createMatches();
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
+  std::vector<cv::DMatch> matches;
+  std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;
   float percentage_;
+  int gridSizeX, gridSizeY;
+  float xStep, yStep;
 };
 
 } //namespace

@@ -12,8 +12,7 @@
 namespace tps {
 
 // code from http://docs.opencv.org/doc/tutorials/features2d/feature_homography/feature_homography.html
-class Surf : public FeatureDetector
-{
+class Surf : public FeatureDetector {
 public:
 	Surf(Image referenceImage, Image targetImage, int minHessian):
 		FeatureDetector(referenceImage, targetImage),

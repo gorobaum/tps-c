@@ -1,5 +1,6 @@
 #include "image.h"
 #include "surf.h"
+#include "featurefactory.h"
 #include "basictps.h"
 #include "paralleltps.h"
 #include "cudatps.h"
@@ -22,23 +23,23 @@ int main(int argc, char** argv) {
 
   int minHessian = 400;
 
-  tps::Surf surf = tps::Surf(referenceImage, targetImage, minHessian);
-  surf.run(true);
+  tps::FeatureFactory ff = tps::FeatureFactory(referenceImage, targetImage, 0.1);
+  ff.run(true);
 
   double basicTpsExecTime = (double)cv::getTickCount();
-  tps::BasicTPS tps = tps::BasicTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regBasic.png");
+  tps::BasicTPS tps = tps::BasicTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regBasic.png");
   tps.run();
   basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
   std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
   double pTpsExecTime = (double)cv::getTickCount();
-  tps::ParallelTPS ptps = tps::ParallelTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regParallel.png");
+  tps::ParallelTPS ptps = tps::ParallelTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regParallel.png");
   ptps.run();
   pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
   std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
   double cTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS ctps = tps::CudaTPS(surf.getReferenceKeypoints(), surf.getTargetKeypoints(), targetImage, "regCuda.png");
+  tps::CudaTPS ctps = tps::CudaTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regCuda.png");
   ctps.run();
   cTpsExecTime = ((double)cv::getTickCount() - cTpsExecTime)/cv::getTickFrequency();
   std::cout << "Cuda TPS execution time: " << cTpsExecTime << std::endl;

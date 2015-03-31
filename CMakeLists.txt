@@ -12,6 +12,7 @@ cuda_add_executable(tps
   src/surf.cxx
   src/basictps.cxx
   src/paralleltps.cxx
+  src/featurefactory.cxx
 	src/cudatps.cu)
 
 target_link_libraries (tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS})
