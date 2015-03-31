@@ -14,7 +14,8 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int heigth, float* so
 
   for (uint i = 0; i < numOfKeys; i++) {
     double r = (x-cudaKeyX[i])*(x-cudaKeyX[i]) + (y-cudaKeyY[i])*(y-cudaKeyY[i]);
-    newCoord += r*log(r) * solution[i+3];
+    if (r != 0.0)
+      newCoord += r*log(r) * solution[i+3];
   }
   if (x*width+y < width*heigth)
     cudaImageCoord[x*width+y] = newCoord;
