@@ -6,37 +6,53 @@
 #include "cudatps.h"
 
 #include <string>
+#include <sstream>
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <cstdio>
 
+void readConfigFile(std::string filename, tps::Image& referenceImage, tps::Image& targetImage, std::string& outputName, float& percentage) {
+  std::ifstream infile;
+  infile.open(filename.c_str());
+  std::string line;
+  std::getline(infile, line);
+  referenceImage = tps::Image(line);
+  std::getline(infile, line);
+  targetImage = tps::Image(line);
+  std::getline(infile, outputName);
+  std::getline(infile, line);
+  percentage = std::stof(line);
+}
+
 int main(int argc, char** argv) {
-	if (argc < 3) {
-		std::cout << "Precisa passar o nome dos arquivos coração! \n";    
+	if (argc < 1) {
+		std::cout << "Precisa passar o arquivo de configuração coração! \n";    
 		return 0;
 	}
 
- 	tps::Image referenceImage = tps::Image(argv[1]);
-  tps::Image targetImage = tps::Image(argv[2]);
-  std::string outputName = argv[3];
-
+ 	tps::Image referenceImage;
+  tps::Image targetImage;
+  std::string outputName;
+  float percentage;
+  readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage);
   int minHessian = 400;
 
-  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, 0.1);
+  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
   fg.run(true);
 
-  // double basicTpsExecTime = (double)cv::getTickCount();
-  // tps::BasicTPS tps = tps::BasicTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regBasic.png");
-  // tps.run();
-  // basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
-  // std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
+  double basicTpsExecTime = (double)cv::getTickCount();
+  tps::BasicTPS tps = tps::BasicTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regBasic.png");
+  tps.run();
+  basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-  // double pTpsExecTime = (double)cv::getTickCount();
-  // tps::ParallelTPS ptps = tps::ParallelTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regParallel.png");
-  // ptps.run();
-  // pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
-  // std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
+  double pTpsExecTime = (double)cv::getTickCount();
+  tps::ParallelTPS ptps = tps::ParallelTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regParallel.png");
+  ptps.run();
+  pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
+  std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
   double cTpsExecTime = (double)cv::getTickCount();
   tps::CudaTPS ctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regCuda.png");

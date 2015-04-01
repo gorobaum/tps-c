@@ -13,6 +13,7 @@ namespace tps {
 
 class Image {
 public:
+	Image() {};
 	Image(std::string filename) {
 		filename_ = filename;
 		image = cv::imread(filename_, CV_LOAD_IMAGE_GRAYSCALE);
@@ -41,16 +42,16 @@ public:
 	template<typename T> T* getPixelVector();
 private:
 	friend class FeatureDetector;
-  friend class FeatureFactory;
+  friend class FeatureGenerator;
   friend class Surf;
 	cv::Mat image;
 	std::vector<int> dimensions;
 	std::string filename_;
 	std::vector<int> compression_params;
 	int getNearestInteger(float number) {
-	if ((number - floor(number)) <= 0.5) return floor(number);
-	return floor(number) + 1.0;
-}
+		if ((number - floor(number)) <= 0.5) return floor(number);
+		return floor(number) + 1.0;
+	}
 };
 
 template<typename T> void Image::changePixelAt(int row, int col, T value) {
