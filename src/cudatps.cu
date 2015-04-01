@@ -40,7 +40,6 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
 
 void tps::CudaTPS::run() {
 	dimensions = registredImage.getDimensions(); 
-  findSolutions();
 	allocResources();
 	allocCudaResources();
 
@@ -75,11 +74,14 @@ void tps::CudaTPS::allocResources() {
 }
 
 void tps::CudaTPS::createCudaSolution() {
+  lienarSolver.solveLinearSystems();
+  std::vector<float> solutionX = lienarSolver.getSolutionX();
+  std::vector<float> solutionY = lienarSolver.getSolutionY();
   floatSolX = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
   floatSolY = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
   for (uint i = 0; i < (targetKeypoints_.size()+3); i++) {
-    floatSolX[i] = solutionX.at<float>(i);
-    floatSolY[i] = solutionY.at<float>(i);
+    floatSolX[i] = solutionX[i];
+    floatSolY[i] = solutionY[i];
   }
 }
 

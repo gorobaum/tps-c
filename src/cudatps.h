@@ -6,14 +6,18 @@
 #include "cuda_occupancy.h"
 
 #include "tps.h"
+#include "OPCVlinearsystems.h"
 
 namespace tps {
-	
+  
 class CudaTPS : public TPS {
-using TPS::TPS;
 public:
+  CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+    TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
+    lienarSolver(referenceKeypoints, targetKeypoints) {}; 
 	void run();
 private:
+  tps::OPCVLinearSystems lienarSolver;
 	void allocResources();
 	void allocCudaResources();
 	void freeResources();

@@ -8,11 +8,11 @@ find_package(CUDA QUIET REQUIRED)
 
 cuda_add_executable(tps
   src/main.cxx
-  src/tps.cxx
   src/surf.cxx
+  src/featuregenerator.cxx
+  src/OPCVlinearsystems.cxx
   src/basictps.cxx
   src/paralleltps.cxx
-  src/featuregenerator.cxx
 	src/cudatps.cu)
 
 target_link_libraries (tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS})

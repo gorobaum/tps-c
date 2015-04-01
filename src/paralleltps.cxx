@@ -10,13 +10,13 @@ void tps::ParallelTPS::runThread(uint tid) {
 	if ((tid+1) == numberOfThreads) limit = dimensions[0];
 	for (uint x = tid*chunck; x < limit; x++)
 		for (int y = 0; y < dimensions[1]; y++) {
-			double newX = solutionX.at<float>(0) + x*solutionX.at<float>(1) + y*solutionX.at<float>(2);
-			double newY = solutionY.at<float>(0) + x*solutionY.at<float>(1) + y*solutionY.at<float>(2);
+			double newX = solutionX[0] + x * solutionX[1] + y * solutionX[2];
+			double newY = solutionY[0] + x * solutionY[1] + y * solutionY[2];
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
 				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
 				if (r != 0.0) {
-					newX += r*log(r) * solutionX.at<float>(i+3);
-					newY += r*log(r) * solutionY.at<float>(i+3);
+					newX += r * log(r) * solutionX[i+3];
+					newY += r * log(r) * solutionY[i+3];
 				}
 			}
 			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
@@ -25,8 +25,9 @@ void tps::ParallelTPS::runThread(uint tid) {
 }
 
 void tps::ParallelTPS::run() {
-	findSolutions();
-	std::vector<int> dimensions = registredImage.getDimensions();
+	lienarSolver.solveLinearSystems();
+	solutionX = lienarSolver.getSolutionX();
+	solutionY = lienarSolver.getSolutionY();
 	std::vector<std::thread> th;
 
 	for (uint i = 0; i < numberOfThreads; ++i) {
