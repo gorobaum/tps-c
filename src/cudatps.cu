@@ -50,7 +50,7 @@ void tps::CudaTPS::run() {
   callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
   callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
 
-  std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
+  // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
   for (int x = 0; x < dimensions[0]; x++)
     for (int y = 0; y < dimensions[1]; y++) {
