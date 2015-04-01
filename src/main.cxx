@@ -1,6 +1,6 @@
 #include "image.h"
 #include "surf.h"
-#include "featurefactory.h"
+#include "featuregenerator.h"
 #include "basictps.h"
 #include "paralleltps.h"
 #include "cudatps.h"
@@ -23,23 +23,23 @@ int main(int argc, char** argv) {
 
   int minHessian = 400;
 
-  tps::FeatureFactory ff = tps::FeatureFactory(referenceImage, targetImage, 0.1);
-  ff.run(true);
+  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, 0.1);
+  fg.run(true);
 
-  double basicTpsExecTime = (double)cv::getTickCount();
-  tps::BasicTPS tps = tps::BasicTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regBasic.png");
-  tps.run();
-  basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
-  std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
+  // double basicTpsExecTime = (double)cv::getTickCount();
+  // tps::BasicTPS tps = tps::BasicTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regBasic.png");
+  // tps.run();
+  // basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+  // std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-  double pTpsExecTime = (double)cv::getTickCount();
-  tps::ParallelTPS ptps = tps::ParallelTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regParallel.png");
-  ptps.run();
-  pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
-  std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
+  // double pTpsExecTime = (double)cv::getTickCount();
+  // tps::ParallelTPS ptps = tps::ParallelTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regParallel.png");
+  // ptps.run();
+  // pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
+  // std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
   double cTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS ctps = tps::CudaTPS(ff.getReferenceKeypoints(), ff.getTargetKeypoints(), targetImage, "regCuda.png");
+  tps::CudaTPS ctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, "regCuda.png");
   ctps.run();
   cTpsExecTime = ((double)cv::getTickCount() - cTpsExecTime)/cv::getTickFrequency();
   std::cout << "Cuda TPS execution time: " << cTpsExecTime << std::endl;

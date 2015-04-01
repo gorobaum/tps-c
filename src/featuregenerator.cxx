@@ -1,10 +1,10 @@
-#include "featurefactory.h"
+#include "featuregenerator.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 
-void tps::FeatureFactory::run(bool createFeatureImage) {
+void tps::FeatureGenerator::run(bool createFeatureImage) {
   gridSizeX = referenceImage_.dimensions[0]*percentage_;
   gridSizeY = referenceImage_.dimensions[1]*percentage_;
   xStep = referenceImage_.dimensions[0]/(gridSizeX-1);
@@ -19,7 +19,7 @@ void tps::FeatureFactory::run(bool createFeatureImage) {
   if (createFeatureImage) saveFeatureImage();
 }
 
-void tps::FeatureFactory::createReferenceImageFeatures() {
+void tps::FeatureGenerator::createReferenceImageFeatures() {
   for (int x = 0; x < gridSizeX; x++)
     for (int y = 0; y < gridSizeY; y++) {
       cv::Point2f newCP(x*xStep, y*yStep);
@@ -29,7 +29,7 @@ void tps::FeatureFactory::createReferenceImageFeatures() {
     }
 }
 
-void tps::FeatureFactory::createTargetImageFeatures() {
+void tps::FeatureGenerator::createTargetImageFeatures() {
   for (int x = 0; x < gridSizeX; x++)
     for (int y = 0; y < gridSizeY; y++) {
       int pos = x*gridSizeX+y;
@@ -42,20 +42,16 @@ void tps::FeatureFactory::createTargetImageFeatures() {
     }
 }
 
-std::vector<float> tps::FeatureFactory::applySenoidalDeformationTo(float x, float y) {
+std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y) {
   float newX = x-8.0*std::sin(y/16.0);
   float newY = y+4.0*std::cos(x/32.0);
-  if (newX < 0) newX = 0;
-  if (newX >= referenceImage_.dimensions[0]) newX = referenceImage_.dimensions[0]-1;
-  if (newY < 0) newY = 0;
-  if (newY >= referenceImage_.dimensions[1]) newY = referenceImage_.dimensions[1]-1;
   std::vector<float> newPoint;
   newPoint.push_back(newX);
   newPoint.push_back(newY);
   return newPoint;
 }
 
-std::vector<cv::DMatch> tps::FeatureFactory::createMatches() {
+std::vector<cv::DMatch> tps::FeatureGenerator::createMatches() {
   std::vector<cv::DMatch> matches;
   for (int x = 0; x < gridSizeX; x++)
     for (int y = 0; y < gridSizeY; y++) {
@@ -66,7 +62,7 @@ std::vector<cv::DMatch> tps::FeatureFactory::createMatches() {
   return matches;
 }
 
-void tps::FeatureFactory::saveFeatureImage() {
+void tps::FeatureGenerator::saveFeatureImage() {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
   compression_params.push_back(95);
