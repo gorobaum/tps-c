@@ -51,7 +51,6 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   // step 2: query working space of geqrf and ormqr
   cusolver_status = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
 
-
   cudaMalloc((void**)&d_work, sizeof(float) * lwork);
 
   // step 3: compute QR factorization
@@ -71,15 +70,14 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
 
   cudaMemcpy(solution, cudaB, sizeof(float)*systemDimension, cudaMemcpyDeviceToHost);
 
-
   cudaFree(cudaA);
   cudaFree(cudaB);
   cudaFree(d_work);
   cudaFree(d_tau);
   cudaFree(devInfo);
 
-  cusolverDnDestroy(handle);
-  cublasDestroy(cublasH);
+  if (cublasH) cublasDestroy(cublasH);   
+  if (handle) cusolverDnDestroy(handle);   
 }
 
 void tps::CudaLinearSystems::createMatrixA() {

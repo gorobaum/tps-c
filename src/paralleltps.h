@@ -3,6 +3,8 @@
 
 #include "tps.h"
 #include "OPCVlinearsystems.h"
+#include "cudalinearsystems.h"
+
 
 #include <thread>
 
@@ -17,7 +19,7 @@ public:
 private:
 	void runThread(uint tid);
 	uint numberOfThreads = std::thread::hardware_concurrency();
-  tps::OPCVLinearSystems lienarSolver;
+  tps::CudaLinearSystems lienarSolver;
   std::vector<float> solutionX;
   std::vector<float> solutionY;
 };
