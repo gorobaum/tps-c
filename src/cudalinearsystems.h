@@ -15,9 +15,8 @@ class CudaLinearSystems : public CPLinearSystems {
 using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems();
-  void free();
 private:
-  std::vector<float> solveLinearSystem(float *A, float *b);
+  std::vector<float> solveLinearSystem(float *A, float *b, float *cudaB, float *cudaSol);
   std::vector<float> pointerToVector(float *pointer);
   void createMatrixA();
   void createBs();

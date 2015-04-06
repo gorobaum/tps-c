@@ -9,11 +9,20 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   createBs();
   allocCudaResources();
 
+  solveLinearSystem(A, bx, cudaBx, cudaSolX);
+  solveLinearSystem(A, by, cudaBy, cudaSolY);
 
+  freeResources();
+  freeCudaResources();
+  cudaDeviceReset();
 }
 
-std::vector<float> solveLinearSystem(float *A, float *b) {
+std::vector<float> tps::CudaLinearSystems::solveLinearSystem(float *A, float *b, float *cudaB, float *cudaSol) {
   std::vector<float> dae;
+  cusolverStatus_t currentStatus;
+  cusolverDnHandle_t *handle;
+  currentStatus = cusolverDnCreate(handle);
+  if (currentStatus == CUSOLVER_STATUS_SUCCESS) std::cout << "SUCESSU\n";
   return dae;
 }
 
@@ -61,7 +70,7 @@ void tps::CudaLinearSystems::createBs() {
 
 std::vector<float> tps::CudaLinearSystems::pointerToVector(float *pointer) {
   std::vector<float> vector;
-  for (i = 0; i < systemDimension; i++) {
+  for (int i = 0; i < systemDimension; i++) {
     vector.push_back(pointer[i]);
   }
   return vector;
