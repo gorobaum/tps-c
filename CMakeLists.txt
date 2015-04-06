@@ -11,6 +11,7 @@ cuda_add_executable(tps
   src/surf.cxx
   src/featuregenerator.cxx
   src/OPCVlinearsystems.cxx
+  src/cudalinearsystems.cxx
   src/basictps.cxx
   src/paralleltps.cxx
 	src/cudatps.cu)

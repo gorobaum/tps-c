@@ -1,5 +1,7 @@
 #include "OPCVlinearsystems.h"
 
+#include <iostream>
+
 void tps::OPCVLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
@@ -10,7 +12,7 @@ void tps::OPCVLinearSystems::solveLinearSystems() {
 
 std::vector<float> tps::OPCVLinearSystems::solveLinearSystem(cv::Mat A, cv::Mat b) {
   std::vector<float> solution;
-  cv::Mat cvSolution = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
+  cv::Mat cvSolution = cv::Mat::zeros(systemDimension, 1, CV_32F);
   cv::solve(A, b, cvSolution, cv::DECOMP_EIG);
 
   for (uint i = 0; i < (targetKeypoints_.size()+3); i++)
@@ -20,7 +22,7 @@ std::vector<float> tps::OPCVLinearSystems::solveLinearSystem(cv::Mat A, cv::Mat 
 }
 
 void tps::OPCVLinearSystems::createMatrixA() {
-  A = cv::Mat::zeros(referenceKeypoints_.size()+3,referenceKeypoints_.size()+3, CV_32F);
+  A = cv::Mat::zeros(systemDimension,systemDimension, CV_32F);
 
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
     A.at<float>(0,j+3) = 1;
@@ -36,11 +38,14 @@ void tps::OPCVLinearSystems::createMatrixA() {
       float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);
       if (r != 0.0) A.at<float>(i+3,j+3) = r*log(r);
     }
+
+  for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+    std::cout << A.at<float>(i,0) << std::endl;
 }
 
 void tps::OPCVLinearSystems::createBs() {
-  bx = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
-  by = cv::Mat::zeros(referenceKeypoints_.size()+3, 1, CV_32F);
+  bx = cv::Mat::zeros(systemDimension, 1, CV_32F);
+  by = cv::Mat::zeros(systemDimension, 1, CV_32F);
   for (uint i = 0; i < referenceKeypoints_.size(); i++) {
     bx.at<float>(i+3) = targetKeypoints_[i].x;
     by.at<float>(i+3) = targetKeypoints_[i].y;

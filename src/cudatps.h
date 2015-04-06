@@ -6,7 +6,7 @@
 #include "cuda_occupancy.h"
 
 #include "tps.h"
-#include "OPCVlinearsystems.h"
+#include "cudalinearsystems.h"
 
 namespace tps {
   
@@ -17,7 +17,7 @@ public:
     lienarSolver(referenceKeypoints, targetKeypoints) {}; 
 	void run();
 private:
-  tps::OPCVLinearSystems lienarSolver;
+  tps::CudaLinearSystems lienarSolver;
 	void allocResources();
 	void allocCudaResources();
 	void freeResources();
