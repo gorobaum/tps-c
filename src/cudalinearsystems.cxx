@@ -2,28 +2,87 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <cublas_v2.h>
 
 
 void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
-  allocCudaResources();
 
-  solveLinearSystem(A, bx, cudaBx, cudaSolX);
-  solveLinearSystem(A, by, cudaBy, cudaSolY);
+  solveLinearSystem(bx, floatSolX);
+  solveLinearSystem(by, floatSolY);
+
+  solutionX = pointerToVector(floatSolX);
+  solutionY = pointerToVector(floatSolY);
 
   freeResources();
-  freeCudaResources();
   cudaDeviceReset();
 }
 
-std::vector<float> tps::CudaLinearSystems::solveLinearSystem(float *A, float *b, float *cudaB, float *cudaSol) {
-  std::vector<float> dae;
+void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
+  int lwork = 0;
+  int info_gpu = 0;
+
+  const int nrhs = 1;
+  const float one = 1;
+
+  float *cudaA = NULL;
+  float *cudaB = NULL;
+  float *d_work = NULL;
+  float *d_tau = NULL;
+  int *devInfo = NULL;
+
   cusolverStatus_t currentStatus;
-  cusolverDnHandle_t *handle;
-  currentStatus = cusolverDnCreate(handle);
-  if (currentStatus == CUSOLVER_STATUS_SUCCESS) std::cout << "SUCESSU\n";
-  return dae;
+  cusolverDnHandle_t handle;
+  cublasHandle_t cublasH;
+  cusolverDnCreate(&handle);
+  cublasCreate(&cublasH);
+
+  // step 1: copy A and B to device
+  cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float));
+  cudaMalloc(&cudaB, systemDimension*sizeof(float));
+  cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaB, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+
+
+  cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension);
+  cudaMalloc((void**)&devInfo, sizeof(int));
+
+  // step 2: query working space of geqrf and ormqr
+  currentStatus = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
+
+  cudaMalloc((void**)&d_work, sizeof(float) * lwork);
+
+  // step 3: compute QR factorization
+  cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
+  cudaDeviceSynchronize();
+  
+  cudaMemcpy(&info_gpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost);
+  printf("after geqrf: info_gpu = %d\n", info_gpu);
+
+  // step 4: compute Q^T*B
+  cusolverDnSormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
+    systemDimension, cudaA, systemDimension, d_tau, cudaB, systemDimension, d_work, lwork, devInfo);
+  cudaDeviceSynchronize();
+
+  cudaMemcpy(&info_gpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost);
+  printf("after geqrf: info_gpu = %d\n", info_gpu);
+
+  // step 5: compute x = R \ Q^T*B
+  cublasStrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
+    CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaB, 
+    systemDimension);
+  cudaDeviceSynchronize();
+
+  cudaMemcpy(solution, cudaB, sizeof(float)*systemDimension, cudaMemcpyDeviceToHost);
+
+  cudaFree(cudaA);
+  cudaFree(cudaB);
+  cudaFree(d_work);
+  cudaFree(d_tau);
+  cudaFree(devInfo);
+
+  cusolverDnDestroy(handle);
 }
 
 void tps::CudaLinearSystems::createMatrixA() {
@@ -58,6 +117,8 @@ void tps::CudaLinearSystems::createMatrixA() {
 void tps::CudaLinearSystems::createBs() {
   bx = (float*)malloc(systemDimension*sizeof(float));
   by = (float*)malloc(systemDimension*sizeof(float));
+  floatSolX = (float*)malloc(systemDimension*sizeof(float));
+  floatSolY = (float*)malloc(systemDimension*sizeof(float));
   for (uint j = 0; j < 3; j++) {
     bx[j] = 0.0;
     by[j] = 0.0;
@@ -76,31 +137,10 @@ std::vector<float> tps::CudaLinearSystems::pointerToVector(float *pointer) {
   return vector;
 }
 
-void tps::CudaLinearSystems::allocCudaResources() {
-  cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float));
-  cudaMalloc(&cudaBx, systemDimension*sizeof(float));
-  cudaMalloc(&cudaBy, systemDimension*sizeof(float));
-  cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaBx, bx, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaBy, by, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
-
-  cudaMalloc(&cudaSolX, systemDimension*sizeof(float));
-  cudaMalloc(&cudaSolY, systemDimension*sizeof(float));
-}
-
 void tps::CudaLinearSystems::freeResources() {
   free(A);
   free(bx);
   free(by);
   free(floatSolX);
   free(floatSolY);
-}
-
-void tps::CudaLinearSystems::freeCudaResources() {
-  cudaFree(cudaA);
-  cudaFree(cudaBx);
-  cudaFree(cudaBy);
-  cudaFree(cudaSolX);
-  cudaFree(cudaSolY);
-  cudaDeviceSynchronize();
 }

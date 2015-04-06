@@ -16,15 +16,12 @@ using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems();
 private:
-  std::vector<float> solveLinearSystem(float *A, float *b, float *cudaB, float *cudaSol);
+  void solveLinearSystem(float *B, float *solution);
   std::vector<float> pointerToVector(float *pointer);
   void createMatrixA();
   void createBs();
-  void allocCudaResources();
   void freeResources();
-  void freeCudaResources();
   float *bx, *by, *A, *floatSolX, *floatSolY;
-  float *cudaBx, *cudaBy, *cudaA, *cudaSolX, *cudaSolY;
 };
 
 } //namepsace
