@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cublas_v2.h>
 
-
 void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
@@ -32,7 +31,9 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   float *d_tau = NULL;
   int *devInfo = NULL;
 
-  cusolverStatus_t currentStatus;
+  cusolverStatus_t cusolver_status;
+  cublasStatus_t cublas_status;
+  cudaError_t cudaStat;
   cusolverDnHandle_t handle;
   cublasHandle_t cublasH;
   cusolverDnCreate(&handle);
@@ -44,37 +45,32 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(cudaB, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
 
-
   cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension);
   cudaMalloc((void**)&devInfo, sizeof(int));
 
   // step 2: query working space of geqrf and ormqr
-  currentStatus = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
+  cusolver_status = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
+
 
   cudaMalloc((void**)&d_work, sizeof(float) * lwork);
 
   // step 3: compute QR factorization
-  cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
+  cusolver_status = cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
   cudaDeviceSynchronize();
   
-  cudaMemcpy(&info_gpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost);
-  printf("after geqrf: info_gpu = %d\n", info_gpu);
-
   // step 4: compute Q^T*B
-  cusolverDnSormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
+  cusolver_status = cusolverDnSormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
     systemDimension, cudaA, systemDimension, d_tau, cudaB, systemDimension, d_work, lwork, devInfo);
   cudaDeviceSynchronize();
 
-  cudaMemcpy(&info_gpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost);
-  printf("after geqrf: info_gpu = %d\n", info_gpu);
-
   // step 5: compute x = R \ Q^T*B
-  cublasStrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
+  cublas_status = cublasStrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
     CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaB, 
     systemDimension);
   cudaDeviceSynchronize();
 
   cudaMemcpy(solution, cudaB, sizeof(float)*systemDimension, cudaMemcpyDeviceToHost);
+
 
   cudaFree(cudaA);
   cudaFree(cudaB);
@@ -83,16 +79,15 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   cudaFree(devInfo);
 
   cusolverDnDestroy(handle);
+  cublasDestroy(cublasH);
 }
 
 void tps::CudaLinearSystems::createMatrixA() {
   A = (float*)malloc(systemDimension*systemDimension*sizeof(float));
 
- for (uint j = 0; j < 3; j++) {
-    A[0*systemDimension+j] = 0.0;
-    A[1*systemDimension+j] = 0.0;
-    A[2*systemDimension+j] = 0.0;
-  }
+ for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+  for (uint j = 0; j < referenceKeypoints_.size()+3; j++)
+    A[i*systemDimension+j] = 0.0;
 
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
     A[0*systemDimension+j+3] = 1;
@@ -108,10 +103,6 @@ void tps::CudaLinearSystems::createMatrixA() {
       float r = computeRSquared(referenceKeypoints_[i].x, referenceKeypoints_[j].x, referenceKeypoints_[i].y, referenceKeypoints_[j].y);
       if (r != 0.0) A[(i+3)*systemDimension+j+3] = r*log(r);
     }
-
-  // std::cout << "Cuda Linear System\n";
-  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-  //   std::cout << A[i] << std::endl;
 }
 
 void tps::CudaLinearSystems::createBs() {

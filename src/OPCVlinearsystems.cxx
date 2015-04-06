@@ -8,6 +8,7 @@ void tps::OPCVLinearSystems::solveLinearSystems() {
 
   solutionX = solveLinearSystem(A, bx);
   solutionY = solveLinearSystem(A, by);
+
 }
 
 std::vector<float> tps::OPCVLinearSystems::solveLinearSystem(cv::Mat A, cv::Mat b) {
