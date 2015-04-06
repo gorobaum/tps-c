@@ -15,12 +15,17 @@ class CudaLinearSystems : public CPLinearSystems {
 using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems();
+  void free();
 private:
-  std::vector<float> solveLinearSystem(cv::Mat A, cv::Mat b);
+  std::vector<float> solveLinearSystem(float *A, float *b);
+  std::vector<float> pointerToVector(float *pointer);
   void createMatrixA();
   void createBs();
-  float *bx, *by, *A;
-  float *cudaBx, *cudaBy, *cudaA;
+  void allocCudaResources();
+  void freeResources();
+  void freeCudaResources();
+  float *bx, *by, *A, *floatSolX, *floatSolY;
+  float *cudaBx, *cudaBy, *cudaA, *cudaSolX, *cudaSolY;
 };
 
 } //namepsace

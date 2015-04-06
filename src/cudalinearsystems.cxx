@@ -7,6 +7,14 @@
 void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
+  allocCudaResources();
+
+
+}
+
+std::vector<float> solveLinearSystem(float *A, float *b) {
+  std::vector<float> dae;
+  return dae;
 }
 
 void tps::CudaLinearSystems::createMatrixA() {
@@ -33,8 +41,9 @@ void tps::CudaLinearSystems::createMatrixA() {
       if (r != 0.0) A[(i+3)*systemDimension+j+3] = r*log(r);
     }
 
-  for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-    std::cout << A[i] << std::endl;
+  // std::cout << "Cuda Linear System\n";
+  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+  //   std::cout << A[i] << std::endl;
 }
 
 void tps::CudaLinearSystems::createBs() {
@@ -50,7 +59,39 @@ void tps::CudaLinearSystems::createBs() {
   }
 }
 
-std::vector<float> solveLinearSystem(cv::Mat A, cv::Mat b) {
-  std::vector<float> dae;
-  return dae;
+std::vector<float> tps::CudaLinearSystems::pointerToVector(float *pointer) {
+  std::vector<float> vector;
+  for (i = 0; i < systemDimension; i++) {
+    vector.push_back(pointer[i]);
+  }
+  return vector;
+}
+
+void tps::CudaLinearSystems::allocCudaResources() {
+  cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float));
+  cudaMalloc(&cudaBx, systemDimension*sizeof(float));
+  cudaMalloc(&cudaBy, systemDimension*sizeof(float));
+  cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaBx, bx, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaBy, by, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+
+  cudaMalloc(&cudaSolX, systemDimension*sizeof(float));
+  cudaMalloc(&cudaSolY, systemDimension*sizeof(float));
+}
+
+void tps::CudaLinearSystems::freeResources() {
+  free(A);
+  free(bx);
+  free(by);
+  free(floatSolX);
+  free(floatSolY);
+}
+
+void tps::CudaLinearSystems::freeCudaResources() {
+  cudaFree(cudaA);
+  cudaFree(cudaBx);
+  cudaFree(cudaBy);
+  cudaFree(cudaSolX);
+  cudaFree(cudaSolY);
+  cudaDeviceSynchronize();
 }

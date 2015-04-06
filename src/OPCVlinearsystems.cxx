@@ -39,8 +39,9 @@ void tps::OPCVLinearSystems::createMatrixA() {
       if (r != 0.0) A.at<float>(i+3,j+3) = r*log(r);
     }
 
-  for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-    std::cout << A.at<float>(i,0) << std::endl;
+  // std::cout << "OPCV Linear System\n";    
+  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+  //   std::cout << A.at<float>(i,0) << std::endl;
 }
 
 void tps::OPCVLinearSystems::createBs() {

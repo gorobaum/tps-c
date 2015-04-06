@@ -43,22 +43,22 @@ void tps::CudaTPS::run() {
 	allocResources();
 	allocCudaResources();
 
-  // dim3 threadsPerBlock(32, 32);
-  // dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
+  dim3 threadsPerBlock(32, 32);
+  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
 
-  // callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
-  // callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
+  callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
+  callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
 
-  // // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
+  // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
-  // for (int x = 0; x < dimensions[0]; x++)
-  //   for (int y = 0; y < dimensions[1]; y++) {
-  //     double newX = imageCoordX[x*dimensions[1]+y];
-  //     double newY = imageCoordY[x*dimensions[1]+y];
-  //     uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
-  //     registredImage.changePixelAt(x, y, value);
-  //   }
-  // registredImage.save();
+  for (int x = 0; x < dimensions[0]; x++)
+    for (int y = 0; y < dimensions[1]; y++) {
+      double newX = imageCoordX[x*dimensions[1]+y];
+      double newY = imageCoordY[x*dimensions[1]+y];
+      uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
+      registredImage.changePixelAt(x, y, value);
+    }
+  registredImage.save();
 
 	freeResources();
 	freeCudaResources();
