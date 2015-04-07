@@ -74,9 +74,17 @@ void tps::CudaTPS::allocResources() {
 }
 
 void tps::CudaTPS::createCudaSolution() {
-  lienarSolver.solveLinearSystems();
-  std::vector<float> solutionX = lienarSolver.getSolutionX();
-  std::vector<float> solutionY = lienarSolver.getSolutionY();
+  std::vector<float> solutionX;
+  std::vector<float> solutionY;
+  if (cudaLS_) {
+    cudalienarSolver.solveLinearSystems();
+    solutionX = cudalienarSolver.getSolutionX();
+    solutionY = cudalienarSolver.getSolutionY();
+  } else {
+    opcvlienarSolver.solveLinearSystems();
+    solutionX = opcvlienarSolver.getSolutionX();
+    solutionY = opcvlienarSolver.getSolutionY();
+  }
   floatSolX = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
   floatSolY = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
   for (uint i = 0; i < (targetKeypoints_.size()+3); i++) {

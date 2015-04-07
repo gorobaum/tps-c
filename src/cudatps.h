@@ -7,17 +7,22 @@
 
 #include "tps.h"
 #include "cudalinearsystems.h"
+#include "OPCVlinearsystems.h"
 
 namespace tps {
   
 class CudaTPS : public TPS {
 public:
-  CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+  CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName, bool cudaLS) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
-    lienarSolver(referenceKeypoints, targetKeypoints) {}; 
-	void run();
+    opcvlienarSolver(referenceKeypoints, targetKeypoints),
+    cudalienarSolver(referenceKeypoints, targetKeypoints),
+    cudaLS_(cudaLS) {}; 
+  void run();
 private:
-  tps::CudaLinearSystems lienarSolver;
+  tps::OPCVLinearSystems opcvlienarSolver;
+  tps::CudaLinearSystems cudalienarSolver;
+  bool cudaLS_;
 	void allocResources();
 	void allocCudaResources();
 	void freeResources();

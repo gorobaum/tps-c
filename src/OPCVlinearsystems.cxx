@@ -6,8 +6,11 @@ void tps::OPCVLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
 
+  double solverExec = (double)cv::getTickCount();
   solutionX = solveLinearSystem(A, bx);
   solutionY = solveLinearSystem(A, by);
+  solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
+  std::cout << "OPCV solver execution time: " << solverExec << std::endl;
 
 }
 

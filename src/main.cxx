@@ -4,6 +4,8 @@
 #include "basictps.h"
 #include "paralleltps.h"
 #include "cudatps.h"
+#include "cudalinearsystems.h"
+#include "OPCVlinearsystems.h"
 
 #include <string>
 #include <sstream>
@@ -42,12 +44,23 @@ int main(int argc, char** argv) {
   readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
   int minHessian = 400;
 
-
   double fgExecTime = (double)cv::getTickCount();
   tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
   fg.run(true);
   fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
   std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+
+  // double opcvExecTime = (double)cv::getTickCount();
+  // tps::OPCVLinearSystems opcvlienarSolver = tps::OPCVLinearSystems(fg.getReferenceKeypoints(), fg.getTargetKeypoints());
+  // opcvlienarSolver.solveLinearSystems();
+  // opcvExecTime = ((double)cv::getTickCount() - opcvExecTime)/cv::getTickFrequency();
+  // std::cout << "OpenCV solver execution time: " << opcvExecTime << std::endl;
+
+  // double cudaExecTime = (double)cv::getTickCount();
+  // tps::CudaLinearSystems cudalienarSolver = tps::CudaLinearSystems(fg.getReferenceKeypoints(), fg.getTargetKeypoints());
+  // cudalienarSolver.solveLinearSystems();
+  // cudaExecTime = ((double)cv::getTickCount() - cudaExecTime)/cv::getTickFrequency();
+  // std::cout << "Cuda solver execution time: " << cudaExecTime << std::endl;
 
   // double basicTpsExecTime = (double)cv::getTickCount();
   // tps::BasicTPS tps = tps::BasicTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"BasicTPS"+extension);
@@ -55,17 +68,23 @@ int main(int argc, char** argv) {
   // basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
   // std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
-  double pTpsExecTime = (double)cv::getTickCount();
-  tps::ParallelTPS ptps = tps::ParallelTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"ParallelTPS"+extension);
-  ptps.run();
-  pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
-  std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
+  // double pTpsExecTime = (double)cv::getTickCount();
+  // tps::ParallelTPS ptps = tps::ParallelTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"ParallelTPS"+extension);
+  // ptps.run();
+  // pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
+  // std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
-  double cTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS ctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"CudaTPS"+extension);
-  ctps.run();
-  cTpsExecTime = ((double)cv::getTickCount() - cTpsExecTime)/cv::getTickFrequency();
-  std::cout << "Cuda TPS execution time: " << cTpsExecTime << std::endl;
+  double OPCVcTpsExecTime = (double)cv::getTickCount();
+  tps::CudaTPS OPCVctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"CudaTPS"+extension, false);
+  OPCVctps.run();
+  OPCVcTpsExecTime = ((double)cv::getTickCount() - OPCVcTpsExecTime)/cv::getTickFrequency();
+  std::cout << "OPCV Cuda TPS execution time: " << OPCVcTpsExecTime << std::endl;
 
+  double CUDAcTpsExecTime = (double)cv::getTickCount();
+  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"CudaTPS"+extension, true);
+  CUDActps.run();
+  CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+  std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+  std::cout << "====================================================\n";
   return 0;
 }

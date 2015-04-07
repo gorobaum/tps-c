@@ -8,8 +8,11 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
 
+  double solverExec = (double)cv::getTickCount();
   solveLinearSystem(bx, floatSolX);
   solveLinearSystem(by, floatSolY);
+  solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
+  std::cout << "Cuda solver execution time: " << solverExec << std::endl;
 
   solutionX = pointerToVector(floatSolX);
   solutionY = pointerToVector(floatSolY);

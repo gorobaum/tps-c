@@ -21,7 +21,7 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
 
 LIST(APPEND CUDA_NVCC_FLAGS )
 
-MESSAGE( "CUDA_NVCC_FLAGS is ${CUDA_CUBLAS_LIBRARIES}" )
+MESSAGE( "CUDA_NVCC_FLAGS is ${CUDA_cusolver_LIBRARY}" )
 
 # TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
 target_link_libraries (tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib64/libcusolver.so ${CUDA_CUBLAS_LIBRARIES})
