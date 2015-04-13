@@ -39,7 +39,7 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
 }
 
 void tps::CudaTPS::run() {
-	dimensions = registredImage.getDimensions(); 
+	dimensions = registredImage.getDimensions();
 	allocResources();
 	allocCudaResources();
 
