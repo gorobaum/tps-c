@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 		std::cout << "Precisa passar o arquivo de configuração coração! \n";    
 		return 0;
 	}
-
+  std::cout << "====================================================\n";
  	tps::Image referenceImage;
   tps::Image targetImage;
   std::string outputName;
@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
   fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
   std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
 
+  std::cout << "Percentage: " << percentage << std::endl;
   std::cout << "Number of control points: " << fg.getReferenceKeypoints().size() << std::endl;
 
   // double opcvExecTime = (double)cv::getTickCount();
@@ -76,16 +77,16 @@ int main(int argc, char** argv) {
   // pTpsExecTime = ((double)cv::getTickCount() - pTpsExecTime)/cv::getTickFrequency();
   // std::cout << "Parallel TPS execution time: " << pTpsExecTime << std::endl;
 
-  if (fg.getReferenceKeypoints().size() < 4000) {
+  if (fg.getReferenceKeypoints().size() < 3700) {
     double OPCVcTpsExecTime = (double)cv::getTickCount();
-    tps::CudaTPS OPCVctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"CudaTPSOPCV"+extension, false);
+    tps::CudaTPS OPCVctps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSOPCV"+extension, false);
     OPCVctps.run();
     OPCVcTpsExecTime = ((double)cv::getTickCount() - OPCVcTpsExecTime)/cv::getTickFrequency();
     std::cout << "OPCV Cuda TPS execution time: " << OPCVcTpsExecTime << std::endl;
   }
 
   double CUDAcTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"CudaTPSCUDA"+extension, true);
+  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension, true);
   CUDActps.run();
   CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
   std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
