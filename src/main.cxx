@@ -56,17 +56,17 @@ int main(int argc, char** argv) {
   std::cout << "Percentage: " << percentage << std::endl;
   std::cout << "Number of control points: " << fg.getReferenceKeypoints().size() << std::endl;
   float totalMemory = fg.getReferenceKeypoints().size()*sizeof(float)*4.0/(1024*1024);
-  std::cout << "CPs memory: " << fg.getReferenceKeypoints().size()*sizeof(float)*4.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "CPs memory: " << fg.getReferenceKeypoints().size()*sizeof(float)*1.0/(1024*1024) << " MB (4x)" << std::endl;
   totalMemory += dimensions[0]*dimensions[1]*sizeof(double)*2.0/(1024*1024);
-  std::cout << "Cuda coord memory: " << dimensions[0]*dimensions[1]*sizeof(double)*2.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "Cuda coord memory: " << dimensions[0]*dimensions[1]*sizeof(double)*1.0/(1024*1024) << " MB (2x)" << std::endl;
   totalMemory += systemDimension*sizeof(float)*2.0/(1024*1024);
-  std::cout << "Cuda solution memory: " << systemDimension*sizeof(float)*2.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "Cuda solution memory: " << systemDimension*sizeof(float)*1.0/(1024*1024) << " MB (2x)" << std::endl;
   totalMemory += fg.getReferenceKeypoints().size()*sizeof(float)*2.0/(1024*1024);
-  std::cout << "Cuda CPs memory: " << fg.getReferenceKeypoints().size()*sizeof(float)*2.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "Cuda CPs memory: " << fg.getReferenceKeypoints().size()*sizeof(float)*1.0/(1024*1024) << " MB (2x)" << std::endl;
   totalMemory += systemDimension*systemDimension*sizeof(float)*1.0/(1024*1024);
-  std::cout << "Matrix A memory: " << systemDimension*systemDimension*sizeof(float)*1.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "Matrix A memory: " << systemDimension*systemDimension*sizeof(float)*1.0/(1024*1024) << " MB (1x)" << std::endl;
   totalMemory += systemDimension*systemDimension*sizeof(float)*1.0/(1024*1024);
-  std::cout << "Vectors B memory: " << systemDimension*sizeof(float)*4.0/(1024*1024) << " MB" << std::endl;
+  std::cout << "Vectors B memory: " << systemDimension*sizeof(float)*1.0/(1024*1024) << " MB (4x)" << std::endl;
   std::cout << "Total memory: " << totalMemory << " MB" << std::endl;
 
   // double opcvExecTime = (double)cv::getTickCount();
