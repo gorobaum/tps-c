@@ -18,7 +18,6 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   solutionY = pointerToVector(floatSolY);
 
   freeResources();
-  cudaDeviceReset();
 }
 
 void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
@@ -79,8 +78,8 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   cudaFree(d_tau);
   cudaFree(devInfo);
 
-  if (cublasH) cublasDestroy(cublasH);   
-  if (handle) cusolverDnDestroy(handle);   
+  cublasDestroy(cublasH);   
+  cusolverDnDestroy(handle);
 }
 
 void tps::CudaLinearSystems::createMatrixA() {

@@ -2,7 +2,6 @@
 #define TPS_PARALLELTPS_H_
 
 #include "tps.h"
-#include "OPCVlinearsystems.h"
 #include "cudalinearsystems.h"
 
 
