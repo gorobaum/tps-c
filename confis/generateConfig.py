@@ -2,7 +2,7 @@ import sys
 
 numFiles = 0
 
-for i in range(2,101, 2):
+for i in range(2,59, 2):
   numFiles = numFiles + 1
   fileName = 'tps.config'+str(numFiles)
   f = open(fileName,'w')

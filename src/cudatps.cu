@@ -88,7 +88,6 @@ void tps::CudaTPS::run() {
   cudaEventRecord(start, 0);
   cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordX, cudaImageCoordY, cudaImage, cudaRegImage, dimensions[1], dimensions[0]);
   cudaMemcpy(regImage, cudaRegImage, dimensions[0]*dimensions[1]*sizeof(uchar), cudaMemcpyDeviceToHost);
-  cudaDeviceSynchronize(); 
   cudaDeviceSynchronize();
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);

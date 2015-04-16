@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
 		std::cout << "Precisa passar o arquivo de configuração coração! \n";    
 		return 0;
 	}
+  std::cout << "====================================================\n";
  	tps::Image referenceImage;
   tps::Image targetImage;
   std::string outputName;
@@ -48,6 +49,9 @@ int main(int argc, char** argv) {
   fg.run(true);
   fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
   std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+
+  std::cout << "Percentage: " << percentage << std::endl;
+  std::cout << "Number of control points: " << fg.getReferenceKeypoints().size() << std::endl;
 
   // double basicTpsExecTime = (double)cv::getTickCount();
   // tps::BasicTPS tps = tps::BasicTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"BasicTPS"+extension);
@@ -66,5 +70,6 @@ int main(int argc, char** argv) {
   CUDActps.run();
   CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
   std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+  std::cout << "====================================================\n";
   return 0;
 }
