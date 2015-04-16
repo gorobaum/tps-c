@@ -35,7 +35,6 @@ int main(int argc, char** argv) {
 		std::cout << "Precisa passar o arquivo de configuração coração! \n";    
 		return 0;
 	}
-  std::cout << "====================================================\n";
  	tps::Image referenceImage;
   tps::Image targetImage;
   std::string outputName;
