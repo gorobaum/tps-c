@@ -40,6 +40,7 @@ public:
 	template<typename T> T bilinearInterpolation(float row, float col);
 	template<typename T> T NNInterpolation(float row, float col);
 	template<typename T> T* getPixelVector();
+	template<typename T> void setPixelVector(T* vector);
 private:
 	friend class FeatureDetector;
   friend class FeatureGenerator;
@@ -102,6 +103,15 @@ T* Image::getPixelVector() {
     for (int y = 0; y < dimensions[1]; y++) vector[x*dimensions[0]+y] = row[y];
   }
   return vector;
+}
+
+template<typename T> 
+void Image::setPixelVector(T* vector) {
+for (int x = 0; x < dimensions[0]; x++)
+  for (int y = 0; y < dimensions[1]; y++) {
+    T newValue = vector[x*dimensions[1]+y];
+    changePixelAt(x, y, newValue);
+  }
 }
 
 } // namespace
