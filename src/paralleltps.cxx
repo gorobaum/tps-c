@@ -30,7 +30,7 @@ void tps::ParallelTPS::run() {
 	solutionY = lienarSolver.getSolutionY();
 	std::vector<std::thread> th;
 	for (uint i = 0; i < numberOfThreads; ++i) {
-    th.push_back(std::thread(&tps::ParallelTPS::runThread, *this, i));
+    th.push_back(std::thread(&tps::ParallelTPS::runThread, this, i));
   }
 
   for(auto &t : th){

@@ -28,7 +28,7 @@ void tps::FeatureGenerator::createReferenceImageFeatures() {
 void tps::FeatureGenerator::createTargetImageFeatures() {
   for (int x = 0; x < gridSizeX; x++)
     for (int y = 0; y < gridSizeY; y++) {
-      int pos = x*gridSizeX+y;
+      int pos = x*gridSizeY+y;
       cv::Point2f referenceCP = referenceKeypoints[pos];
       std::vector<float> newPoint = applySenoidalDeformationTo(referenceCP.x, referenceCP.y);
       cv::Point2f newCP(newPoint[0], newPoint[1]);
@@ -51,7 +51,7 @@ std::vector<cv::DMatch> tps::FeatureGenerator::createMatches() {
   std::vector<cv::DMatch> matches;
   for (int x = 0; x < gridSizeX; x++)
     for (int y = 0; y < gridSizeY; y++) {
-      int pos = x*gridSizeX+y;
+      int pos = x*gridSizeY+y;
       cv::DMatch match(pos, pos, -1);
       matches.push_back(match);
     }

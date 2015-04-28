@@ -15,7 +15,8 @@ namespace tps {
 class TPS
 {
 public:
-	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+	TPS() = delete;
+	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image& targetImage, std::string outputName) :
 		referenceKeypoints_(referenceKeypoints),
 		targetKeypoints_(targetKeypoints),
 		targetImage_(targetImage),
@@ -24,7 +25,7 @@ public:
 protected:
 	std::vector<cv::Point2f> referenceKeypoints_;
 	std::vector<cv::Point2f> targetKeypoints_;
-	tps::Image targetImage_;
+	tps::Image& targetImage_;
 	tps::Image registredImage;
 	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
 };

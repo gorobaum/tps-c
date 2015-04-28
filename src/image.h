@@ -19,19 +19,25 @@ public:
 		image = cv::imread(filename_, CV_LOAD_IMAGE_GRAYSCALE);
 	  if( !image.data )
       std::cout << " --(!) Error reading images form file" << filename << std::endl;
+    std::cout << "Cols = " << image.cols << std::endl;
+    std::cout << "Rows = " << image.rows << std::endl;
 		dimensions.push_back(image.cols);
 		dimensions.push_back(image.rows);
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		compression_params.push_back(95);
 	};
-	Image(int rows, int cols, const std::string& filename) {
+	Image(int cols, int rows, const std::string& filename) {
 		filename_ = filename;
 		image = cv::Mat::zeros(rows, cols, CV_8U);
+    std::cout << "Cols = " << image.cols << std::endl;
+    std::cout << "Rows = " << image.rows << std::endl;
 		dimensions.push_back(image.cols);
 		dimensions.push_back(image.rows);
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		compression_params.push_back(95);
-	}
+	};
+	Image(const Image& blah) = delete;
+	Image& operator = (const Image& blah) = delete;
 	void save() {cv::imwrite(filename_.c_str(), image, compression_params);};
 	cv::Mat getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions; };
@@ -98,18 +104,18 @@ T Image::NNInterpolation(float col, float row) {
 template<typename T> 
 T* Image::getPixelVector() {
 	T* vector = (T*)malloc(dimensions[1]*dimensions[0]*sizeof(T));
-  for (int row = 0; row < dimensions[1]; row++) {
-    T* ptrRow = image.ptr<T>(row);
-    for (int col = 0; col < dimensions[0]; col++) vector[row*dimensions[0]+col] = ptrRow[col];
+  for (int col = 0; col < dimensions[0]; col++) {
+    T* ptrRow = image.ptr<T>(col);
+    for (int row = 0; row < dimensions[1]; row++) vector[col*dimensions[1]+row] = ptrRow[row];
   }
   return vector;
 }
 
 template<typename T> 
 void Image::setPixelVector(T* vector) {
-for (int row = 0; row < dimensions[1]; row++)
-  for (int col = 0; col < dimensions[0]; col++) {
-    T newValue = vector[row*dimensions[0]+col];
+for (int col = 0; col < dimensions[0]; col++)
+  for (int row = 0; row < dimensions[1]; row++) {
+    T newValue = vector[col*dimensions[1]+row];
     changePixelAt(col, row, newValue);
   }
 }

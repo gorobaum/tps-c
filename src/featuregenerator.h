@@ -7,7 +7,7 @@ namespace tps {
 	
 class FeatureGenerator : public FeatureDetector {
 public:
-  FeatureGenerator(Image referenceImage, Image targetImage, float percentage):
+  FeatureGenerator(Image& referenceImage, Image& targetImage, float percentage):
     FeatureDetector(referenceImage, targetImage),
     percentage_(percentage) {};
   void run(bool createFeatureImage);

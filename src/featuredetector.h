@@ -14,7 +14,7 @@ namespace tps {
 class FeatureDetector
 {
 public:
-	FeatureDetector(Image referenceImage, Image targetImage):
+	FeatureDetector(Image& referenceImage, Image& targetImage):
 		referenceImage_(referenceImage),
 		targetImage_(targetImage) {};
   virtual void run(bool createFeatureImage) = 0;
@@ -22,8 +22,8 @@ public:
   std::vector<cv::Point2f> getReferenceKeypoints() {return referenceKeypoints;};
   std::vector<cv::Point2f> getTargetKeypoints() {return targetKeypoints;};
 protected:
-	Image referenceImage_;
-	Image targetImage_;
+	Image& referenceImage_;
+	Image& targetImage_;
 	// Data structures
 	std::vector<cv::Point2f> referenceKeypoints;
   std::vector<cv::Point2f> targetKeypoints;

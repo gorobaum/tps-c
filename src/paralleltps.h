@@ -11,7 +11,8 @@ namespace tps {
 
 class ParallelTPS : public TPS {
 public:
-  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+  ParallelTPS() = delete;
+  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image& targetImage, std::string outputName) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
     lienarSolver(referenceKeypoints, targetKeypoints) {}; 
 	void run();

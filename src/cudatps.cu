@@ -9,7 +9,7 @@
 __device__ double cudaGetPixel(int x, int y, uchar* image, int width, int heigth) {
   if (x > heigth-1) return 0;
   if (y > width-1) return 0;
-  return image[x*width+y];
+  return image[x*heigth+y];
 }
 
 // Kernel definition
@@ -34,9 +34,9 @@ __global__ void cudaRegistredImage(double* cudaImageCoordX, double* cudaImageCoo
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
 
-  double newX = cudaImageCoordX[x*width+y];
-  double newY = cudaImageCoordY[x*width+y];
-  cudaRegImage[x*width+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, heigth);
+  double newX = cudaImageCoordX[x*heigth+y];
+  double newY = cudaImageCoordY[x*heigth+y];
+  cudaRegImage[x*heigth+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, heigth);
 }
 
 // Kernel definition
@@ -51,8 +51,8 @@ __global__ void cudaTPS(double* cudaImageCoord, int width, int heigth, float* so
     if (r != 0.0)
       newCoord += r*log(r) * solution[i+3];
   }
-  if (x*width+y < width*heigth)
-    cudaImageCoord[x*width+y] = newCoord;
+  if (x*heigth+y < width*heigth)
+    cudaImageCoord[x*heigth+y] = newCoord;
 }
 
 void tps::CudaTPS::callKernel(double* cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks) {
@@ -60,7 +60,7 @@ void tps::CudaTPS::callKernel(double* cudaImageCoord, float *cudaSolution, dim3 
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  cudaTPS<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], dimensions[0], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  cudaTPS<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[0], dimensions[1], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
   cudaDeviceSynchronize();
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -86,7 +86,7 @@ void tps::CudaTPS::run() {
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordX, cudaImageCoordY, cudaImage, cudaRegImage, dimensions[1], dimensions[0]);
+  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordX, cudaImageCoordY, cudaImage, cudaRegImage, dimensions[0], dimensions[1]);
   cudaMemcpy(regImage, cudaRegImage, dimensions[0]*dimensions[1]*sizeof(uchar), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
   cudaEventRecord(stop, 0);
@@ -158,7 +158,6 @@ void tps::CudaTPS::freeResources() {
   free(floatSolY);
   free(floatKeyX);
   free(floatKeyY);
-  free(regImage);
 }
 
 void tps::CudaTPS::freeCudaResources() {

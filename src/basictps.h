@@ -8,7 +8,7 @@ namespace tps {
 
 class BasicTPS : public TPS {
 public:
-  BasicTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+  BasicTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image& targetImage, std::string outputName) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
     lienarSolver(referenceKeypoints, targetKeypoints) {};	
   void run();

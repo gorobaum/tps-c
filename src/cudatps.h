@@ -12,7 +12,7 @@ namespace tps {
   
 class CudaTPS : public TPS {
 public:
-  CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+  CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image& targetImage, std::string outputName) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
     cudalienarSolver(referenceKeypoints, targetKeypoints) {}; 
   void run();
