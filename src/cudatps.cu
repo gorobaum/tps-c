@@ -14,11 +14,10 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* so
 
   for (uint i = 0; i < numOfKeys; i++) {
     double r = (x-cudaKeyCol[i])*(x-cudaKeyCol[i]) + (y-cudaKeyRow[i])*(y-cudaKeyRow[i]);
-    if (r != 0.0)
-      newCoord += r*log(r) * solution[i+3];
+    if (r != 0.0) newCoord += r*log(r) * solution[i+3];
   }
-  if (x*width+y < width*height)
-    cudaImageCoord[x*width+y] = newCoord;
+  if (x*height+y < width*height)
+    cudaImageCoord[x*height+y] = newCoord;
 }
 
 void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
@@ -52,8 +51,8 @@ void tps::CudaTPS::run() {
 
   for (int col = 0; col < width; col++)
     for (int row = 0; row < height; row++) {
-      double newCol = imageCoordCol[col*width+row];
-      double newRow = imageCoordRow[col*width+row];
+      double newCol = imageCoordCol[col*height+row];
+      double newRow = imageCoordRow[col*height+row];
       uchar value = targetImage_.bilinearInterpolation(newCol, newRow);
       registredImage.changePixelAt(col, row, value);
     }

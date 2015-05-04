@@ -45,7 +45,7 @@ void tps::Image::save(std::string filename) {
   cv::Mat savImage = cv::Mat::zeros(height_, width_, CV_8U);
   for (int col = 0; col < width_; col++)
       for (int row = 0; row < height_; row++)
-        savImage.at<uchar>(row, col) = image[col][row];
+        savImage.at<uchar>(row, col) = (uchar)image[col][row];
 
   cv::imwrite(filename.c_str(), savImage, compression_params);
 }

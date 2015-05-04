@@ -36,7 +36,6 @@ private:
   float *floatSolCol, *floatSolRow;
   float *floatKeyCol, *floatKeyRow;
   float *cudaKeyCol, *cudaKeyRow;
-  size_t cudaPitch, hostPitch;
 };
 
 }
