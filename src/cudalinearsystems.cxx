@@ -8,11 +8,11 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
 
-  solveLinearSystem(bx, floatSolX);
-  solveLinearSystem(by, floatSolY);
+  solveLinearSystem(bx, floatSolCol);
+  solveLinearSystem(by, floatSolRow);
 
-  solutionX = pointerToVector(floatSolX);
-  solutionY = pointerToVector(floatSolY);
+  solutionCol = pointerToVector(floatSolCol);
+  solutionRow = pointerToVector(floatSolRow);
 
   freeResources();
 }
@@ -105,8 +105,8 @@ void tps::CudaLinearSystems::createMatrixA() {
 void tps::CudaLinearSystems::createBs() {
   bx = (float*)malloc(systemDimension*sizeof(float));
   by = (float*)malloc(systemDimension*sizeof(float));
-  floatSolX = (float*)malloc(systemDimension*sizeof(float));
-  floatSolY = (float*)malloc(systemDimension*sizeof(float));
+  floatSolCol = (float*)malloc(systemDimension*sizeof(float));
+  floatSolRow = (float*)malloc(systemDimension*sizeof(float));
   for (uint j = 0; j < 3; j++) {
     bx[j] = 0.0;
     by[j] = 0.0;
@@ -129,6 +129,6 @@ void tps::CudaLinearSystems::freeResources() {
   free(A);
   free(bx);
   free(by);
-  free(floatSolX);
-  free(floatSolY);
+  free(floatSolCol);
+  free(floatSolRow);
 }

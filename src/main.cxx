@@ -1,5 +1,7 @@
 #include "image.h"
 #include "featuregenerator.h"
+#include "tps.h"
+#include "cudatps.h"
 
 #include <string>
 #include <sstream>
@@ -51,5 +53,10 @@ int main(int argc, char** argv) {
   fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
   std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
 
+  double CUDAcTpsExecTime = (double)cv::getTickCount();
+  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);
+  CUDActps.run();
+  CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+  std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
   return 0;
 }

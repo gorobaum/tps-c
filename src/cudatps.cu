@@ -6,18 +6,18 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__global__ void tpsCuda(double* cudaImageCoord, int width, int heigth, float* solution, float* cudaKeyX, float* cudaKeyY, uint numOfKeys)
+__global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* solution, float* cudaKeyCol, float* cudaKeyRow, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   double newCoord = solution[0] + x*solution[1] + y*solution[2];
 
   for (uint i = 0; i < numOfKeys; i++) {
-    double r = (x-cudaKeyX[i])*(x-cudaKeyX[i]) + (y-cudaKeyY[i])*(y-cudaKeyY[i]);
+    double r = (x-cudaKeyCol[i])*(x-cudaKeyCol[i]) + (y-cudaKeyRow[i])*(y-cudaKeyRow[i]);
     if (r != 0.0)
       newCoord += r*log(r) * solution[i+3];
   }
-  if (x*width+y < width*heigth)
+  if (x*width+y < width*height)
     cudaImageCoord[x*width+y] = newCoord;
 }
 
@@ -26,9 +26,9 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, dimensions[1], dimensions[0], cudaSolution, cudaKeyX, cudaKeyY, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, cudaKeyCol, cudaKeyRow, targetKeypoints_.size());
   cudaDeviceSynchronize(); 
-  cudaMemcpy(imageCoord, cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double), cudaMemcpyDeviceToHost);
+  cudaMemcpy(imageCoord, cudaImageCoord, width*height*sizeof(double), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsedTime;
@@ -39,26 +39,25 @@ void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 thre
 }
 
 void tps::CudaTPS::run() {
-	dimensions = registredImage.getDimensions();
 	allocResources();
 	allocCudaResources();
 
   dim3 threadsPerBlock(32, 32);
-  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x), std::ceil(1.0*dimensions[1]/threadsPerBlock.y));
+  dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
-  callKernel(cudaSolutionX, imageCoordX, threadsPerBlock, numBlocks);
-  callKernel(cudaSolutionY, imageCoordY, threadsPerBlock, numBlocks);
+  callKernel(cudaSolutionCol, imageCoordCol, threadsPerBlock, numBlocks);
+  callKernel(cudaSolutionRow, imageCoordRow, threadsPerBlock, numBlocks);
 
   // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
-  for (int x = 0; x < dimensions[0]; x++)
-    for (int y = 0; y < dimensions[1]; y++) {
-      double newX = imageCoordX[x*dimensions[1]+y];
-      double newY = imageCoordY[x*dimensions[1]+y];
-      uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
-      registredImage.changePixelAt(x, y, value);
+  for (int col = 0; col < width; col++)
+    for (int row = 0; row < height; row++) {
+      double newCol = imageCoordCol[col*width+row];
+      double newRow = imageCoordRow[col*width+row];
+      uchar value = targetImage_.bilinearInterpolation(newCol, newRow);
+      registredImage.changePixelAt(col, row, value);
     }
-  registredImage.save();
+  registredImage.save(outputName_);
 
 	freeResources();
 	freeCudaResources();
@@ -67,68 +66,62 @@ void tps::CudaTPS::run() {
 }
 
 void tps::CudaTPS::allocResources() {
-  imageCoordX = (double*)malloc(dimensions[0]*dimensions[1]*sizeof(double));
-  imageCoordY = (double*)malloc(dimensions[0]*dimensions[1]*sizeof(double));
+  imageCoordCol = (double*)malloc(width*height*sizeof(double));
+  imageCoordRow = (double*)malloc(width*height*sizeof(double));
   createCudaSolution();
   createCudaKeyPoint();
 }
 
 void tps::CudaTPS::createCudaSolution() {
-  std::vector<float> solutionX;
-  std::vector<float> solutionY;
-  if (cudaLS_) {
-    cudalienarSolver.solveLinearSystems();
-    solutionX = cudalienarSolver.getSolutionX();
-    solutionY = cudalienarSolver.getSolutionY();
-  } else {
-    opcvlienarSolver.solveLinearSystems();
-    solutionX = opcvlienarSolver.getSolutionX();
-    solutionY = opcvlienarSolver.getSolutionY();
-  }
-  floatSolX = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
-  floatSolY = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
+  std::vector<float> solutionCol;
+  std::vector<float> solutionRow;
+  cudalienarSolver.solveLinearSystems();
+  solutionCol = cudalienarSolver.getSolutionCol();
+  solutionRow = cudalienarSolver.getSolutionRow();
+  floatSolCol = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
+  floatSolRow = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
   for (uint i = 0; i < (targetKeypoints_.size()+3); i++) {
-    floatSolX[i] = solutionX[i];
-    floatSolY[i] = solutionY[i];
+    floatSolCol[i] = solutionCol[i];
+    floatSolRow[i] = solutionRow[i];
   }
 }
 
 void tps::CudaTPS::createCudaKeyPoint() {
-  floatKeyX = (float*)malloc(targetKeypoints_.size()*sizeof(float));
-  floatKeyY = (float*)malloc(targetKeypoints_.size()*sizeof(float));
+  floatKeyCol = (float*)malloc(targetKeypoints_.size()*sizeof(float));
+  floatKeyRow = (float*)malloc(targetKeypoints_.size()*sizeof(float));
   for (uint i = 0; i < targetKeypoints_.size(); i++) {
-    floatKeyX[i] = referenceKeypoints_[i].x;
-    floatKeyY[i] = referenceKeypoints_[i].y;
+    floatKeyCol[i] = referenceKeypoints_[i].x;
+    floatKeyRow[i] = referenceKeypoints_[i].y;
   }
 }
 
 void tps::CudaTPS::allocCudaResources() {
-  cudaMalloc(&cudaImageCoord, dimensions[0]*dimensions[1]*sizeof(double));
-  cudaMalloc(&cudaSolutionX, (targetKeypoints_.size()+3)*sizeof(float));
-  cudaMalloc(&cudaSolutionY, (targetKeypoints_.size()+3)*sizeof(float));
-  cudaMemcpy(cudaSolutionX, floatSolX, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaSolutionY, floatSolY, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMalloc(&cudaImageCoord, width*height*sizeof(double));
+  cudaMalloc(&cudaSolutionCol, (targetKeypoints_.size()+3)*sizeof(float));
+  cudaMalloc(&cudaSolutionRow, (targetKeypoints_.size()+3)*sizeof(float));
+  cudaMemcpy(cudaSolutionCol, floatSolCol, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaSolutionRow, floatSolRow, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
 
-  cudaMalloc(&cudaKeyX, targetKeypoints_.size()*sizeof(float));
-  cudaMalloc(&cudaKeyY, targetKeypoints_.size()*sizeof(float));
-  cudaMemcpy(cudaKeyX, floatKeyX, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaKeyY, floatKeyY, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMalloc(&cudaKeyCol, targetKeypoints_.size()*sizeof(float));
+  cudaMalloc(&cudaKeyRow, targetKeypoints_.size()*sizeof(float));
+  cudaMemcpy(cudaKeyCol, floatKeyCol, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaKeyRow, floatKeyRow, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
 }
 
 void tps::CudaTPS::freeResources() {
-  free(imageCoordX);
-  free(imageCoordY);
-  free(floatSolX);
-  free(floatSolY);
-  free(floatKeyX);
-  free(floatKeyY);
+  free(imageCoordCol);
+  free(imageCoordRow);
+  free(floatSolCol);
+  free(floatSolRow);
+  free(floatKeyCol);
+  free(floatKeyRow);
 }
 
 void tps::CudaTPS::freeCudaResources() {
   cudaFree(cudaImageCoord);
-  cudaFree(cudaSolutionX);
-  cudaFree(cudaSolutionY);
-  cudaFree(cudaKeyX);
-  cudaFree(cudaKeyY);
+  cudaFree(cudaSolutionCol);
+  cudaFree(cudaSolutionRow);
+  cudaFree(cudaKeyCol);
+  cudaFree(cudaKeyRow);
 	cudaDeviceSynchronize();
 }

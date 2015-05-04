@@ -21,7 +21,7 @@ private:
   void createMatrixA();
   void createBs();
   void freeResources();
-  float *bx, *by, *A, *floatSolX, *floatSolY;
+  float *bx, *by, *A, *floatSolCol, *floatSolRow;
 };
 
 } //namepsace

@@ -17,7 +17,7 @@ public:
 	Image(cv::Mat matImage) {
 		width_ = matImage.size().width;
 		height_ = matImage.size().height;
-		image = std::vector<std::vector<int>>(width_, std::vector<int>(height_, 0));
+		image = std::vector< std::vector<int> >(width_, std::vector<int>(height_, 0));
 		for (int col = 0; col < width_; col++)
 			for (int row = 0; row < height_; row++)
 				image[col][row] = (int)matImage.at<uchar>(row, col);
@@ -25,9 +25,10 @@ public:
 	Image(int width, int height) {
 		width_ = width;
 		height_ = height;
-		image = std::vector<std::vector<int>>(width_, std::vector<int>(height_, 0));
+		image = std::vector< std::vector<int> >(width_, std::vector<int>(height_, 0));
 	};
-	std::vector<std::vector<int>> getImage() {return image;};
+	std::vector< std::vector<int> > getImage() {return image;};
+	void save(std::string filename);
 	int getWidth() { return width_; };
 	int getHeight() { return height_; };
 	void changePixelAt(int col, int row, int value);
@@ -35,7 +36,7 @@ public:
 	int bilinearInterpolation(float col, float row);
 	int NNInterpolation(float col, float row);
 private:
-	std::vector<std::vector<int>> image;
+	std::vector< std::vector<int> > image;
 	int width_;
 	int height_;
 	int getNearestInteger(float number) {

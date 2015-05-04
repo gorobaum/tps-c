@@ -1,6 +1,5 @@
 #include "tps.h"
 
-
 void tps::TPS::findSolutions() {
 	cv::Mat A = createMatrixA();
 

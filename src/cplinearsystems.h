@@ -14,8 +14,8 @@ public:
     targetKeypoints_(targetKeypoints),
     systemDimension(referenceKeypoints_.size()+3) {};
   virtual void solveLinearSystems() = 0;
-  std::vector<float> getSolutionX() {return solutionX;};
-  std::vector<float> getSolutionY() {return solutionY;};
+  std::vector<float> getSolutionCol() {return solutionCol;};
+  std::vector<float> getSolutionRow() {return solutionRow;};
 protected:
   virtual void createMatrixA() = 0;
   virtual void createBs() = 0;
@@ -23,8 +23,8 @@ protected:
   std::vector<cv::Point2f> referenceKeypoints_;
   std::vector<cv::Point2f> targetKeypoints_;
   int systemDimension;
-  std::vector<float> solutionX;
-  std::vector<float> solutionY;
+  std::vector<float> solutionCol;
+  std::vector<float> solutionRow;
 };
 
 } //namespace
