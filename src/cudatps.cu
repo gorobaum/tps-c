@@ -53,7 +53,7 @@ void tps::CudaTPS::run() {
     for (int row = 0; row < height; row++) {
       double newCol = imageCoordCol[col*height+row];
       double newRow = imageCoordRow[col*height+row];
-      uchar value = targetImage_.bilinearInterpolation(newCol, newRow);
+      int value = targetImage_.bilinearInterpolation(newCol, newRow);
       registredImage.changePixelAt(col, row, value);
     }
   registredImage.save(outputName_);
