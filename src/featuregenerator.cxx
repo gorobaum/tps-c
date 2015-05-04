@@ -9,6 +9,10 @@ void tps::FeatureGenerator::run(bool createFeatureImage) {
   gridSizeY = referenceImage_.dimensions[1]*percentage_;
   xStep = referenceImage_.dimensions[0]*1.0/(gridSizeX-1);
   yStep = referenceImage_.dimensions[1]*1.0/(gridSizeY-1);
+  std::cout << "gridSizeX = " << gridSizeX << std::endl;
+  std::cout << "gridSizeY = " << gridSizeY << std::endl;
+  std::cout << "xStep = " << xStep << std::endl;
+  std::cout << "yStep = " << yStep << std::endl;
   createReferenceImageFeatures();
   createTargetImageFeatures();
   matches = createMatches();
