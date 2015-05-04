@@ -14,6 +14,12 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   solutionCol = pointerToVector(floatSolCol);
   solutionRow = pointerToVector(floatSolRow);
 
+  for (int i = 0; i < systemDimension; i++)
+    std::cout << "solutionCol[" << i << "] = " << solutionCol[i] << std::endl;
+
+  for (int i = 0; i < systemDimension; i++)
+    std::cout << "solutionRow[" << i << "] = " << solutionRow[i] << std::endl;
+
   freeResources();
 }
 
