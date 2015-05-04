@@ -9,13 +9,8 @@ find_package(CUDA QUIET REQUIRED)
 
 cuda_add_executable(tps
   src/main.cxx
-  src/surf.cxx
-  src/featuregenerator.cxx
-  src/OPCVlinearsystems.cxx
-  src/cudalinearsystems.cxx
-  src/basictps.cxx
-  src/paralleltps.cxx
-	src/cudatps.cu)
+  src/image.cxx
+  src/featuregenerator.cxx)
 
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
 
