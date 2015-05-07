@@ -35,28 +35,38 @@ int main(int argc, char** argv) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
   compression_params.push_back(95);
-  if (argc < 1) {
-    std::cout << "Precisa passar o arquivo de configuração coração! \n";    
-    return 0;
-  }
- 	tps::Image referenceImage;
-  tps::Image targetImage;
-  std::string outputName;
-  std::string extension;
-  float percentage;
-  readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
-  int minHessian = 400;
 
-  double fgExecTime = (double)cv::getTickCount();
-  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
-  fg.run(true);
-  fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
-  std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+  cv::Mat rect = cv::Mat::zeros(210,380,CV_8U);
+  for (int col = 0; col < rect.size().width; col++) rect.at<uchar>(10, col) = 255;
+  for (int col = 0; col < rect.size().width; col++) rect.at<uchar>(200, col) = 255;
+  for (int row = 0; row < rect.size().height; row++) rect.at<uchar>(row, 190) = 255;
+  if (rect.at<uchar>(0, 190) == 255) std::cout << "CERTO!\n";
+  cv::imwrite("linha.png", rect, compression_params);
 
-  double CUDAcTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);
-  CUDActps.run();
-  CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-  std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+
+
+  // if (argc < 1) {
+  //   std::cout << "Precisa passar o arquivo de configuração coração! \n";    
+  //   return 0;
+  // }
+ 	// tps::Image referenceImage;
+  // tps::Image targetImage;
+  // std::string outputName;
+  // std::string extension;
+  // float percentage;
+  // readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
+  // int minHessian = 400;
+
+  // double fgExecTime = (double)cv::getTickCount();
+  // tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
+  // fg.run(true);
+  // fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
+  // std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+
+  // double CUDAcTpsExecTime = (double)cv::getTickCount();
+  // tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);
+  // CUDActps.run();
+  // CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+  // std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
   return 0;
 }
