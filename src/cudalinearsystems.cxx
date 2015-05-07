@@ -11,6 +11,13 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   solveLinearSystem(bx, floatSolCol);
   solveLinearSystem(by, floatSolRow);
 
+  // std::cout << "bx = " << std::endl;
+  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+  //   std::cout << bx[i] << ", ";
+  // std::cout << std::endl << "by = " << std::endl;
+  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
+  //   std::cout << by[i] << ", ";
+
   solutionCol = pointerToVector(floatSolCol);
   solutionRow = pointerToVector(floatSolRow);
 
@@ -111,7 +118,7 @@ void tps::CudaLinearSystems::createBs() {
     bx[j] = 0.0;
     by[j] = 0.0;
   }
-  for (uint i = 0; i < referenceKeypoints_.size(); i++) {
+  for (uint i = 0; i < targetKeypoints_.size(); i++) {
     bx[i+3] = targetKeypoints_[i].x;
     by[i+3] = targetKeypoints_[i].y;
   }

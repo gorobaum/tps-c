@@ -48,9 +48,6 @@ int main(int argc, char** argv) {
   readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
   int minHessian = 400;
 
-  std::cout << "Width = " << referenceImage.getWidth() << std::endl;
-  std::cout << "Height = " << referenceImage.getHeight() << std::endl;
-
   double fgExecTime = (double)cv::getTickCount();
   tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
   fg.run(true);

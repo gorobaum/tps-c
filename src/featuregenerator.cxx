@@ -22,7 +22,6 @@ void tps::FeatureGenerator::createReferenceImageFeatures() {
   for (int col = 0; col < gridSizeCol; col++)
     for (int row = 0; row < gridSizeRow; row++) {
       cv::Point2f newCP(col*colStep, row*rowStep);
-      std::cout << "NewCP = " << newCP.x << " - " << newCP.y << std::endl;
       referenceKeypoints.push_back(newCP);
       cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
       keypoints_ref.push_back(newKP);

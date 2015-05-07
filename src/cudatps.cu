@@ -88,7 +88,7 @@ void tps::CudaTPS::createCudaSolution() {
 void tps::CudaTPS::createCudaKeyPoint() {
   floatKeyCol = (float*)malloc(targetKeypoints_.size()*sizeof(float));
   floatKeyRow = (float*)malloc(targetKeypoints_.size()*sizeof(float));
-  for (uint i = 0; i < targetKeypoints_.size(); i++) {
+  for (uint i = 0; i < referenceKeypoints_.size(); i++) {
     floatKeyCol[i] = referenceKeypoints_[i].x;
     floatKeyRow[i] = referenceKeypoints_[i].y;
   }
