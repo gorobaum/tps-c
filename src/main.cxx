@@ -46,6 +46,8 @@ int main(int argc, char** argv) {
   if (macaco.getPixelAt(10, 10) == 255) std::cout << "CERTO!\n";
   if (macaco.getPixelAt(180, 200) == 255) std::cout << "CERTO!\n";
   if (macaco.getPixelAt(100, 100) == 0) std::cout << "CERTO!\n";
+  for (int col = 0; col < rect.size().width; col++) macaco.changePixelAt(col, 105, 255) ;
+  macaco.save("aeHO.png");
   cv::imwrite("linha.png", rect, compression_params);
 
   // if (argc < 1) {
