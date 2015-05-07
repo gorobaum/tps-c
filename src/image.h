@@ -20,7 +20,7 @@ public:
 		image = std::vector< std::vector<int> >(width_, std::vector<int>(height_, 0));
 		for (int col = 0; col < width_; col++)
 			for (int row = 0; row < height_; row++)
-				image[col][row] = (int)matImage.at<uchar>(row, col);
+				image[col][row] = matImage.at<uchar>(row, col);
 	};
 	Image(int width, int height) {
 		width_ = width;

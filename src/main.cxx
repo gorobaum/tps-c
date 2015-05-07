@@ -40,10 +40,13 @@ int main(int argc, char** argv) {
   for (int col = 0; col < rect.size().width; col++) rect.at<uchar>(10, col) = 255;
   for (int col = 0; col < rect.size().width; col++) rect.at<uchar>(200, col) = 255;
   for (int row = 0; row < rect.size().height; row++) rect.at<uchar>(row, 190) = 255;
-  if (rect.at<uchar>(0, 190) == 255) std::cout << "CERTO!\n";
+  tps::Image macaco = tps::Image(rect);
+  if (macaco.getWidth() == 380) std::cout << "Width ok!\n";
+  if (macaco.getHeight() == 210) std::cout << "Height ok!\n";
+  if (macaco.getPixelAt(10, 10) == 255) std::cout << "CERTO!\n";
+  if (macaco.getPixelAt(180, 200) == 255) std::cout << "CERTO!\n";
+  if (macaco.getPixelAt(100, 100) == 0) std::cout << "CERTO!\n";
   cv::imwrite("linha.png", rect, compression_params);
-
-
 
   // if (argc < 1) {
   //   std::cout << "Precisa passar o arquivo de configuração coração! \n";    
