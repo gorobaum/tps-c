@@ -42,11 +42,11 @@ void tps::FeatureGenerator::createTargetImageFeatures() {
 }
 
 std::vector<int> tps::FeatureGenerator::applySenoidalDeformationTo(int x, int y) {
-  int newX = x+8*std::sin(y/16);
-  int newY = y-4*std::cos(x/32);
+  int newX = x-8*std::sin(y/16);
+  int newY = y+4*std::cos(x/32);
   std::vector<int> newPoint;
-  newPoint.push_back(newY);
   newPoint.push_back(newX);
+  newPoint.push_back(newY);
   return newPoint;
 }
 
