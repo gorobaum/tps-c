@@ -20,7 +20,7 @@ private:
   cv::Mat tarImg_;
   int gridSizeCol, gridSizeRow;
   float colStep, rowStep;
-  std::vector<float> applySenoidalDeformationTo(float x, float y);
+  std::vector<int> applySenoidalDeformationTo(int x, int y);
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
   std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;
