@@ -15,8 +15,8 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   solutionRow = pointerToVector(floatSolRow);
 
   // std::cout << "A = " << std::endl;
-  // for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-  //   for (uint j = 0; j < referenceKeypoints_.size(); j++)
+  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++) {
+  //   for (uint j = 0; j < referenceKeypoints_.size()+3; j++)
   //     std::cout << A[i*systemDimension+j] << ", ";
   //   std::cout << "; " << std::endl;
   // }
@@ -29,18 +29,18 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   //   std::cout << referenceKeypoints_[i].y << ", ";
 
   // std::cout << std::endl << "bx = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size(); i++)
+  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
   //   std::cout << bx[i] << ", ";
   // std::cout << std::endl << "by = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size(); i++)
+  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
   //   std::cout << by[i] << ", ";
 
-  std::cout << std::endl << "solutionCol = " << std::endl;
-  for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-    std::cout << solutionCol[i] << ", ";
-  std::cout << std::endl << "solutionRow = " << std::endl;
-  for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-    std::cout << solutionRow[i] << ", ";
+  // std::cout << std::endl << "solutionCol = " << std::endl;
+  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
+  //   std::cout << solutionCol[i] << ", ";
+  // std::cout << std::endl << "solutionRow = " << std::endl;
+  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
+  //   std::cout << solutionRow[i] << ", ";
 
   freeResources();
 }

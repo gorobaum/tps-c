@@ -42,8 +42,8 @@ void tps::FeatureGenerator::createTargetImageFeatures() {
 }
 
 std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y) {
-  float newX = x-8.0*std::sin(y/16.0);
-  float newY = y+4.0*std::cos(x/32.0);
+  float newX = std::round(x-8.0*std::sin(y/16.0));
+  float newY = std::round(y+4.0*std::cos(x/32.0));
   std::vector<float> newPoint;
   newPoint.push_back(newX);
   newPoint.push_back(newY);
