@@ -48,14 +48,28 @@ int main(int argc, char** argv) {
   readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
   int minHessian = 400;
 
-  double fgExecTime = (double)cv::getTickCount();
-  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
-  fg.run(true);
-  fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
-  std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+  // double fgExecTime = (double)cv::getTickCount();
+  // tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
+  // fg.run(true);
+  // fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
+  // std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+
+  std::vector<cv::Point2f> referenceKeypoints;
+  std::vector<cv::Point2f> targetKeypoints;
+  int x[7] = {1,1,20,20,11,7,16};
+  int y[7] = {1,20,1,20,8,17,12};
+  int X[7] = {10,10,10,10,15,25,20};
+  int Y[7] = {0,0,0,0,0,0,0};
+  for ( int i = 0; i < 7; i++) {
+    cv::Point2f newCP(x[i], y[i]);
+    referenceKeypoints.push_back(newCP);
+    cv::Point2f newCPT(X[i], Y[i]);
+    targetKeypoints.push_back(newCPT);
+  }
+  
 
   double CUDAcTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);
+  tps::CudaTPS CUDActps = tps::CudaTPS(referenceKeypoints, targetKeypoints, targetImage, outputName+"TPSCUDA"+extension);
   CUDActps.run();
   CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
   std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
