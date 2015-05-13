@@ -6,37 +6,37 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
-__device__ double cudaGetPixel(int x, int y, uchar* image, int width, int heigth) {
-  if (x > heigth-1 || x < 0) return 0;
-  if (y > width-1 || y < 0) return 0;
-  return image[x*heigth+y];
+__device__ double cudaGetPixel(int x, int y, uchar* image, int width, int height) {
+  if (x > width-1 || x < 0) return 0;
+  if (y > height-1 || y < 0) return 0;
+  return image[x*height+y];
 }
 
 // Kernel definition
-__device__ double cudaBilinearInterpolation(double newX, double newY, uchar* image, int width, int heigth) {
-  int u = trunc(newX);
-  int v = trunc(newY);
+__device__ double cudaBilinearInterpolation(double col, double row, uchar* image, int width, int height) {
+  int u = trunc(col);
+  int v = trunc(row);
 
-  uchar pixelOne = cudaGetPixel(u, v, image, width, heigth);
-  uchar pixelTwo = cudaGetPixel(u+1, v, image, width, heigth);
-  uchar pixelThree = cudaGetPixel(u, v+1, image, width, heigth);
-  uchar pixelFour = cudaGetPixel(u+1, v+1, image, width, heigth);
+  uchar pixelOne = cudaGetPixel(u, v, image, width, height);
+  uchar pixelTwo = cudaGetPixel(u+1, v, image, width, height);
+  uchar pixelThree = cudaGetPixel(u, v+1, image, width, height);
+  uchar pixelFour = cudaGetPixel(u+1, v+1, image, width, height);
 
-  double interpolation = (u+1-newX)*(v+1-newY)*pixelOne
-                        + (newX-u)*(v+1-newY)*pixelTwo 
-                        + (u+1-newX)*(newY-v)*pixelThree
-                        + (newX-u)*(newY-v)*pixelFour;
+  double interpolation = (u+1-col)*(v+1-row)*pixelOne
+                        + (col-u)*(v+1-row)*pixelTwo 
+                        + (u+1-col)*(row-v)*pixelThree
+                        + (col-u)*(row-v)*pixelFour;
   return interpolation;
 }
 
 // Kernel definition
-__global__ void cudaRegistredImage(double* cudaImageCoordX, double* cudaImageCoordY, uchar* cudaImage, uchar* cudaRegImage, int width, int heigth) {
+__global__ void cudaRegistredImage(double* cudaImageCoordX, double* cudaImageCoordY, uchar* cudaImage, uchar* cudaRegImage, int width, int height) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
 
-  double newX = cudaImageCoordX[x*heigth+y];
-  double newY = cudaImageCoordY[x*heigth+y];
-  cudaRegImage[x*heigth+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, heigth);
+  double newX = cudaImageCoordX[x*height+y];
+  double newY = cudaImageCoordY[x*height+y];
+  cudaRegImage[x*height+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, height);
 }
 
 // Kernel definition
