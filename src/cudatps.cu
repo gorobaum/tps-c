@@ -7,8 +7,8 @@
 
 // Kernel definition
 __device__ double cudaGetPixel(int x, int y, uchar* image, int width, int heigth) {
-  if (x > heigth-1) return 0;
-  if (y > width-1) return 0;
+  if (x > heigth-1 || x < 0) return 0;
+  if (y > width-1 || y < 0) return 0;
   return image[x*heigth+y];
 }
 
@@ -108,6 +108,9 @@ void tps::CudaTPS::run() {
 
 void tps::CudaTPS::allocResources() {
   regImage = (uchar*)malloc(width*height*sizeof(uchar));
+  for (int col = 0; col < width; col++)
+    for (int row = 0; row < height; row++)
+      regImage[col*height+row] = 0;
   createCudaSolution();
   createCudaKeyPoint();
 }
