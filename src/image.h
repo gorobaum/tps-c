@@ -35,6 +35,8 @@ public:
 	int getPixelAt(int col, int row);
 	int bilinearInterpolation(float col, float row);
 	int NNInterpolation(float col, float row);
+	uchar* getPixelVector();
+	void setPixelVector(uchar* vector);
 private:
 	std::vector< std::vector<int> > image;
 	int width_;

@@ -49,3 +49,18 @@ void tps::Image::save(std::string filename) {
 
   cv::imwrite(filename.c_str(), savImage, compression_params);
 }
+
+uchar* tps::Image::getPixelVector() {
+  uchar* vector = (uchar*)malloc(width_*height_*sizeof(uchar));
+  for (int col = 0; col < width_; col++)
+      for (int row = 0; row < height_; row++) vector[col*height_+row] = (uchar)image[col][row];
+  return vector;
+}
+
+void tps::Image::setPixelVector(uchar* vector) {
+for (int col = 0; col < width_; col++)
+  for (int row = 0; row < height_; row++) {
+    uchar newValue = vector[col*height_+row];
+    changePixelAt(col, row, newValue);
+  }
+}
