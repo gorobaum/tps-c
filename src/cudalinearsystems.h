@@ -15,13 +15,17 @@ class CudaLinearSystems : public CPLinearSystems {
 using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems();
+  float* getCudaSolCol() { return cudaSolutionCol; };
+  float* getCudaSolRow() { return cudaSolutionRow; };
+  void freeCuda();
 private:
-  void solveLinearSystem(float *B, float *solution);
+  void solveLinearSystem(float *B, float *cudaSolution);
   std::vector<float> pointerToVector(float *pointer);
   void createMatrixA();
   void createBs();
   void freeResources();
-  float *bx, *by, *A, *floatSolCol, *floatSolRow;
+  float *cudaSolutionCol, *cudaSolutionRow;
+  float *bx, *by, *A;
 };
 
 } //namepsace

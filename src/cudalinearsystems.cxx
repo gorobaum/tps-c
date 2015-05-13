@@ -8,11 +8,11 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
 
-  solveLinearSystem(bx, floatSolCol);
-  solveLinearSystem(by, floatSolRow);
+  cudaMalloc(&cudaSolutionCol, systemDimension*sizeof(float));
+  cudaMalloc(&cudaSolutionRow, systemDimension*sizeof(float));
 
-  solutionCol = pointerToVector(floatSolCol);
-  solutionRow = pointerToVector(floatSolRow);
+  solveLinearSystem(bx, cudaSolutionCol);
+  solveLinearSystem(by, cudaSolutionRow);
 
   // std::cout << "A = " << std::endl;
   // for (uint i = 0; i < referenceKeypoints_.size()+3; i++) {
@@ -45,7 +45,7 @@ void tps::CudaLinearSystems::solveLinearSystems() {
   freeResources();
 }
 
-void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
+void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   int lwork = 0;
   int info_gpu = 0;
 
@@ -53,7 +53,6 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   const float one = 1;
 
   float *cudaA = NULL;
-  float *cudaB = NULL;
   float *d_work = NULL;
   float *d_tau = NULL;
   int *devInfo = NULL;
@@ -68,9 +67,8 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
 
   // step 1: copy A and B to device
   cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float));
-  cudaMalloc(&cudaB, systemDimension*sizeof(float));
   cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaB, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
 
   cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension);
   cudaMalloc((void**)&devInfo, sizeof(int));
@@ -86,19 +84,16 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *solution) {
   
   // step 4: compute Q^T*B
   cusolver_status = cusolverDnSormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
-    systemDimension, cudaA, systemDimension, d_tau, cudaB, systemDimension, d_work, lwork, devInfo);
+    systemDimension, cudaA, systemDimension, d_tau, cudaSolution, systemDimension, d_work, lwork, devInfo);
   cudaDeviceSynchronize();
 
   // step 5: compute x = R \ Q^T*B
   cublas_status = cublasStrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
-    CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaB, 
+    CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaSolution, 
     systemDimension);
   cudaDeviceSynchronize();
 
-  cudaMemcpy(solution, cudaB, sizeof(float)*systemDimension, cudaMemcpyDeviceToHost);
-
   cudaFree(cudaA);
-  cudaFree(cudaB);
   cudaFree(d_work);
   cudaFree(d_tau);
   cudaFree(devInfo);
@@ -133,8 +128,6 @@ void tps::CudaLinearSystems::createMatrixA() {
 void tps::CudaLinearSystems::createBs() {
   bx = (float*)malloc(systemDimension*sizeof(float));
   by = (float*)malloc(systemDimension*sizeof(float));
-  floatSolCol = (float*)malloc(systemDimension*sizeof(float));
-  floatSolRow = (float*)malloc(systemDimension*sizeof(float));
   for (uint j = 0; j < 3; j++) {
     bx[j] = 0.0;
     by[j] = 0.0;
@@ -157,6 +150,9 @@ void tps::CudaLinearSystems::freeResources() {
   free(A);
   free(bx);
   free(by);
-  free(floatSolCol);
-  free(floatSolRow);
+}
+
+void tps::CudaLinearSystems::freeCuda() {
+  cudaFree(cudaSolutionCol);
+  cudaFree(cudaSolutionRow);
 }

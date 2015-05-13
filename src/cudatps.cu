@@ -119,14 +119,8 @@ void tps::CudaTPS::createCudaSolution() {
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;
   cudalienarSolver.solveLinearSystems();
-  solutionCol = cudalienarSolver.getSolutionCol();
-  solutionRow = cudalienarSolver.getSolutionRow();
-  floatSolCol = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
-  floatSolRow = (float*)malloc((targetKeypoints_.size()+3)*sizeof(float));
-  for (uint i = 0; i < (targetKeypoints_.size()+3); i++) {
-    floatSolCol[i] = solutionCol[i];
-    floatSolRow[i] = solutionRow[i];
-  }
+  cudaSolutionCol = cudalienarSolver.getCudaSolCol();
+  cudaSolutionRow = cudalienarSolver.getCudaSolRow();
 }
 
 void tps::CudaTPS::createCudaKeyPoint() {
@@ -141,10 +135,6 @@ void tps::CudaTPS::createCudaKeyPoint() {
 void tps::CudaTPS::allocCudaResources() {
   cudaMalloc(&cudaImageCoordCol, width*height*sizeof(double));
   cudaMalloc(&cudaImageCoordRow, width*height*sizeof(double));
-  cudaMalloc(&cudaSolutionCol, (targetKeypoints_.size()+3)*sizeof(float));
-  cudaMalloc(&cudaSolutionRow, (targetKeypoints_.size()+3)*sizeof(float));
-  cudaMemcpy(cudaSolutionCol, floatSolCol, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaSolutionRow, floatSolRow, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
 
   cudaMalloc(&cudaKeyCol, targetKeypoints_.size()*sizeof(float));
   cudaMalloc(&cudaKeyRow, targetKeypoints_.size()*sizeof(float));
@@ -157,8 +147,6 @@ void tps::CudaTPS::allocCudaResources() {
 }
 
 void tps::CudaTPS::freeResources() {
-  free(floatSolCol);
-  free(floatSolRow);
   free(floatKeyCol);
   free(floatKeyRow);
 }
@@ -166,8 +154,7 @@ void tps::CudaTPS::freeResources() {
 void tps::CudaTPS::freeCudaResources() {
   cudaFree(cudaImageCoordCol);
   cudaFree(cudaImageCoordRow);
-  cudaFree(cudaSolutionCol);
-  cudaFree(cudaSolutionRow);
+  cudalienarSolver.freeCuda();
   cudaFree(cudaKeyCol);
   cudaFree(cudaKeyRow);
 	cudaDeviceSynchronize();
