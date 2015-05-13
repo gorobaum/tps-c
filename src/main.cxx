@@ -31,6 +31,35 @@ void readConfigFile(std::string filename, tps::Image& referenceImage, tps::Image
   percentage = std::stof(line);
 }
 
+void memoryEstimation(int width, int height, int numberOfCps) {
+  int floatSize = sizeof(float);
+  int doubleSize = sizeof(double);
+  int ucharSize = sizeof(uchar);
+
+  int systemDimention = numberOfCps+3;
+
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo( &avail, &total );
+  size_t used = total - avail;
+  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
+
+  double solutionsMemory = 2.0*systemDimention*floatSize/(1024*1024);
+  std::cout << "GPU Memory occupied by the linear systems solutions = " << solutionsMemory << "MB" << std::endl;
+
+  double coordinatesMemory = 2.0*width*height*doubleSize/(1024*1024);
+  std::cout << "GPU Memory occupied by the coordinates calculation = " << coordinatesMemory << "MB" << std::endl;
+
+  double keypointsMemory = 2.0*numberOfCps*floatSize/(1024*1024);
+  std::cout << "GPU Memory occupied by the keypoints = " << keypointsMemory << "MB" << std::endl;
+
+  double pixelsMemory = 2.0*width*height*ucharSize/(1024*1024);
+  std::cout << "GPU Memory occupied by the pixels = " << pixelsMemory << "MB" << std::endl;
+
+  double totalMemory = solutionsMemory+coordinatesMemory+keypointsMemory+pixelsMemory;
+  std::cout << "Total GPU memory occupied = " << totalMemory << "MB" << std::endl;
+}
+
 int main(int argc, char** argv) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -53,20 +82,8 @@ int main(int argc, char** argv) {
   fg.run(true);
   fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
   std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
-
-  // std::vector<cv::Point2f> referenceKeypoints;
-  // std::vector<cv::Point2f> targetKeypoints;
-  // int x[7] = {1,1,20,20,11,7,16};
-  // int y[7] = {1,20,1,20,8,17,12};
-  // int X[7] = {10,10,10,10,15,25,20};
-  // int Y[7] = {0,0,0,0,0,0,0};
-  // for ( int i = 0; i < 7; i++) {
-  //   cv::Point2f newCP(x[i], y[i]);
-  //   referenceKeypoints.push_back(newCP);
-  //   cv::Point2f newCPT(X[i], Y[i]);
-  //   targetKeypoints.push_back(newCPT);
-  // }
   
+  memoryEstimation(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
 
   double CUDAcTpsExecTime = (double)cv::getTickCount();
   tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);

@@ -111,7 +111,6 @@ void tps::CudaTPS::allocResources() {
   for (int col = 0; col < width; col++)
     for (int row = 0; row < height; row++)
       regImage[col*height+row] = 0;
-  createCudaSolution();
   createCudaKeyPoint();
 }
 
@@ -133,6 +132,8 @@ void tps::CudaTPS::createCudaKeyPoint() {
 }
 
 void tps::CudaTPS::allocCudaResources() {
+  createCudaSolution();
+
   cudaMalloc(&cudaImageCoordCol, width*height*sizeof(double));
   cudaMalloc(&cudaImageCoordRow, width*height*sizeof(double));
 
@@ -152,6 +153,11 @@ void tps::CudaTPS::freeResources() {
 }
 
 void tps::CudaTPS::freeCudaResources() {
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo( &avail, &total );
+  size_t used = total - avail;
+  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
   cudaFree(cudaImageCoordCol);
   cudaFree(cudaImageCoordRow);
   cudalienarSolver.freeCuda();

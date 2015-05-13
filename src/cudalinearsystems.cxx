@@ -7,40 +7,12 @@
 void tps::CudaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
-
+  
   cudaMalloc(&cudaSolutionCol, systemDimension*sizeof(float));
   cudaMalloc(&cudaSolutionRow, systemDimension*sizeof(float));
 
   solveLinearSystem(bx, cudaSolutionCol);
   solveLinearSystem(by, cudaSolutionRow);
-
-  // std::cout << "A = " << std::endl;
-  // for (uint i = 0; i < referenceKeypoints_.size()+3; i++) {
-  //   for (uint j = 0; j < referenceKeypoints_.size()+3; j++)
-  //     std::cout << A[i*systemDimension+j] << ", ";
-  //   std::cout << "; " << std::endl;
-  // }
-
-  // std::cout << "referenceKeypoints_.x = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size(); i++)
-  //   std::cout << referenceKeypoints_[i].x << ", ";
-  // std::cout << std::endl << "referenceKeypoints_.y = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size(); i++)
-  //   std::cout << referenceKeypoints_[i].y << ", ";
-
-  // std::cout << std::endl << "bx = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-  //   std::cout << bx[i] << ", ";
-  // std::cout << std::endl << "by = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-  //   std::cout << by[i] << ", ";
-
-  // std::cout << std::endl << "solutionCol = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-  //   std::cout << solutionCol[i] << ", ";
-  // std::cout << std::endl << "solutionRow = " << std::endl;
-  // for (uint i = 0; i < targetKeypoints_.size()+3; i++)
-  //   std::cout << solutionRow[i] << ", ";
 
   freeResources();
 }
@@ -94,12 +66,13 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   cudaDeviceSynchronize();
 
   cudaFree(cudaA);
-  cudaFree(d_work);
   cudaFree(d_tau);
   cudaFree(devInfo);
+  cudaFree(d_work);
 
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);
+
 }
 
 void tps::CudaLinearSystems::createMatrixA() {
