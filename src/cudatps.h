@@ -26,16 +26,16 @@ private:
 	void allocCudaResources();
 	void freeResources();
 	void freeCudaResources();
-  void callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks);
+  void callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks);
   void createCudaSolution();
   void createCudaKeyPoint();
-	double *imageCoordCol;
-  double *imageCoordRow;
-	double *cudaImageCoord;
+	double *cudaImageCoordCol, *cudaImageCoordRow;
   float *cudaSolutionCol, *cudaSolutionRow;
   float *floatSolCol, *floatSolRow;
   float *floatKeyCol, *floatKeyRow;
   float *cudaKeyCol, *cudaKeyRow;
+  uchar *cudaRegImage, *cudaImage;
+  uchar *regImage;  
 };
 
 }

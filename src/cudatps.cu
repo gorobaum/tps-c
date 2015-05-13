@@ -6,6 +6,40 @@
 #define MAXTHREADPBLOCK 1024
 
 // Kernel definition
+__device__ double cudaGetPixel(int x, int y, uchar* image, int width, int heigth) {
+  if (x > heigth-1) return 0;
+  if (y > width-1) return 0;
+  return image[x*heigth+y];
+}
+
+// Kernel definition
+__device__ double cudaBilinearInterpolation(double newX, double newY, uchar* image, int width, int heigth) {
+  int u = trunc(newX);
+  int v = trunc(newY);
+
+  uchar pixelOne = cudaGetPixel(u, v, image, width, heigth);
+  uchar pixelTwo = cudaGetPixel(u+1, v, image, width, heigth);
+  uchar pixelThree = cudaGetPixel(u, v+1, image, width, heigth);
+  uchar pixelFour = cudaGetPixel(u+1, v+1, image, width, heigth);
+
+  double interpolation = (u+1-newX)*(v+1-newY)*pixelOne
+                        + (newX-u)*(v+1-newY)*pixelTwo 
+                        + (u+1-newX)*(newY-v)*pixelThree
+                        + (newX-u)*(newY-v)*pixelFour;
+  return interpolation;
+}
+
+// Kernel definition
+__global__ void cudaRegistredImage(double* cudaImageCoordX, double* cudaImageCoordY, uchar* cudaImage, uchar* cudaRegImage, int width, int heigth) {
+  int x = blockDim.x*blockIdx.x + threadIdx.x;
+  int y = blockDim.y*blockIdx.y + threadIdx.y;
+
+  double newX = cudaImageCoordX[x*heigth+y];
+  double newY = cudaImageCoordY[x*heigth+y];
+  cudaRegImage[x*heigth+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, heigth);
+}
+
+// Kernel definition
 __global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* solution, float* cudaKeyCol, float* cudaKeyRow, uint numOfKeys)
 {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
@@ -20,14 +54,13 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* so
     cudaImageCoord[x*height+y] = newCoord;
 }
 
-void tps::CudaTPS::callKernel(float *cudaSolution, double *imageCoord, dim3 threadsPerBlock, dim3 numBlocks) {
+void tps::CudaTPS::callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks) {
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
   tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, cudaKeyCol, cudaKeyRow, targetKeypoints_.size());
   cudaDeviceSynchronize(); 
-  cudaMemcpy(imageCoord, cudaImageCoord, width*height*sizeof(double), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsedTime;
@@ -44,18 +77,27 @@ void tps::CudaTPS::run() {
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
-  callKernel(cudaSolutionCol, imageCoordCol, threadsPerBlock, numBlocks);
-  callKernel(cudaSolutionRow, imageCoordRow, threadsPerBlock, numBlocks);
+  callKernel(cudaImageCoordCol, cudaSolutionCol, threadsPerBlock, numBlocks);
+  callKernel(cudaImageCoordRow, cudaSolutionRow, threadsPerBlock, numBlocks);
 
   // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
-  for (int col = 0; col < width; col++)
-    for (int row = 0; row < height; row++) {
-      double newCol = imageCoordCol[col*height+row];
-      double newRow = imageCoordRow[col*height+row];
-      int value = targetImage_.bilinearInterpolation(newCol, newRow);
-      registredImage.changePixelAt(col, row, value);
-    }
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordCol, cudaImageCoordRow, cudaImage, cudaRegImage, width, height);
+  cudaMemcpy(regImage, cudaRegImage, width*height*sizeof(uchar), cudaMemcpyDeviceToHost);
+  cudaDeviceSynchronize();
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsedTime;
+  cudaEventElapsedTime(&elapsedTime, start, stop);
+  cudaEventDestroy(start);
+  cudaEventDestroy(stop);
+  std::cout << "Time = " << elapsedTime << " ms\n";
+
+  registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);
 
 	freeResources();
@@ -65,8 +107,7 @@ void tps::CudaTPS::run() {
 }
 
 void tps::CudaTPS::allocResources() {
-  imageCoordCol = (double*)malloc(width*height*sizeof(double));
-  imageCoordRow = (double*)malloc(width*height*sizeof(double));
+  regImage = (uchar*)malloc(width*height*sizeof(uchar));
   createCudaSolution();
   createCudaKeyPoint();
 }
@@ -95,7 +136,8 @@ void tps::CudaTPS::createCudaKeyPoint() {
 }
 
 void tps::CudaTPS::allocCudaResources() {
-  cudaMalloc(&cudaImageCoord, width*height*sizeof(double));
+  cudaMalloc(&cudaImageCoordCol, width*height*sizeof(double));
+  cudaMalloc(&cudaImageCoordRow, width*height*sizeof(double));
   cudaMalloc(&cudaSolutionCol, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMalloc(&cudaSolutionRow, (targetKeypoints_.size()+3)*sizeof(float));
   cudaMemcpy(cudaSolutionCol, floatSolCol, (targetKeypoints_.size()+3)*sizeof(float), cudaMemcpyHostToDevice);
@@ -105,11 +147,13 @@ void tps::CudaTPS::allocCudaResources() {
   cudaMalloc(&cudaKeyRow, targetKeypoints_.size()*sizeof(float));
   cudaMemcpy(cudaKeyCol, floatKeyCol, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(cudaKeyRow, floatKeyRow, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
+
+  cudaMalloc(&cudaRegImage, width*height*sizeof(uchar));
+  cudaMalloc(&cudaImage, width*height*sizeof(uchar));
+  cudaMemcpy(cudaImage, targetImage_.getPixelVector(), width*height*sizeof(uchar), cudaMemcpyHostToDevice);
 }
 
 void tps::CudaTPS::freeResources() {
-  free(imageCoordCol);
-  free(imageCoordRow);
   free(floatSolCol);
   free(floatSolRow);
   free(floatKeyCol);
@@ -117,7 +161,8 @@ void tps::CudaTPS::freeResources() {
 }
 
 void tps::CudaTPS::freeCudaResources() {
-  cudaFree(cudaImageCoord);
+  cudaFree(cudaImageCoordCol);
+  cudaFree(cudaImageCoordRow);
   cudaFree(cudaSolutionCol);
   cudaFree(cudaSolutionRow);
   cudaFree(cudaKeyCol);
