@@ -115,8 +115,6 @@ void tps::CudaTPS::allocResources() {
 }
 
 void tps::CudaTPS::createCudaSolution() {
-  std::vector<float> solutionCol;
-  std::vector<float> solutionRow;
   cudalienarSolver.solveLinearSystems();
   cudaSolutionCol = cudalienarSolver.getCudaSolCol();
   cudaSolutionRow = cudalienarSolver.getCudaSolRow();
