@@ -7,11 +7,9 @@ void tps::CudaMemory::allocCudaCoord(double *hostCoordinateCol, double *hostCoor
   cudaMemcpy(coordinateRow, hostCoordinateRow, imageWidth*imageHeight*sizeof(double), cudaMemcpyHostToDevice);
 }
 
-void tps::CudaMemory::allocCudaSolution(float *hostSolutionCol, float *hostSolutionRow) {
+void tps::CudaMemory::allocCudaSolution() {
   cudaMalloc(&solutionCol, systemDim*sizeof(float));
-  cudaMemcpy(solutionCol, hostSolutionCol, systemDim*sizeof(float), cudaMemcpyHostToDevice);
   cudaMalloc(&solutionRow, systemDim*sizeof(float));
-  cudaMemcpy(solutionRow, hostSolutionRow, systemDim*sizeof(float), cudaMemcpyHostToDevice);
 }
 
 void tps::CudaMemory::allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow) {

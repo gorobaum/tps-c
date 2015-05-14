@@ -115,9 +115,9 @@ void tps::CudaTPS::allocResources() {
 }
 
 void tps::CudaTPS::createCudaSolution() {
-  cudalienarSolver.solveLinearSystems();
-  cudaSolutionCol = cudalienarSolver.getCudaSolCol();
-  cudaSolutionRow = cudalienarSolver.getCudaSolRow();
+  cudalienarSolver.solveLinearSystems(cm_);
+  cudaSolutionCol = cm_.getSolutionCol();
+  cudaSolutionRow = cm_.getSolutionRow();
 }
 
 void tps::CudaTPS::createCudaKeyPoint() {
@@ -158,8 +158,8 @@ void tps::CudaTPS::freeCudaResources() {
   std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
   cudaFree(cudaImageCoordCol);
   cudaFree(cudaImageCoordRow);
-  cudalienarSolver.freeCuda();
   cudaFree(cudaKeyCol);
   cudaFree(cudaKeyRow);
+  cm_.freeMemory();
 	cudaDeviceSynchronize();
 }

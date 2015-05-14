@@ -4,15 +4,14 @@
 #include <iostream>
 #include <cublas_v2.h>
 
-void tps::CudaLinearSystems::solveLinearSystems() {
+void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
   
-  cudaMalloc(&cudaSolutionCol, systemDimension*sizeof(float));
-  cudaMalloc(&cudaSolutionRow, systemDimension*sizeof(float));
+  cm.allocCudaSolution();
 
-  solveLinearSystem(bx, cudaSolutionCol);
-  solveLinearSystem(by, cudaSolutionRow);
+  solveLinearSystem(bx, cm.getSolutionCol());
+  solveLinearSystem(by, cm.getSolutionRow());
 
   freeResources();
 }
@@ -123,9 +122,4 @@ void tps::CudaLinearSystems::freeResources() {
   free(A);
   free(bx);
   free(by);
-}
-
-void tps::CudaLinearSystems::freeCuda() {
-  cudaFree(cudaSolutionCol);
-  cudaFree(cudaSolutionRow);
 }

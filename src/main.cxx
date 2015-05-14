@@ -86,8 +86,10 @@ int main(int argc, char** argv) {
   
   memoryEstimation(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
 
+  tps::CudaMemory cm = tps::CudaMemory(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+
   double CUDAcTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension);
+  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension, cm);
   CUDActps.run();
   CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
   std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;

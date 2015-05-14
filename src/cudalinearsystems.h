@@ -8,23 +8,20 @@
 #include "cusolverDn.h"
 
 #include "cplinearsystems.h"
+#include "cudamemory.h"
 
 namespace tps {
 
 class CudaLinearSystems : public CPLinearSystems {
 using CPLinearSystems::CPLinearSystems;
 public:
-  void solveLinearSystems();
-  float* getCudaSolCol() { return cudaSolutionCol; };
-  float* getCudaSolRow() { return cudaSolutionRow; };
-  void freeCuda();
+  void solveLinearSystems(tps::CudaMemory& cm);
 private:
   void solveLinearSystem(float *B, float *cudaSolution);
   std::vector<float> pointerToVector(float *pointer);
   void createMatrixA();
   void createBs();
   void freeResources();
-  float *cudaSolutionCol, *cudaSolutionRow;
   float *bx, *by, *A;
 };
 

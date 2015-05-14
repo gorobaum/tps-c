@@ -15,7 +15,7 @@ public:
     numberOfCps(cps),
     systemDim(cps+3) {};
   void allocCudaCoord(double *hostCoordinateCol, double *hostCoordinateRow);
-  void allocCudaSolution(float *hostSolutionCol, float *hostSolutionRow);
+  void allocCudaSolution();
   void allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow);
   void allocCudaImagePixels(unsigned char *hostTargetImage, unsigned char *hostRegImage);
   void freeMemory();

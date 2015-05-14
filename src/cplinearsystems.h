@@ -13,7 +13,6 @@ public:
     referenceKeypoints_(referenceKeypoints),
     targetKeypoints_(targetKeypoints),
     systemDimension(referenceKeypoints_.size()+3) {};
-  virtual void solveLinearSystems() = 0;
   std::vector<float> getSolutionCol() {return solutionCol;};
   std::vector<float> getSolutionRow() {return solutionRow;};
 protected:
