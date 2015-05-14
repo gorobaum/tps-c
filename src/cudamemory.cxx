@@ -1,10 +1,8 @@
 #include "cudamemory.h"
 
-void tps::CudaMemory::allocCudaCoord(double *hostCoordinateCol, double *hostCoordinateRow) {
+void tps::CudaMemory::allocCudaCoord() {
   cudaMalloc(&coordinateCol, imageWidth*imageHeight*sizeof(double));
-  cudaMemcpy(coordinateCol, hostCoordinateCol, imageWidth*imageHeight*sizeof(double), cudaMemcpyHostToDevice);
   cudaMalloc(&coordinateRow, imageWidth*imageHeight*sizeof(double));
-  cudaMemcpy(coordinateRow, hostCoordinateRow, imageWidth*imageHeight*sizeof(double), cudaMemcpyHostToDevice);
 }
 
 void tps::CudaMemory::allocCudaSolution() {

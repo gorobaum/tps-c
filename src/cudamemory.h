@@ -14,7 +14,7 @@ public:
     imageHeight(height),
     numberOfCps(cps),
     systemDim(cps+3) {};
-  void allocCudaCoord(double *hostCoordinateCol, double *hostCoordinateRow);
+  void allocCudaCoord();
   void allocCudaSolution();
   void allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow);
   void allocCudaImagePixels(unsigned char *hostTargetImage, unsigned char *hostRegImage);

@@ -77,8 +77,8 @@ void tps::CudaTPS::run() {
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
-  callKernel(cudaImageCoordCol, cudaSolutionCol, threadsPerBlock, numBlocks);
-  callKernel(cudaImageCoordRow, cudaSolutionRow, threadsPerBlock, numBlocks);
+  callKernel(cm_.getCoordinateCol(), cudaSolutionCol, threadsPerBlock, numBlocks);
+  callKernel(cm_.getCoordinateRow(), cudaSolutionRow, threadsPerBlock, numBlocks);
 
   // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
@@ -86,7 +86,7 @@ void tps::CudaTPS::run() {
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordCol, cudaImageCoordRow, cudaImage, cudaRegImage, width, height);
+  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm_.getCoordinateCol(), cm_.getCoordinateRow(), cudaImage, cudaRegImage, width, height);
   cudaMemcpy(regImage, cudaRegImage, width*height*sizeof(uchar), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
   cudaEventRecord(stop, 0);
@@ -132,8 +132,7 @@ void tps::CudaTPS::createCudaKeyPoint() {
 void tps::CudaTPS::allocCudaResources() {
   createCudaSolution();
 
-  cudaMalloc(&cudaImageCoordCol, width*height*sizeof(double));
-  cudaMalloc(&cudaImageCoordRow, width*height*sizeof(double));
+  cm_.allocCudaCoord();
 
   cudaMalloc(&cudaKeyCol, targetKeypoints_.size()*sizeof(float));
   cudaMalloc(&cudaKeyRow, targetKeypoints_.size()*sizeof(float));
@@ -156,8 +155,6 @@ void tps::CudaTPS::freeCudaResources() {
   cudaMemGetInfo( &avail, &total );
   size_t used = total - avail;
   std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
-  cudaFree(cudaImageCoordCol);
-  cudaFree(cudaImageCoordRow);
   cudaFree(cudaKeyCol);
   cudaFree(cudaKeyRow);
   cm_.freeMemory();
