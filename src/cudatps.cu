@@ -74,7 +74,7 @@ void tps::CudaTPS::run() {
 	allocResources();
   cudalienarSolver.solveLinearSystems(cm_);
   allocCudaResources();
-  
+
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
@@ -136,6 +136,11 @@ void tps::CudaTPS::freeResources() {
 }
 
 void tps::CudaTPS::freeCudaResources() {
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo( &avail, &total );
+  size_t used = total - avail;
+  std::cout << "Device memory used after kernel execution: " << used/(1024*1024) << "MB" << std::endl;
   cm_.freeMemory();
 	cudaDeviceSynchronize();
 }

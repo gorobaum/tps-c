@@ -2,12 +2,12 @@ import sys
 
 numFiles = 0
 
-for i in range(2,101, 2):
+for i in range(2,51, 2):
   numFiles = numFiles + 1
   fileName = 'tps.config'+str(numFiles)
   f = open(fileName,'w')
-  f.write('images/lena-Ref.png\n')
-  f.write('images/lena-Tar.png\n')
+  f.write('images/grid-Ref.png\n')
+  f.write('images/grid-Tar.png\n')
   porcentage = i*0.01
   name = 'result-'+str(porcentage)+'\n'
   f.write(name)

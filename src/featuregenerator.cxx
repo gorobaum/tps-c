@@ -7,8 +7,8 @@
 void tps::FeatureGenerator::run(bool createFeatureImage) {
   gridSizeCol = referenceImage_.getWidth()*percentage_;
   gridSizeRow = referenceImage_.getHeight()*percentage_;
-  colStep = referenceImage_.getWidth()*1.0/(gridSizeCol);
-  rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow);
+  colStep = referenceImage_.getWidth()*1.0/(gridSizeCol-1);
+  rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow-1);
   std::cout << "gridSizeCol = " << gridSizeCol << std::endl;
   std::cout << "gridSizeRow = " << gridSizeRow << std::endl;
   std::cout << "colStep = " << colStep << std::endl;

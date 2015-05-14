@@ -70,28 +70,34 @@ int main(int argc, char** argv) {
     std::cout << "Precisa passar o arquivo de configuração coração! \n";    
     return 0;
   }
- 	tps::Image referenceImage;
-  tps::Image targetImage;
-  std::string outputName;
-  std::string extension;
-  float percentage;
-  readConfigFile(argv[1], referenceImage, targetImage, outputName, percentage, extension);
-  int minHessian = 400;
 
-  double fgExecTime = (double)cv::getTickCount();
-  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
-  fg.run(true);
-  fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
-  std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
-  
-  memoryEstimation(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+  std::ifstream infile;
+  infile.open(argv[1]);
 
-  tps::CudaMemory cm = tps::CudaMemory(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+  for (std::string line; std::getline(infile, line); infile.eof()) {
+   	tps::Image referenceImage;
+    tps::Image targetImage;
+    std::string outputName;
+    std::string extension;
+    float percentage;
+    readConfigFile(line, referenceImage, targetImage, outputName, percentage, extension);
+    int minHessian = 400;
 
-  double CUDAcTpsExecTime = (double)cv::getTickCount();
-  tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension, cm);
-  CUDActps.run();
-  CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-  std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+    double fgExecTime = (double)cv::getTickCount();
+    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
+    fg.run(true);
+    fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
+    std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+    
+    memoryEstimation(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+
+    tps::CudaMemory cm = tps::CudaMemory(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+
+    double CUDAcTpsExecTime = (double)cv::getTickCount();
+    tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension, cm);
+    CUDActps.run();
+    CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+    std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+  }
   return 0;
 }
