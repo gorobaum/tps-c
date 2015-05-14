@@ -10,7 +10,13 @@ void tps::CudaMemory::allocCudaSolution() {
   cudaMalloc(&solutionRow, systemDim*sizeof(float));
 }
 
-void tps::CudaMemory::allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow) {
+void tps::CudaMemory::allocCudaKeypoints(std::vector<cv::Point2f> referenceKeypoints_) {
+  float* hostKeypointCol = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
+  float* hostKeypointRow = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
+  for (uint i = 0; i < referenceKeypoints_.size(); i++) {
+    hostKeypointCol[i] = referenceKeypoints_[i].x;
+    hostKeypointRow[i] = referenceKeypoints_[i].y;
+  }
   cudaMalloc(&keypointCol, numberOfCps*sizeof(float));
   cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
   cudaMalloc(&keypointRow, numberOfCps*sizeof(float));

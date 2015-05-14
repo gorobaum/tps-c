@@ -22,7 +22,7 @@ public:
     systemDim(cps+3) {};
   void allocCudaCoord();
   void allocCudaSolution();
-  void allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow);
+  void allocCudaKeypoints(std::vector<cv::Point2f> referenceKeypoints_);
   void allocCudaImagePixels(tps::Image& image);
   void freeMemory();
   double memoryEstimation();

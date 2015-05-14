@@ -112,21 +112,11 @@ void tps::CudaTPS::allocResources() {
   for (int col = 0; col < width; col++)
     for (int row = 0; row < height; row++)
       regImage[col*height+row] = 0;
-  createCudaKeyPoint();
-}
-
-void tps::CudaTPS::createCudaKeyPoint() {
-  floatKeyCol = (float*)malloc(targetKeypoints_.size()*sizeof(float));
-  floatKeyRow = (float*)malloc(targetKeypoints_.size()*sizeof(float));
-  for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-    floatKeyCol[i] = referenceKeypoints_[i].x;
-    floatKeyRow[i] = referenceKeypoints_[i].y;
-  }
 }
 
 void tps::CudaTPS::allocCudaResources() {
   cm_.allocCudaCoord();
-  cm_.allocCudaKeypoints(floatKeyCol, floatKeyRow);
+  cm_.allocCudaKeypoints(referenceKeypoints_);
   cm_.allocCudaImagePixels(targetImage_);
 }
 
