@@ -21,6 +21,8 @@ void tps::CudaMemory::allocCudaKeypoints(std::vector<cv::Point2f> referenceKeypo
   cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
   cudaMalloc(&keypointRow, numberOfCps*sizeof(float));
   cudaMemcpy(keypointRow, hostKeypointRow, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
+  free(hostKeypointCol);
+  free(hostKeypointRow);
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {

@@ -27,12 +27,9 @@ private:
   tps::CudaMemory& cm_;
 	void allocResources();
 	void allocCudaResources();
-	void freeResources();
 	void freeCudaResources();
   void callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks);
   void createCudaKeyPoint();
-  float *floatSolCol, *floatSolRow;
-  float *floatKeyCol, *floatKeyRow;
   uchar *regImage;  
 };
 

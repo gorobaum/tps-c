@@ -101,7 +101,6 @@ void tps::CudaTPS::run() {
   registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);
 
-	freeResources();
 	freeCudaResources();
 
 	cudaDeviceReset();
@@ -118,11 +117,6 @@ void tps::CudaTPS::allocCudaResources() {
   cm_.allocCudaCoord();
   cm_.allocCudaKeypoints(referenceKeypoints_);
   cm_.allocCudaImagePixels(targetImage_);
-}
-
-void tps::CudaTPS::freeResources() {
-  free(floatKeyCol);
-  free(floatKeyRow);
 }
 
 void tps::CudaTPS::freeCudaResources() {
