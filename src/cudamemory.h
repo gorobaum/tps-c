@@ -21,11 +21,8 @@ public:
     referenceKeypoints_(referenceKeypoints),
     numberOfCps(referenceKeypoints.size()),
     systemDim(numberOfCps+3) {};
-  void allocCudaCoord();
-  void allocCudaSolution();
-  void allocCudaKeypoints();
-  void allocCudaImagePixels(tps::Image& image);
   void freeMemory();
+  void allocCudaMemory(tps::Image& image);
   double memoryEstimation();
   double* getCoordinateCol() { return coordinateCol; };
   double* getCoordinateRow() { return coordinateRow; };
@@ -36,6 +33,10 @@ public:
   uchar* getTargetImage() { return targetImage; };
   uchar* getRegImage() { return regImage; };
 private:
+  void allocCudaCoord();
+  void allocCudaSolution();
+  void allocCudaKeypoints();
+  void allocCudaImagePixels(tps::Image& image);
   int imageWidth;
   int imageHeight;
   std::vector<cv::Point2f> referenceKeypoints_;

@@ -1,5 +1,12 @@
 #include "cudamemory.h"
 
+void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
+  allocCudaCoord();
+  allocCudaSolution();
+  allocCudaKeypoints();
+  allocCudaImagePixels(image);
+}
+
 void tps::CudaMemory::allocCudaCoord() {
   cudaMalloc(&coordinateCol, imageWidth*imageHeight*sizeof(double));
   cudaMalloc(&coordinateRow, imageWidth*imageHeight*sizeof(double));

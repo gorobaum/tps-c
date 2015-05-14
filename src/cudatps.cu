@@ -73,7 +73,6 @@ void tps::CudaTPS::callKernel(double *cudaImageCoord, float *cudaSolution, dim3 
 void tps::CudaTPS::run() {
 	allocResources();
   cudalienarSolver.solveLinearSystems(cm_);
-  allocCudaResources();
 
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
@@ -101,9 +100,9 @@ void tps::CudaTPS::run() {
   registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);
 
-	freeCudaResources();
+  free(regImage);
 
-	cudaDeviceReset();
+  cudaDeviceSynchronize();
 }
 
 void tps::CudaTPS::allocResources() {
@@ -111,20 +110,4 @@ void tps::CudaTPS::allocResources() {
   for (int col = 0; col < width; col++)
     for (int row = 0; row < height; row++)
       regImage[col*height+row] = 0;
-}
-
-void tps::CudaTPS::allocCudaResources() {
-  cm_.allocCudaCoord();
-  cm_.allocCudaKeypoints();
-  cm_.allocCudaImagePixels(targetImage_);
-}
-
-void tps::CudaTPS::freeCudaResources() {
-  size_t avail;
-  size_t total;
-  cudaMemGetInfo( &avail, &total );
-  size_t used = total - avail;
-  std::cout << "Device memory used after kernel execution: " << used/(1024*1024) << "MB" << std::endl;
-  cm_.freeMemory();
-	cudaDeviceSynchronize();
 }

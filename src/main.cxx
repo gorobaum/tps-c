@@ -108,16 +108,36 @@ int main(int argc, char** argv) {
     std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
   }
 
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo( &avail, &total );
+  size_t used = (total - avail)/(1024*1024);
+  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
+
+  std::vector< tps::CudaMemory > cudaMemories;
   for (int i = 0; i < count; i++) {
-    memoryEstimation(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i].size());
-
-    tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
-
-    double CUDAcTpsExecTime = (double)cv::getTickCount();
-    tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[i], targetsKPs[i], targetImages[i], outputNames[i]+"TPSCUDA"+extension, cm);
-    CUDActps.run();
-    CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-    std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+    int lastI = i;
+    while(used <= 1800) {
+      std::cout << "i = " << i << std::endl;
+      std::cout << "count = " << count << std::endl;
+      tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
+      if (used+cm.memoryEstimation() > 1800) break;
+      cm.allocCudaMemory(targetImages[i]);
+      cudaMemories.push_back(cm);
+      cudaMemGetInfo( &avail, &total );
+      used = (total - avail)/(1024*1024);
+      std::cout << "Device used memory = " << used << "MB" << std::endl;
+      i++;
+      if (i >= count) break;
+    }
+    for (int j = lastI; j < i; j++) {
+      double CUDAcTpsExecTime = (double)cv::getTickCount();
+      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension, cudaMemories[j]);
+      CUDActps.run();
+      CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+      std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+      cudaMemories[j].freeMemory();
+    }
   }
   return 0;
 }

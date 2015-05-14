@@ -8,8 +8,6 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
   
-  cm.allocCudaSolution();
-
   solveLinearSystem(bx, cm.getSolutionCol());
   solveLinearSystem(by, cm.getSolutionRow());
 
