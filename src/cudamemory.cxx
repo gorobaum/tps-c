@@ -23,6 +23,20 @@ void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
   cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar));
 }
 
+double tps::CudaMemory::memoryEstimation() {
+  int floatSize = sizeof(float);
+  int doubleSize = sizeof(double);
+  int ucharSize = sizeof(uchar);
+
+  double solutionsMemory = 2.0*systemDim*floatSize/(1024*1024);
+  double coordinatesMemory = 2.0*imageWidth*imageHeight*doubleSize/(1024*1024);
+  double keypointsMemory = 2.0*numberOfCps*floatSize/(1024*1024);
+  double pixelsMemory = 2.0*imageWidth*imageHeight*ucharSize/(1024*1024);
+
+  double totalMemory = solutionsMemory+coordinatesMemory+keypointsMemory+pixelsMemory;
+  return totalMemory;
+}
+
 void tps::CudaMemory::freeMemory() {
   cudaFree(coordinateCol);
   cudaFree(coordinateRow);

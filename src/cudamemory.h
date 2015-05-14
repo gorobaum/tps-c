@@ -25,6 +25,7 @@ public:
   void allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow);
   void allocCudaImagePixels(tps::Image& image);
   void freeMemory();
+  double memoryEstimation();
   double* getCoordinateCol() { return coordinateCol; };
   double* getCoordinateRow() { return coordinateRow; };
   float* getSolutionCol() { return solutionCol; };
