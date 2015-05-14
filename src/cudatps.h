@@ -30,14 +30,9 @@ private:
 	void freeResources();
 	void freeCudaResources();
   void callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks);
-  void createCudaSolution();
   void createCudaKeyPoint();
-	double *cudaImageCoordCol, *cudaImageCoordRow;
-  float *cudaSolutionCol, *cudaSolutionRow;
   float *floatSolCol, *floatSolRow;
   float *floatKeyCol, *floatKeyRow;
-  float *cudaKeyCol, *cudaKeyRow;
-  uchar *cudaRegImage, *cudaImage;
   uchar *regImage;  
 };
 

@@ -72,13 +72,14 @@ void tps::CudaTPS::callKernel(double *cudaImageCoord, float *cudaSolution, dim3 
 
 void tps::CudaTPS::run() {
 	allocResources();
-	allocCudaResources();
-
+  cudalienarSolver.solveLinearSystems(cm_);
+  allocCudaResources();
+  
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
-  callKernel(cm_.getCoordinateCol(), cudaSolutionCol, threadsPerBlock, numBlocks);
-  callKernel(cm_.getCoordinateRow(), cudaSolutionRow, threadsPerBlock, numBlocks);
+  callKernel(cm_.getCoordinateCol(), cm_.getSolutionCol(), threadsPerBlock, numBlocks);
+  callKernel(cm_.getCoordinateRow(), cm_.getSolutionRow(), threadsPerBlock, numBlocks);
 
   // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
@@ -114,12 +115,6 @@ void tps::CudaTPS::allocResources() {
   createCudaKeyPoint();
 }
 
-void tps::CudaTPS::createCudaSolution() {
-  cudalienarSolver.solveLinearSystems(cm_);
-  cudaSolutionCol = cm_.getSolutionCol();
-  cudaSolutionRow = cm_.getSolutionRow();
-}
-
 void tps::CudaTPS::createCudaKeyPoint() {
   floatKeyCol = (float*)malloc(targetKeypoints_.size()*sizeof(float));
   floatKeyRow = (float*)malloc(targetKeypoints_.size()*sizeof(float));
@@ -130,14 +125,9 @@ void tps::CudaTPS::createCudaKeyPoint() {
 }
 
 void tps::CudaTPS::allocCudaResources() {
-  createCudaSolution();
-
   cm_.allocCudaCoord();
   cm_.allocCudaKeypoints(floatKeyCol, floatKeyRow);
   cm_.allocCudaImagePixels(targetImage_);
-  cudaMalloc(&cudaRegImage, width*height*sizeof(uchar));
-  cudaMalloc(&cudaImage, width*height*sizeof(uchar));
-  cudaMemcpy(cudaImage, targetImage_.getPixelVector(), width*height*sizeof(uchar), cudaMemcpyHostToDevice);
 }
 
 void tps::CudaTPS::freeResources() {
@@ -146,11 +136,6 @@ void tps::CudaTPS::freeResources() {
 }
 
 void tps::CudaTPS::freeCudaResources() {
-  size_t avail;
-  size_t total;
-  cudaMemGetInfo( &avail, &total );
-  size_t used = total - avail;
-  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
   cm_.freeMemory();
 	cudaDeviceSynchronize();
 }
