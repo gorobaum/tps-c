@@ -12,26 +12,6 @@
 #include <cstring>
 #include <cstdio>
 
-cv::Mat cvRefImg;
-cv::Mat cvTarImg;
-
-void readConfigFile(std::string filename, tps::Image& referenceImage, tps::Image& targetImage, std::string& outputName, float& percentage, std::string& extension) {
-  std::ifstream infile;
-  infile.open(filename.c_str());
-  std::string line;
-  std::getline(infile, line);
-  cvRefImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  referenceImage = tps::Image(cvRefImg);
-  std::size_t pos = line.find('.');
-  extension = line.substr(pos);
-  std::getline(infile, line);
-  cvTarImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  targetImage = tps::Image(cvTarImg);
-  std::getline(infile, outputName);
-  std::getline(infile, line);
-  percentage = std::stof(line);
-}
-
 void memoryEstimation(int width, int height, int numberOfCps) {
   int floatSize = sizeof(float);
   int doubleSize = sizeof(double);
@@ -61,6 +41,28 @@ void memoryEstimation(int width, int height, int numberOfCps) {
   std::cout << "Total GPU memory occupied = " << totalMemory << "MB" << std::endl;
 }
 
+void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
+                    std::vector< cv::Mat >& cvTarImgs, std::vector< std::string >& outputNames, 
+                    std::vector< float >& percentages) {
+  std::ifstream infile;
+  infile.open(filename.c_str());
+  std::string line;
+  
+  std::getline(infile, line);
+  cv::Mat cvTarImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
+  tps::Image targetImage = tps::Image(cvTarImg);
+  cvTarImgs.push_back(cvTarImg);
+  targetImages.push_back(targetImage);
+
+  std::string outputName;
+  std::getline(infile, outputName);
+  outputNames.push_back(outputName);
+
+  std::getline(infile, line);
+  float percentage = std::stof(line);
+  percentages.push_back(percentage);
+}
+
 int main(int argc, char** argv) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -71,30 +73,41 @@ int main(int argc, char** argv) {
     return 0;
   }
 
+  // int minHessian = 400;
   std::ifstream infile;
   infile.open(argv[1]);
 
-  for (std::string line; std::getline(infile, line); infile.eof()) {
-   	tps::Image referenceImage;
-    tps::Image targetImage;
-    std::string outputName;
-    std::string extension;
-    float percentage;
-    readConfigFile(line, referenceImage, targetImage, outputName, percentage, extension);
-    int minHessian = 400;
+  std::string line; 
+  std::getline(infile, line);
 
+  std::size_t pos = line.find('.');
+  std::string extension = line.substr(pos);
+
+  cv::Mat cvRefImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
+  tps::Image referenceImage = tps::Image(cvRefImg);
+  std::vector< cv::Mat > cvTarImgs;
+  std::vector< tps::Image > targetImages;
+  std::vector< std::string > outputNames;
+  std::vector< float > percentages;
+
+  int count = 0;
+  for (line; std::getline(infile, line); infile.eof(), count++) {
+    readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
+  }
+
+  for (int i = 0; i < count; i++) {
     double fgExecTime = (double)cv::getTickCount();
-    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage, cvRefImg, cvTarImg);
+    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i], cvRefImg, cvTarImgs[i]);
     fg.run(true);
     fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
     std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
     
-    memoryEstimation(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+    memoryEstimation(targetImages[i].getWidth(), targetImages[i].getHeight(), fg.getReferenceKeypoints().size());
 
-    tps::CudaMemory cm = tps::CudaMemory(targetImage.getWidth(), targetImage.getHeight(), fg.getReferenceKeypoints().size());
+    tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), fg.getReferenceKeypoints().size());
 
     double CUDAcTpsExecTime = (double)cv::getTickCount();
-    tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImage, outputName+"TPSCUDA"+extension, cm);
+    tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImages[i], outputNames[i]+"TPSCUDA"+extension, cm);
     CUDActps.run();
     CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
     std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
