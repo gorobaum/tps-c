@@ -15,14 +15,15 @@ namespace tps {
   
 class CudaMemory {
 public:
-  CudaMemory(int width, int height, int cps) :
+  CudaMemory(int width, int height, std::vector<cv::Point2f> referenceKeypoints) :
     imageWidth(width),
     imageHeight(height),
-    numberOfCps(cps),
-    systemDim(cps+3) {};
+    referenceKeypoints_(referenceKeypoints),
+    numberOfCps(referenceKeypoints.size()),
+    systemDim(numberOfCps+3) {};
   void allocCudaCoord();
   void allocCudaSolution();
-  void allocCudaKeypoints(std::vector<cv::Point2f> referenceKeypoints_);
+  void allocCudaKeypoints();
   void allocCudaImagePixels(tps::Image& image);
   void freeMemory();
   double memoryEstimation();
@@ -37,6 +38,7 @@ public:
 private:
   int imageWidth;
   int imageHeight;
+  std::vector<cv::Point2f> referenceKeypoints_;
   int numberOfCps;
   int systemDim;
   double *coordinateCol, *coordinateRow;

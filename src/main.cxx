@@ -95,19 +95,26 @@ int main(int argc, char** argv) {
     readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
   }
 
+  std::vector< std::vector< cv::Point2f > > referencesKPs;
+  std::vector< std::vector< cv::Point2f > > targetsKPs;
+
   for (int i = 0; i < count; i++) {
     double fgExecTime = (double)cv::getTickCount();
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i], cvRefImg, cvTarImgs[i]);
     fg.run(true);
     fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
+    referencesKPs.push_back(fg.getReferenceKeypoints());
+    targetsKPs.push_back(fg.getTargetKeypoints());
     std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
-    
-    memoryEstimation(targetImages[i].getWidth(), targetImages[i].getHeight(), fg.getReferenceKeypoints().size());
+  }
 
-    tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), fg.getReferenceKeypoints().size());
+  for (int i = 0; i < count; i++) {
+    memoryEstimation(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i].size());
+
+    tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
 
     double CUDAcTpsExecTime = (double)cv::getTickCount();
-    tps::CudaTPS CUDActps = tps::CudaTPS(fg.getReferenceKeypoints(), fg.getTargetKeypoints(), targetImages[i], outputNames[i]+"TPSCUDA"+extension, cm);
+    tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[i], targetsKPs[i], targetImages[i], outputNames[i]+"TPSCUDA"+extension, cm);
     CUDActps.run();
     CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
     std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;

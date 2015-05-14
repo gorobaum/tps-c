@@ -115,7 +115,7 @@ void tps::CudaTPS::allocResources() {
 
 void tps::CudaTPS::allocCudaResources() {
   cm_.allocCudaCoord();
-  cm_.allocCudaKeypoints(referenceKeypoints_);
+  cm_.allocCudaKeypoints();
   cm_.allocCudaImagePixels(targetImage_);
 }
 
