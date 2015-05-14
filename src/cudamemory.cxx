@@ -17,11 +17,10 @@ void tps::CudaMemory::allocCudaKeypoints(float *hostKeypointCol, float *hostKeyp
   cudaMemcpy(keypointRow, hostKeypointRow, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
 }
 
-void tps::CudaMemory::allocCudaImagePixels(unsigned char *hostTargetImage, unsigned char *hostRegImage) {
-  cudaMalloc(&targetImage, numberOfCps*sizeof(float));
-  cudaMemcpy(targetImage, hostTargetImage, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMalloc(&regImage, numberOfCps*sizeof(float));
-  cudaMemcpy(regImage, hostRegImage, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
+void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
+  cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(uchar));
+  cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(uchar), cudaMemcpyHostToDevice);
+  cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar));
 }
 
 void tps::CudaMemory::freeMemory() {

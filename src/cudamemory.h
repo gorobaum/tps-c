@@ -5,6 +5,12 @@
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include "image.h"
+
 namespace tps {
   
 class CudaMemory {
@@ -17,7 +23,7 @@ public:
   void allocCudaCoord();
   void allocCudaSolution();
   void allocCudaKeypoints(float *hostKeypointCol, float *hostKeypointRow);
-  void allocCudaImagePixels(unsigned char *hostTargetImage, unsigned char *hostRegImage);
+  void allocCudaImagePixels(tps::Image& image);
   void freeMemory();
   double* getCoordinateCol() { return coordinateCol; };
   double* getCoordinateRow() { return coordinateRow; };
@@ -25,8 +31,8 @@ public:
   float* getSolutionRow() { return solutionRow; };
   float* getKeypointCol() { return keypointCol; };
   float* getKeypointRow() { return keypointRow; };
-  unsigned char* getTargetImage() { return targetImage; };
-  unsigned char* getRegImage() { return regImage; };
+  uchar* getTargetImage() { return targetImage; };
+  uchar* getRegImage() { return regImage; };
 private:
   int imageWidth;
   int imageHeight;
@@ -35,7 +41,7 @@ private:
   double *coordinateCol, *coordinateRow;
   float *solutionCol, *solutionRow;
   float *keypointCol, *keypointRow;
-  unsigned char *targetImage, *regImage;
+  uchar *targetImage, *regImage;
 };
 
 } // namespace

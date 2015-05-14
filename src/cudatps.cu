@@ -59,7 +59,7 @@ void tps::CudaTPS::callKernel(double *cudaImageCoord, float *cudaSolution, dim3 
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, cudaKeyCol, cudaKeyRow, targetKeypoints_.size());
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, cm_.getKeypointCol(), cm_.getKeypointRow(), targetKeypoints_.size());
   cudaDeviceSynchronize(); 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -86,8 +86,8 @@ void tps::CudaTPS::run() {
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm_.getCoordinateCol(), cm_.getCoordinateRow(), cudaImage, cudaRegImage, width, height);
-  cudaMemcpy(regImage, cudaRegImage, width*height*sizeof(uchar), cudaMemcpyDeviceToHost);
+  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm_.getCoordinateCol(), cm_.getCoordinateRow(), cm_.getTargetImage(), cm_.getRegImage(), width, height);
+  cudaMemcpy(regImage, cm_.getRegImage(), width*height*sizeof(uchar), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -133,12 +133,8 @@ void tps::CudaTPS::allocCudaResources() {
   createCudaSolution();
 
   cm_.allocCudaCoord();
-
-  cudaMalloc(&cudaKeyCol, targetKeypoints_.size()*sizeof(float));
-  cudaMalloc(&cudaKeyRow, targetKeypoints_.size()*sizeof(float));
-  cudaMemcpy(cudaKeyCol, floatKeyCol, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaKeyRow, floatKeyRow, targetKeypoints_.size()*sizeof(float), cudaMemcpyHostToDevice);
-
+  cm_.allocCudaKeypoints(floatKeyCol, floatKeyRow);
+  cm_.allocCudaImagePixels(targetImage_);
   cudaMalloc(&cudaRegImage, width*height*sizeof(uchar));
   cudaMalloc(&cudaImage, width*height*sizeof(uchar));
   cudaMemcpy(cudaImage, targetImage_.getPixelVector(), width*height*sizeof(uchar), cudaMemcpyHostToDevice);
@@ -155,8 +151,6 @@ void tps::CudaTPS::freeCudaResources() {
   cudaMemGetInfo( &avail, &total );
   size_t used = total - avail;
   std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
-  cudaFree(cudaKeyCol);
-  cudaFree(cudaKeyRow);
   cm_.freeMemory();
 	cudaDeviceSynchronize();
 }
