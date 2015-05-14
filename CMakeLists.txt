@@ -10,6 +10,7 @@ find_package(CUDA QUIET REQUIRED)
 cuda_add_executable(tps
   src/main.cxx
   src/image.cxx
+  src/cudamemory.cxx
   src/featuregenerator.cxx
   src/cudalinearsystems.cxx
   src/cudatps.cu)

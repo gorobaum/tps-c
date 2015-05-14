@@ -2,6 +2,7 @@
 #include "featuregenerator.h"
 #include "tps.h"
 #include "cudatps.h"
+#include "cudamemory.h"
 
 #include <string>
 #include <sstream>
