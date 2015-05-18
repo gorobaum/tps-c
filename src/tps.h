@@ -20,6 +20,8 @@ public:
 		targetKeypoints_(targetKeypoints),
 		outputName_(outputName),
 		targetImage_(targetImage),
+    width(targetImage.getWidth()),
+    height(targetImage.getHeight()),
 		registredImage(targetImage.getWidth(), targetImage.getHeight()) {};
 	virtual void run() = 0;
 protected:
@@ -27,6 +29,8 @@ protected:
 	std::vector<cv::Point2f> targetKeypoints_;
 	std::string outputName_;
 	tps::Image targetImage_;
+  int width;
+  int height;
 	tps::Image registredImage;
 	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
 };

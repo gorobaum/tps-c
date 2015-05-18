@@ -2,8 +2,7 @@
 #define TPS_PARALLELTPS_H_
 
 #include "tps.h"
-#include "cudalinearsystems.h"
-
+#include "OPCVlinearsystems.h"
 
 #include <thread>
 
@@ -18,9 +17,9 @@ public:
 private:
 	void runThread(uint tid);
 	uint numberOfThreads = std::thread::hardware_concurrency();
-  tps::CudaLinearSystems lienarSolver;
-  std::vector<float> solutionX;
-  std::vector<float> solutionY;
+  tps::OPCVLinearSystems lienarSolver;
+  std::vector<float> solutionCol;
+  std::vector<float> solutionRow;
 };
 
 } // namespace

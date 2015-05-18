@@ -16,14 +16,10 @@ public:
   CudaTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
     cudalienarSolver(referenceKeypoints, targetKeypoints),
-    width(targetImage.getWidth()),
-    height(targetImage.getHeight()),
     cm_(cm) {}; 
   void run();
 private:
   tps::CudaLinearSystems cudalienarSolver;
-  int width;
-  int height;
   tps::CudaMemory& cm_;
 	void allocResources();
   void callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks);

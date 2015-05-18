@@ -4,30 +4,29 @@
 #include <iostream>
 
 void tps::ParallelTPS::runThread(uint tid) {
-	std::vector<int> dimensions = registredImage.getDimensions();
-	int chunck = dimensions[0]/numberOfThreads;
+	int chunck = width/numberOfThreads;
 	uint limit = (tid+1)*chunck;
-	if ((tid+1) == numberOfThreads) limit = dimensions[0];
-	for (uint x = tid*chunck; x < limit; x++)
-		for (int y = 0; y < dimensions[1]; y++) {
-			double newX = solutionX[0] + x * solutionX[1] + y * solutionX[2];
-			double newY = solutionY[0] + x * solutionY[1] + y * solutionY[2];
+	if ((tid+1) == numberOfThreads) limit = width;
+	for (uint col = tid*chunck; col < limit; col++)
+		for (int row = 0; row < height; row++) {
+			double newCol = solutionCol[0] + col * solutionCol[1] + row * solutionCol[2];
+			double newRow = solutionRow[0] + col * solutionRow[1] + row * solutionRow[2];
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-				float r = computeRSquared(x, referenceKeypoints_[i].x, y, referenceKeypoints_[i].y);
+				float r = computeRSquared(col, referenceKeypoints_[i].x, row, referenceKeypoints_[i].y);
 				if (r != 0.0) {
-					newX += r * log(r) * solutionX[i+3];
-					newY += r * log(r) * solutionY[i+3];
+					newCol += r * log(r) * solutionCol[i+3];
+					newRow += r * log(r) * solutionRow[i+3];
 				}
 			}
-			uchar value = targetImage_.bilinearInterpolation<uchar>(newX, newY);
-			registredImage.changePixelAt(x, y, value);
+			uchar value = targetImage_.bilinearInterpolation(newCol, newRow);
+			registredImage.changePixelAt(col, row, value);
 		}
 }
 
 void tps::ParallelTPS::run() {
 	lienarSolver.solveLinearSystems();
-	solutionX = lienarSolver.getSolutionX();
-	solutionY = lienarSolver.getSolutionY();
+	solutionCol = lienarSolver.getSolutionCol();
+	solutionRow = lienarSolver.getSolutionRow();
 	std::vector<std::thread> th;
 
 	for (uint i = 0; i < numberOfThreads; ++i) {
@@ -38,5 +37,5 @@ void tps::ParallelTPS::run() {
     t.join();
   }
 
-	registredImage.save();
+	registredImage.save(outputName_);
 }

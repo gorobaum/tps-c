@@ -2,7 +2,7 @@
 #define TPS_BASICTPS_H_
 
 #include "tps.h"
-#include "cudalinearsystems.h"
+#include "OPCVlinearsystems.h"
 
 namespace tps {
 
@@ -13,9 +13,9 @@ public:
     lienarSolver(referenceKeypoints, targetKeypoints) {};	
   void run();
 private:
-  tps::CudaLinearSystems lienarSolver;
-  std::vector<float> solutionX;
-  std::vector<float> solutionY;
+  tps::OPCVLinearSystems lienarSolver;
+  std::vector<float> solutionCol;
+  std::vector<float> solutionRow;
 };
 
 } // namespace

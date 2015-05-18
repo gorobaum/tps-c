@@ -12,7 +12,10 @@ cuda_add_executable(tps
   src/image.cxx
   src/cudamemory.cxx
   src/featuregenerator.cxx
+  src/OPCVlinearsystems.cxx
   src/cudalinearsystems.cxx
+  src/basictps.cxx
+  src/paralleltps.cxx
   src/cudatps.cu)
 
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
