@@ -2,6 +2,7 @@
 #include "featuregenerator.h"
 #include "tps.h"
 #include "cudatps.h"
+#include "paralleltps.h"
 #include "cudamemory.h"
 
 #include <string>
@@ -131,11 +132,19 @@ int main(int argc, char** argv) {
       if (i >= count) break;
     }
     for (int j = lastI; j < i; j++) {
+      if (referencesKPs[j].size() <= 3800) {
+        double ParallelTpsExecTime = (double)cv::getTickCount();
+        tps::ParallelTPS ParallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension);
+        ParallelTPS.run();
+        ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+        std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      }
+
       double CUDAcTpsExecTime = (double)cv::getTickCount();
       tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension, cudaMemories[j]);
       CUDActps.run();
       CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-      std::cout << "CUDA Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+      std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
       cudaMemories[j].freeMemory();
     }
   }
