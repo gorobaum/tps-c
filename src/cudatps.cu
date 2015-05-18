@@ -5,6 +5,16 @@
 
 #define MAXTHREADPBLOCK 1024
 
+inline
+cudaError_t checkCuda(cudaError_t result)
+{
+    if (result != cudaSuccess) {
+        std::cout << "CUDA Runtime Error: \n" << cudaGetErrorString(result) << std::endl;
+        assert(result == cudaSuccess);
+    }
+    return result;
+}
+
 // Kernel definition
 __device__ double cudaGetPixel(int x, int y, uchar* image, int width, int height) {
   if (x > width-1 || x < 0) return 0;
@@ -56,18 +66,18 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* so
 
 void tps::CudaTPS::callKernel(double *cudaImageCoord, float *cudaSolution, dim3 threadsPerBlock, dim3 numBlocks) {
   cudaEvent_t start, stop;
-  cudaEventCreate(&start);
-  cudaEventCreate(&stop);
-  cudaEventRecord(start, 0);
+  checkCuda(cudaEventCreate(&start));
+  checkCuda(cudaEventCreate(&stop));
+  checkCuda(cudaEventRecord(start, 0));
   tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, cm_.getKeypointCol(), cm_.getKeypointRow(), targetKeypoints_.size());
   cudaDeviceSynchronize(); 
-  cudaEventRecord(stop, 0);
-  cudaEventSynchronize(stop);
+  checkCuda(cudaEventRecord(stop, 0));
+  checkCuda(cudaEventSynchronize(stop));
   float elapsedTime;
-  cudaEventElapsedTime(&elapsedTime, start, stop);
-  cudaEventDestroy(start);
-  cudaEventDestroy(stop);
-  std::cout << "Time = " << elapsedTime << " ms\n";
+  checkCuda(cudaEventElapsedTime(&elapsedTime, start, stop));
+  checkCuda(cudaEventDestroy(start));
+  checkCuda(cudaEventDestroy(stop));
+  std::cout << "callKernel execution time = " << elapsedTime << " ms\n";
 }
 
 void tps::CudaTPS::run() {
@@ -83,26 +93,26 @@ void tps::CudaTPS::run() {
   // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
   cudaEvent_t start, stop;
-  cudaEventCreate(&start);
-  cudaEventCreate(&stop);
-  cudaEventRecord(start, 0);
+  checkCuda(cudaEventCreate(&start));
+  checkCuda(cudaEventCreate(&stop));
+  checkCuda(cudaEventRecord(start, 0));
   cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm_.getCoordinateCol(), cm_.getCoordinateRow(), cm_.getTargetImage(), cm_.getRegImage(), width, height);
-  cudaMemcpy(regImage, cm_.getRegImage(), width*height*sizeof(uchar), cudaMemcpyDeviceToHost);
-  cudaDeviceSynchronize();
-  cudaEventRecord(stop, 0);
-  cudaEventSynchronize(stop);
+  checkCuda(cudaMemcpy(regImage, cm_.getRegImage(), width*height*sizeof(uchar), cudaMemcpyDeviceToHost));
+  checkCuda(cudaDeviceSynchronize());
+  checkCuda(cudaEventRecord(stop, 0));
+  checkCuda(cudaEventSynchronize(stop));
   float elapsedTime;
-  cudaEventElapsedTime(&elapsedTime, start, stop);
-  cudaEventDestroy(start);
-  cudaEventDestroy(stop);
-  std::cout << "Time = " << elapsedTime << " ms\n";
+  checkCuda(cudaEventElapsedTime(&elapsedTime, start, stop));
+  checkCuda(cudaEventDestroy(start));
+  checkCuda(cudaEventDestroy(stop));
+  std::cout << "cudaRegistredImage execution time = " << elapsedTime << " ms\n";
 
   registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);
 
   free(regImage);
 
-  cudaDeviceSynchronize();
+  checkCuda(cudaDeviceSynchronize());
 }
 
 void tps::CudaTPS::allocResources() {

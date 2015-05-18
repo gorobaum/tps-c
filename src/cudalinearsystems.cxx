@@ -4,6 +4,17 @@
 #include <iostream>
 #include <cublas_v2.h>
 
+inline
+cudaError_t checkCuda(cudaError_t result)
+{
+    if (result != cudaSuccess) {
+        std::cout << "CUDA Runtime Error: \n" << cudaGetErrorString(result) << std::endl;
+        assert(result == cudaSuccess);
+    }
+    return result;
+}
+
+
 void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
@@ -35,17 +46,18 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   cublasCreate(&cublasH);
 
   // step 1: copy A and B to device
-  cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float));
-  cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice);
+  checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float)));
 
-  cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension);
-  cudaMalloc((void**)&devInfo, sizeof(int));
+  checkCuda(cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice));
+  checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice));
+
+  checkCuda(cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension));
+  checkCuda(cudaMalloc((void**)&devInfo, sizeof(int)));
 
   // step 2: query working space of geqrf and ormqr
   cusolver_status = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
 
-  cudaMalloc((void**)&d_work, sizeof(float) * lwork);
+  checkCuda(cudaMalloc((void**)&d_work, sizeof(float) * lwork));
 
   // step 3: compute QR factorization
   cusolver_status = cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
@@ -62,10 +74,10 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
     systemDimension);
   cudaDeviceSynchronize();
 
-  cudaFree(cudaA);
-  cudaFree(d_tau);
-  cudaFree(devInfo);
-  cudaFree(d_work);
+  checkCuda(cudaFree(cudaA));
+  checkCuda(cudaFree(d_tau));
+  checkCuda(cudaFree(devInfo));
+  checkCuda(cudaFree(d_work));
 
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);

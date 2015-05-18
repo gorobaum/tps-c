@@ -1,5 +1,15 @@
 #include "cudamemory.h"
 
+inline
+cudaError_t checkCuda(cudaError_t result)
+{
+    if (result != cudaSuccess) {
+        std::cout << "CUDA Runtime Error: \n" << cudaGetErrorString(result) << std::endl;
+        assert(result == cudaSuccess);
+    }
+    return result;
+}
+
 void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
   allocCudaCoord();
   allocCudaSolution();
@@ -8,13 +18,13 @@ void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
 }
 
 void tps::CudaMemory::allocCudaCoord() {
-  cudaMalloc(&coordinateCol, imageWidth*imageHeight*sizeof(double));
-  cudaMalloc(&coordinateRow, imageWidth*imageHeight*sizeof(double));
+  checkCuda(cudaMalloc(&coordinateCol, imageWidth*imageHeight*sizeof(double)));
+  checkCuda(cudaMalloc(&coordinateRow, imageWidth*imageHeight*sizeof(double)));
 }
 
 void tps::CudaMemory::allocCudaSolution() {
-  cudaMalloc(&solutionCol, systemDim*sizeof(float));
-  cudaMalloc(&solutionRow, systemDim*sizeof(float));
+  checkCuda(cudaMalloc(&solutionCol, systemDim*sizeof(float)));
+  checkCuda(cudaMalloc(&solutionRow, systemDim*sizeof(float)));
 }
 
 void tps::CudaMemory::allocCudaKeypoints() {
@@ -24,18 +34,18 @@ void tps::CudaMemory::allocCudaKeypoints() {
     hostKeypointCol[i] = referenceKeypoints_[i].x;
     hostKeypointRow[i] = referenceKeypoints_[i].y;
   }
-  cudaMalloc(&keypointCol, numberOfCps*sizeof(float));
-  cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMalloc(&keypointRow, numberOfCps*sizeof(float));
+  checkCuda(cudaMalloc(&keypointCol, numberOfCps*sizeof(float)));
+  checkCuda(cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice));
+  checkCuda(cudaMalloc(&keypointRow, numberOfCps*sizeof(float)));
   cudaMemcpy(keypointRow, hostKeypointRow, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
   free(hostKeypointCol);
   free(hostKeypointRow);
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
-  cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(uchar));
-  cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(uchar), cudaMemcpyHostToDevice);
-  cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar));
+  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(uchar)));
+  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(uchar), cudaMemcpyHostToDevice));
+  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar)));
 }
 
 double tps::CudaMemory::memoryEstimation() {
