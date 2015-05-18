@@ -119,6 +119,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < count; i++) {
     int lastI = i;
     while(used <= 1800) {
+      std::cout << "============================================" << std::endl;
       std::cout << "Entry number " << i << " will run." << std::endl;
       std::cout << "Last entry executed was " << count << std::endl;
       tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
@@ -128,10 +129,13 @@ int main(int argc, char** argv) {
       cudaMemGetInfo( &avail, &total );
       used = (total - avail)/(1024*1024);
       std::cout << "Device used memory = " << used << "MB" << std::endl;
+      std::cout << "============================================" << std::endl;
       i++;
       if (i >= count) break;
     }
     for (int j = lastI; j < i; j++) {
+      std::cout << "============================================" << std::endl;
+      std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
       if (referencesKPs[j].size() <= 3800) {
         double ParallelTpsExecTime = (double)cv::getTickCount();
         tps::ParallelTPS ParallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension);
@@ -146,6 +150,7 @@ int main(int argc, char** argv) {
       CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
       std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
       cudaMemories[j].freeMemory();
+      std::cout << "============================================" << std::endl;
     }
   }
   return 0;

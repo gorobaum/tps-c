@@ -18,9 +18,12 @@ cudaError_t checkCuda(cudaError_t result)
 void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
-  
+
+  double solverExec = (double)cv::getTickCount();
   solveLinearSystem(bx, cm.getSolutionCol());
   solveLinearSystem(by, cm.getSolutionRow());
+  solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
+  std::cout << "Cuda solver execution time: " << solverExec << std::endl;
 
   freeResources();
 }
