@@ -29,13 +29,10 @@ void tps::ParallelTPS::run() {
 	solutionRow = lienarSolver.getSolutionRow();
 	std::vector<std::thread> th;
 
-	for (uint i = 0; i < numberOfThreads; ++i) {
-    th.push_back(std::thread(&tps::ParallelTPS::runThread, *this, i));
-  }
+	for (uint i = 0; i < numberOfThreads; ++i)
+    th.push_back(std::thread(&tps::ParallelTPS::runThread, this, i));
 
-  for(auto &t : th){
-    t.join();
-  }
+  for(uint i = 0; i < numberOfThreads; ++i) th[i].join();
 
 	registredImage.save(outputName_);
 }

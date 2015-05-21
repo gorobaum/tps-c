@@ -2,6 +2,7 @@
 #include "featuregenerator.h"
 #include "tps.h"
 #include "cudatps.h"
+#include "basictps.h"
 #include "paralleltps.h"
 #include "cudamemory.h"
 
@@ -136,16 +137,22 @@ int main(int argc, char** argv) {
     for (int j = lastI; j < i; j++) {
       std::cout << "============================================" << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
-      if (referencesKPs[j].size() <= 3800) {
+      if (referencesKPs[j].size() <= 3200) {
+        double BasicTPSExecTime = (double)cv::getTickCount();
+        tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
+        BasicTPS.run();
+        BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
+        std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
+
         double ParallelTpsExecTime = (double)cv::getTickCount();
-        tps::ParallelTPS ParallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension);
-        ParallelTPS.run();
+        tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+        parallelTPS.run();
         ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
         std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
       }
 
       double CUDAcTpsExecTime = (double)cv::getTickCount();
-      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"TPSCUDA"+extension, cudaMemories[j]);
+      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
       CUDActps.run();
       CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
       std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
