@@ -122,7 +122,6 @@ int main(int argc, char** argv) {
     while(used <= 1800) {
       std::cout << "============================================" << std::endl;
       std::cout << "Entry number " << i << " will run." << std::endl;
-      std::cout << "Last entry executed was " << count << std::endl;
       tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
       if (used+cm.memoryEstimation() > 1800) break;
       cm.allocCudaMemory(targetImages[i]);
@@ -134,15 +133,17 @@ int main(int argc, char** argv) {
       i++;
       if (i >= count) break;
     }
+
     for (int j = lastI; j < i; j++) {
       std::cout << "============================================" << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
+      std::cout << "#Percentage = " << percentages[j] << std::endl;
       if (referencesKPs[j].size() <= 3200) {
-        double BasicTPSExecTime = (double)cv::getTickCount();
-        tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
-        BasicTPS.run();
-        BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
-        std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
+        // double BasicTPSExecTime = (double)cv::getTickCount();
+        // tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
+        // BasicTPS.run();
+        // BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
+        // std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
 
         double ParallelTpsExecTime = (double)cv::getTickCount();
         tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
