@@ -1,5 +1,8 @@
 #include "cudalinearsystems.h"
 
+#include "cusolver_common.h"
+#include "cusolverDn.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <cublas_v2.h>

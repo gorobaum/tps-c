@@ -1,8 +1,6 @@
 #ifndef TPS_TPS_H_
 #define TPS_TPS_H_
 
-#undef __SSE2__
-
 #include "image.h"
 #include "cplinearsystems.h"
 

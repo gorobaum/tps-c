@@ -6,6 +6,7 @@ include_directories (src)
 find_package(OpenCV REQUIRED)
 find_package(CUDA QUIET REQUIRED)
 
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
 
 cuda_add_executable(tps
   src/main.cxx
@@ -16,18 +17,20 @@ cuda_add_executable(tps
   src/cudalinearsystems.cxx
   src/basictps.cxx
   src/paralleltps.cxx
-  src/cudatps.cu)
+  src/cudatps.cxx
+  src/cutps.cu)
 
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
 
-LIST(APPEND CUDA_NVCC_FLAGS )
+LIST(APPEND CUDA_NVCC_FLAGS)
 
 MESSAGE("CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
 
 # TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
-target_link_libraries(tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib64/libcusolver.so ${CUDA_CUBLAS_LIBRARIES})
 
 list(APPEND CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS_DEBUG}")
+
+target_link_libraries(tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib64/libcusolver.so ${CUDA_CUBLAS_LIBRARIES})
+
 
 add_custom_target (
 	cleanShit

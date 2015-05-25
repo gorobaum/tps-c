@@ -4,6 +4,7 @@
 #include "tps.h"
 #include "OPCVlinearsystems.h"
 #include "cudalinearsystems.h"
+#include "cudamemory.h"
 
 #include <thread>
 
@@ -11,18 +12,16 @@ namespace tps {
 
 class ParallelTPS : public TPS {
 public:
-  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
+  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
-    cudalienarSolver(referenceKeypoints, targetKeypoints),
-    cm_(cm) {}; 
+    lienarSolver(referenceKeypoints, targetKeypoints) {}; 
 	void run();
 private:
-	void runThread(uint tid);
-  tps::CudaMemory& cm_;
-	uint numberOfThreads = std::thread::hardware_concurrency();
-  tps::CudaLinearSystems cudalienarSolver;
+  tps::OPCVLinearSystems lienarSolver;
+  uint numberOfThreads = std::thread::hardware_concurrency();
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;
+	void runThread(uint tid);
 };
 
 } // namespace
