@@ -48,6 +48,23 @@ void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
   checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar)));
 }
 
+std::vector<float> tps::CudaMemory::getHostSolCol() {
+  return cudaToHost(solutionCol);
+}
+
+std::vector<float> tps::CudaMemory::getHostSolRow() {
+  return cudaToHost(solutionRow);
+}
+
+std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
+    float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
+    cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);
+    std::vector<float> hostSol;
+    for (int i =0; i < systemDim; i++) hostSol.push_back(hostSolPointer[i]);
+    delete(hostSolPointer);
+    return hostSol;
+}
+
 double tps::CudaMemory::memoryEstimation() {
   int floatSize = sizeof(float);
   int doubleSize = sizeof(double);

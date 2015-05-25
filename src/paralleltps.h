@@ -12,12 +12,14 @@ namespace tps {
 
 class ParallelTPS : public TPS {
 public:
-  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
+  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
-    lienarSolver(referenceKeypoints, targetKeypoints) {}; 
+    cudalienarSolver(referenceKeypoints, targetKeypoints),
+    cm_(cm) {}; 
 	void run();
 private:
-  tps::OPCVLinearSystems lienarSolver;
+  tps::CudaLinearSystems cudalienarSolver;
+  tps::CudaMemory& cm_;
   uint numberOfThreads = std::thread::hardware_concurrency();
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;

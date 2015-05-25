@@ -28,6 +28,9 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
   std::cout << "Cuda solver execution time: " << solverExec << std::endl;
 
+  solutionCol = cm.getHostSolCol();
+  solutionRow = cm.getHostSolRow();
+
   freeResources();
 }
 

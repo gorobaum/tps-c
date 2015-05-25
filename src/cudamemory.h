@@ -32,11 +32,14 @@ public:
   float* getKeypointRow() { return keypointRow; };
   uchar* getTargetImage() { return targetImage; };
   uchar* getRegImage() { return regImage; };
+  std::vector<float> getHostSolCol();
+  std::vector<float> getHostSolRow();
 private:
   void allocCudaCoord();
   void allocCudaSolution();
   void allocCudaKeypoints();
   void allocCudaImagePixels(tps::Image& image);
+  std::vector<float> cudaToHost(float *cudaMemory);
   int imageWidth;
   int imageHeight;
   std::vector<cv::Point2f> referenceKeypoints_;
