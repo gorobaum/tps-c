@@ -136,6 +136,7 @@ int main(int argc, char** argv) {
 
     for (int j = lastI; j < i; j++) {
       std::cout << "============================================" << std::endl;
+      std::cout << "#Execution = " << j << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       if (referencesKPs[j].size() <= 3200) {

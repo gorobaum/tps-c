@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for config in $(cat tps.configs) 
+for i in `seq 1 10`;
   do 
-    ./tps $config >> saida.txt
+    ./tps tps.configs >> "saida"$i".txt"
   done
