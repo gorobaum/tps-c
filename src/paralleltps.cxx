@@ -24,9 +24,9 @@ void tps::ParallelTPS::runThread(uint tid) {
 }
 
 void tps::ParallelTPS::run() {
-	lienarSolver.solveLinearSystems();
-	solutionCol = lienarSolver.getSolutionCol();
-	solutionRow = lienarSolver.getSolutionRow();
+	cudalienarSolver.solveLinearSystems(cm_);
+	solutionCol = cudalienarSolver.getSolutionCol();
+	solutionRow = cudalienarSolver.getSolutionRow();
 	std::vector<std::thread> th;
 
 	for (uint i = 0; i < numberOfThreads; ++i)

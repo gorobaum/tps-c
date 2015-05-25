@@ -1,6 +1,8 @@
 #ifndef TPS_TPS_H_
 #define TPS_TPS_H_
 
+#undef __SSE2__
+
 #include "image.h"
 #include "cplinearsystems.h"
 
@@ -12,8 +14,7 @@
 
 namespace tps {
 
-class TPS
-{
+class TPS {
 public:
 	TPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName) :
 		referenceKeypoints_(referenceKeypoints),

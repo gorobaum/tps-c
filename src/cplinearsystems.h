@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#undef __SSE2__
+
 #include <opencv2/core/core.hpp>
 
 namespace tps {

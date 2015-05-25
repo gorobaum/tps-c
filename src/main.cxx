@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
         // std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
 
         double ParallelTpsExecTime = (double)cv::getTickCount();
-        tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+        tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension, cudaMemories[j]);
         parallelTPS.run();
         ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
         std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
