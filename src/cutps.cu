@@ -1,6 +1,10 @@
 #include <iostream>
 #include <cassert>
 
+#include "cuda.h"
+#include "cuda_runtime.h"
+#include "cuda_occupancy.h"
+
 #include "cutps.h"
 
 inline
@@ -62,7 +66,17 @@ __global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* so
     cudaImageCoord[x*height+y] = newCoord;
 }
 
-void runTPSCUDA(double* cudaImageCoord, float* cudaSolution, dim3 threadsPerBlock, dim3 numBlocks, int width, int height,
+void runTPSCUDA(tps::CudaMemory cm, int width, int height, int numberOfCPs) {
+  dim3 threadsPerBlock(32, 32);
+  dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
+
+  runTPSCUDAForCoord(cm.getCoordinateCol(), cm.getSolutionCol(), threadsPerBlock, numBlocks, width, height,
+              cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
+  runTPSCUDAForCoord(cm.getCoordinateRow(), cm.getSolutionRow(), threadsPerBlock, numBlocks, width, height,
+              cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
+}
+
+void runTPSCUDAForCoord(double* cudaImageCoord, float* cudaSolution, dim3 threadsPerBlock, dim3 numBlocks, int width, int height,
                 float* keypointCol, float* keypointRow, int numberOfCP) {
   cudaEvent_t start, stop;
   checkCuda(cudaEventCreate(&start));
@@ -79,8 +93,10 @@ void runTPSCUDA(double* cudaImageCoord, float* cudaSolution, dim3 threadsPerBloc
   std::cout << "callKernel execution time = " << elapsedTime << " ms\n";
 }
 
-unsigned char* runRegImage(double* cudaImageCoordX, double* cudaImageCoordY, unsigned char* cudaImage, unsigned char* cudaRegImage, int width, int height, 
-                  dim3 threadsPerBlock, dim3 numBlocks) {
+unsigned char* runRegImage(tps::CudaMemory cm, int width, int height) {
+  dim3 threadsPerBlock(32, 32);
+  dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
+
   unsigned char* regImage = (unsigned char*)malloc(width*height*sizeof(unsigned char));
 
   for (int col = 0; col < width; col++)
@@ -91,11 +107,9 @@ unsigned char* runRegImage(double* cudaImageCoordX, double* cudaImageCoordY, uns
   checkCuda(cudaEventCreate(&start));
   checkCuda(cudaEventCreate(&stop));
   checkCuda(cudaEventRecord(start, 0));
-  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cudaImageCoordX, cudaImageCoordY, cudaImage, cudaRegImage, width, height);
-  std::cout << "RegImage[100] = " << (int)regImage[100*height] << std::endl;
-  checkCuda(cudaMemcpy(regImage, cudaRegImage, width*height*sizeof(unsigned char), cudaMemcpyDeviceToHost));
-  std::cout << "RegImage[100] = " << (int)regImage[100*height] << std::endl;
+  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm.getCoordinateCol(), cm.getCoordinateRow(), cm.getTargetImage(), cm.getRegImage(), width, height);
   checkCuda(cudaDeviceSynchronize());
+  checkCuda(cudaMemcpy(regImage, cm.getRegImage(), width*height*sizeof(unsigned char), cudaMemcpyDeviceToHost));
   checkCuda(cudaEventRecord(stop, 0));
   checkCuda(cudaEventSynchronize(stop));
   float elapsedTime;

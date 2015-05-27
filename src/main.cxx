@@ -108,7 +108,9 @@ int main(int argc, char** argv) {
   std::vector< std::vector< std::vector<float> > > referencesKPs;
   std::vector< std::vector< std::vector<float> > > targetsKPs;
 
+  std::cout << "============================================" << std::endl;
   for (int i = 0; i < count; i++) {
+    std::cout << "Generating the CPS for entry number " << i << std::endl;
     double fgExecTime = (double)cv::getTickCount();
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i], cvRefImg, cvTarImgs[i]);
     fg.run(true);
@@ -116,6 +118,7 @@ int main(int argc, char** argv) {
     referencesKPs.push_back(fg.getReferenceKeypoints());
     targetsKPs.push_back(fg.getTargetKeypoints());
     std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+    std::cout << "============================================" << std::endl;
   }
 
   size_t avail;
@@ -125,10 +128,10 @@ int main(int argc, char** argv) {
   std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
 
   std::vector< tps::CudaMemory > cudaMemories;
+  std::cout << "============================================" << std::endl;
   for (int i = 0; i < count; i++) {
     int lastI = i;
     while(used <= 1800) {
-      std::cout << "============================================" << std::endl;
       std::cout << "Entry number " << i << " will run." << std::endl;
       tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
       if (used+cm.memoryEstimation() > 1800) break;
@@ -137,17 +140,17 @@ int main(int argc, char** argv) {
       cudaMemGetInfo( &avail, &total );
       used = (total - avail)/(1024*1024);
       std::cout << "Device used memory = " << used << "MB" << std::endl;
-      std::cout << "============================================" << std::endl;
       i++;
       if (i >= count) break;
+      else std::cout << "--------------------------------------------" << std::endl;
     }
 
+    std::cout << "============================================" << std::endl;
     for (int j = lastI; j < i; j++) {
-      std::cout << "============================================" << std::endl;
       std::cout << "#Execution = " << j << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
       std::cout << "#Percentage = " << percentages[j] << std::endl;
-
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
       // double BasicTPSExecTime = (double)cv::getTickCount();
       // tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
       // BasicTPS.run();
@@ -160,6 +163,8 @@ int main(int argc, char** argv) {
       parallelTPS.run();
       ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
       std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
       double CUDAcTpsExecTime = (double)cv::getTickCount();
       tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);

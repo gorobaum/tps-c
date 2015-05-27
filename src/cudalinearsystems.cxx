@@ -90,7 +90,6 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
 
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);
-
 }
 
 void tps::CudaLinearSystems::createMatrixA() {

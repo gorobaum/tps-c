@@ -6,8 +6,6 @@ include_directories (src)
 find_package(OpenCV REQUIRED)
 find_package(CUDA QUIET REQUIRED)
 
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
-
 cuda_add_executable(tps
   src/main.cxx
   src/image.cxx

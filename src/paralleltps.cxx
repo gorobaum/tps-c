@@ -34,8 +34,5 @@ void tps::ParallelTPS::run() {
 
   for(uint i = 0; i < numberOfThreads; ++i) th[i].join();
 
-  std::cout << "ParaRegImage[100] = " << registredImage.getPixelAt(0, 100) << std::endl;
-	std::cout << "ParaRegImage[100] = " << registredImage.getPixelAt(100, 0) << std::endl;
-
 	registredImage.save(outputName_);
 }
