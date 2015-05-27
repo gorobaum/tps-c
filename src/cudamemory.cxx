@@ -1,5 +1,7 @@
 #include "cudamemory.h"
 
+#include <cassert>
+
 inline
 cudaError_t checkCuda(cudaError_t result)
 {
@@ -43,9 +45,9 @@ void tps::CudaMemory::allocCudaKeypoints() {
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
-  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(uchar)));
-  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(uchar), cudaMemcpyHostToDevice));
-  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(uchar)));
+  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(unsigned char)));
+  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice));
+  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(unsigned char)));
 }
 
 std::vector<float> tps::CudaMemory::getHostSolCol() {
@@ -68,7 +70,7 @@ std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
 double tps::CudaMemory::memoryEstimation() {
   int floatSize = sizeof(float);
   int doubleSize = sizeof(double);
-  int ucharSize = sizeof(uchar);
+  int ucharSize = sizeof(unsigned char);
 
   double solutionsMemory = 2.0*systemDim*floatSize/(1024*1024);
   double coordinatesMemory = 2.0*imageWidth*imageHeight*doubleSize/(1024*1024);

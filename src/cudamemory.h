@@ -1,6 +1,8 @@
 #ifndef TPS_CUDAMEMORY_H_
 #define TPS_CUDAMEMORY_H_
 
+#include <iostream>
+
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
@@ -26,8 +28,8 @@ public:
   float* getSolutionRow() { return solutionRow; };
   float* getKeypointCol() { return keypointCol; };
   float* getKeypointRow() { return keypointRow; };
-  uchar* getTargetImage() { return targetImage; };
-  uchar* getRegImage() { return regImage; };
+  unsigned char* getTargetImage() { return targetImage; };
+  unsigned char* getRegImage() { return regImage; };
   std::vector<float> getHostSolCol();
   std::vector<float> getHostSolRow();
 private:
@@ -44,7 +46,7 @@ private:
   double *coordinateCol, *coordinateRow;
   float *solutionCol, *solutionRow;
   float *keypointCol, *keypointRow;
-  uchar *targetImage, *regImage;
+  unsigned char *targetImage, *regImage;
 };
 
 } // namespace

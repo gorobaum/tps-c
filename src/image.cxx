@@ -1,5 +1,9 @@
 #include "image.h"
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 void tps::Image::changePixelAt(int col, int row, int value) {
   if (col >= 0 && col < width_-1 && row >= 0 && row < height_-1)
     image[col][row] = value;

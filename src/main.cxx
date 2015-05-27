@@ -52,7 +52,11 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   
   std::getline(infile, line);
   cv::Mat cvTarImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  tps::Image targetImage = tps::Image(cvTarImg);
+  std::vector< std::vector<int> > vecImage(cvTarImg.size().width, std::vector<int>(cvTarImg.size().height, 0));
+    for (int col = 0; col < cvTarImg.size().width; col++)
+      for (int row = 0; row < cvTarImg.size().height; row++)
+        vecImage[col][row] = cvTarImg.at<uchar>(row, col);
+  tps::Image targetImage = tps::Image(vecImage, cvTarImg.size().width, cvTarImg.size().height);
   cvTarImgs.push_back(cvTarImg);
   targetImages.push_back(targetImage);
 
@@ -86,7 +90,11 @@ int main(int argc, char** argv) {
   std::string extension = line.substr(pos);
 
   cv::Mat cvRefImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  tps::Image referenceImage = tps::Image(cvRefImg);
+  std::vector< std::vector<int> > vecImage(cvRefImg.size().width, std::vector<int>(cvRefImg.size().height, 0));
+    for (int col = 0; col < cvRefImg.size().width; col++)
+      for (int row = 0; row < cvRefImg.size().height; row++)
+        vecImage[col][row] = cvRefImg.at<uchar>(row, col);
+  tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height);
   std::vector< cv::Mat > cvTarImgs;
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;
