@@ -12,7 +12,7 @@ void tps::ParallelTPS::runThread(uint tid) {
 			double newCol = solutionCol[0] + col * solutionCol[1] + row * solutionCol[2];
 			double newRow = solutionRow[0] + col * solutionRow[1] + row * solutionRow[2];
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-				float r = computeRSquared(col, referenceKeypoints_[i].x, row, referenceKeypoints_[i].y);
+				float r = computeRSquared(col, referenceKeypoints_[i][0], row, referenceKeypoints_[i][1]);
 				if (r != 0.0) {
 					newCol += r * log(r) * solutionCol[i+3];
 					newRow += r * log(r) * solutionRow[i+3];
@@ -33,6 +33,9 @@ void tps::ParallelTPS::run() {
     th.push_back(std::thread(&tps::ParallelTPS::runThread, this, i));
 
   for(uint i = 0; i < numberOfThreads; ++i) th[i].join();
+
+  std::cout << "ParaRegImage[100] = " << registredImage.getPixelAt(0, 100) << std::endl;
+	std::cout << "ParaRegImage[100] = " << registredImage.getPixelAt(100, 0) << std::endl;
 
 	registredImage.save(outputName_);
 }

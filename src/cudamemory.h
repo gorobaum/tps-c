@@ -5,17 +5,13 @@
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 #include "image.h"
 
 namespace tps {
   
 class CudaMemory {
 public:
-  CudaMemory(int width, int height, std::vector<cv::Point2f> referenceKeypoints) :
+  CudaMemory(int width, int height, std::vector< std::vector<float> > referenceKeypoints) :
     imageWidth(width),
     imageHeight(height),
     referenceKeypoints_(referenceKeypoints),
@@ -42,7 +38,7 @@ private:
   std::vector<float> cudaToHost(float *cudaMemory);
   int imageWidth;
   int imageHeight;
-  std::vector<cv::Point2f> referenceKeypoints_;
+  std::vector< std::vector<float> > referenceKeypoints_;
   int numberOfCps;
   int systemDim;
   double *coordinateCol, *coordinateRow;

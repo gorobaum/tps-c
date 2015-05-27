@@ -12,7 +12,7 @@ void tps::BasicTPS::run() {
 			double newCol = solutionCol[0] + col * solutionCol[1] + row * solutionCol[2];
 			double newRow = solutionRow[0] + col * solutionRow[1] + row * solutionRow[2];
 			for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-				float r = computeRSquared(col, referenceKeypoints_[i].x, row, referenceKeypoints_[i].y);
+				float r = computeRSquared(col, referenceKeypoints_[i][0], row, referenceKeypoints_[i][1]);
 				if (r != 0.0) {
 					newCol += r * log(r) * solutionCol[i+3];
 					newRow += r * log(r) * solutionRow[i+3];

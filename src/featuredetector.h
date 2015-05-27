@@ -19,14 +19,14 @@ public:
 		targetImage_(targetImage) {};
   virtual void run(bool createFeatureImage) = 0;
   virtual void saveFeatureImage() = 0;
-  std::vector<cv::Point2f> getReferenceKeypoints() {return referenceKeypoints;};
-  std::vector<cv::Point2f> getTargetKeypoints() {return targetKeypoints;};
+  std::vector< std::vector<float> > getReferenceKeypoints() {return referenceKeypoints;};
+  std::vector< std::vector<float> > getTargetKeypoints() {return targetKeypoints;};
 protected:
 	Image referenceImage_;
 	Image targetImage_;
 	// Data structures
-	std::vector<cv::Point2f> referenceKeypoints;
-  std::vector<cv::Point2f> targetKeypoints;
+	std::vector< std::vector<float> > referenceKeypoints;
+  std::vector< std::vector<float> > targetKeypoints;
 };
 
 } // namespace

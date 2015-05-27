@@ -97,8 +97,8 @@ int main(int argc, char** argv) {
     readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
   }
 
-  std::vector< std::vector< cv::Point2f > > referencesKPs;
-  std::vector< std::vector< cv::Point2f > > targetsKPs;
+  std::vector< std::vector< std::vector<float> > > referencesKPs;
+  std::vector< std::vector< std::vector<float> > > targetsKPs;
 
   for (int i = 0; i < count; i++) {
     double fgExecTime = (double)cv::getTickCount();
@@ -139,19 +139,19 @@ int main(int argc, char** argv) {
       std::cout << "#Execution = " << j << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
       std::cout << "#Percentage = " << percentages[j] << std::endl;
-      if (referencesKPs[j].size() <= 3200) {
-        // double BasicTPSExecTime = (double)cv::getTickCount();
-        // tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
-        // BasicTPS.run();
-        // BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
-        // std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
 
-        double ParallelTpsExecTime = (double)cv::getTickCount();
-        tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension, cudaMemories[j]);
-        parallelTPS.run();
-        ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-        std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
-      }
+      // double BasicTPSExecTime = (double)cv::getTickCount();
+      // tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
+      // BasicTPS.run();
+      // BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
+      // std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
+      tps::CudaMemory parallelCM = tps::CudaMemory(targetImages[j].getWidth(), targetImages[j].getHeight(), referencesKPs[j]);
+      parallelCM.allocCudaMemory(targetImages[j]);
+      double ParallelTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension, parallelCM);
+      parallelTPS.run();
+      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
       double CUDAcTpsExecTime = (double)cv::getTickCount();
       tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);

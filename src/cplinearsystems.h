@@ -9,7 +9,7 @@ namespace tps {
 
 class CPLinearSystems {
 public:  
-  CPLinearSystems(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints) :
+  CPLinearSystems(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints) :
     referenceKeypoints_(referenceKeypoints),
     targetKeypoints_(targetKeypoints),
     systemDimension(referenceKeypoints_.size()+3) {};
@@ -19,8 +19,8 @@ protected:
   virtual void createMatrixA() = 0;
   virtual void createBs() = 0;
   float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
-  std::vector<cv::Point2f> referenceKeypoints_;
-  std::vector<cv::Point2f> targetKeypoints_;
+  std::vector< std::vector<float> > referenceKeypoints_;
+  std::vector< std::vector<float> > targetKeypoints_;
   int systemDimension;
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;

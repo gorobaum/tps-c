@@ -21,7 +21,9 @@ void tps::FeatureGenerator::run(bool createFeatureImage) {
 void tps::FeatureGenerator::createReferenceImageFeatures() {
   for (int col = 0; col < gridSizeCol; col++)
     for (int row = 0; row < gridSizeRow; row++) {
-      cv::Point2i newCP(col*colStep, row*rowStep);
+      std::vector<float> newCP;
+      newCP.push_back(col*colStep);
+      newCP.push_back(row*rowStep);
       referenceKeypoints.push_back(newCP);
       cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
       keypoints_ref.push_back(newKP);
@@ -32,19 +34,18 @@ void tps::FeatureGenerator::createTargetImageFeatures() {
   for (int col = 0; col < gridSizeCol; col++)
     for (int row = 0; row < gridSizeRow; row++) {
       int pos = col*gridSizeRow+row;
-      cv::Point2i referenceCP = referenceKeypoints[pos];
-      std::vector<int> newPoint = applySenoidalDeformationTo(referenceCP.x, referenceCP.y);
-      cv::Point2i newCP(newPoint[0], newPoint[1]);
-      targetKeypoints.push_back(newCP);
+      std::vector<float> referenceCP = referenceKeypoints[pos];
+      std::vector<float> newPoint = applySenoidalDeformationTo(referenceCP[0], referenceCP[1]);
+      targetKeypoints.push_back(newPoint);
       cv::KeyPoint newKP(newPoint[0], newPoint[1], 0.1);
       keypoints_tar.push_back(newKP);
     }
 }
 
-std::vector<int> tps::FeatureGenerator::applySenoidalDeformationTo(int x, int y) {
-  int newX = x-8*std::sin(y/16);
-  int newY = y+4*std::cos(x/32);
-  std::vector<int> newPoint;
+std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y) {
+  float newX = x-8*std::sin(y/16);
+  float newY = y+4*std::cos(x/32);
+  std::vector<float> newPoint;
   newPoint.push_back(newX);
   newPoint.push_back(newY);
   return newPoint;

@@ -12,7 +12,7 @@ namespace tps {
 
 class ParallelTPS : public TPS {
 public:
-  ParallelTPS(std::vector<cv::Point2f> referenceKeypoints, std::vector<cv::Point2f> targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
+  ParallelTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
     cudalienarSolver(referenceKeypoints, targetKeypoints),
     cm_(cm) {}; 

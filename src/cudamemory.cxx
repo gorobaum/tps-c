@@ -31,8 +31,8 @@ void tps::CudaMemory::allocCudaKeypoints() {
   float* hostKeypointCol = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
   float* hostKeypointRow = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
   for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-    hostKeypointCol[i] = referenceKeypoints_[i].x;
-    hostKeypointRow[i] = referenceKeypoints_[i].y;
+    hostKeypointCol[i] = referenceKeypoints_[i][0];
+    hostKeypointRow[i] = referenceKeypoints_[i][1];
   }
   checkCuda(cudaMalloc(&keypointCol, numberOfCps*sizeof(float)));
   checkCuda(cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice));
