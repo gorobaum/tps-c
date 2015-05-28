@@ -33,6 +33,11 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS_DEBUG}")
 target_link_libraries(tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib64/libcusolver.so ${CUDA_CUBLAS_LIBRARIES} ${ARMADILLO_LIBRARIES})
 
 add_custom_target (
-	cleanShit
-	COMMAND ${CMAKE_COMMAND} -E remove result-* confis/tps.config* tps.configs
+	cleanResults
+	COMMAND ${CMAKE_COMMAND} -E remove result-*
+)
+
+add_custom_target(
+  cleanConfigurations
+  COMMAND ${CMAKE_COMMAND} -E remove confis/tps.config* tps.configs
 )
