@@ -4,6 +4,7 @@
 #include "tps.h"
 #include "OPCVlinearsystems.h"
 #include "cudalinearsystems.h"
+#include "armalinearsystems.h"
 #include "cudamemory.h"
 
 #include <thread>
@@ -14,10 +15,14 @@ class ParallelTPS : public TPS {
 public:
   ParallelTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage, std::string outputName) :
     TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
-    lienarSolver(referenceKeypoints, targetKeypoints) {}; 
+    opcvlienarSolver(referenceKeypoints, targetKeypoints),
+    cudalienarSolver(referenceKeypoints, targetKeypoints),
+    armalienarSolver(referenceKeypoints, targetKeypoints) {}; 
 	void run();
 private:
-  tps::OPCVLinearSystems lienarSolver;
+  tps::OPCVLinearSystems opcvlienarSolver;
+  tps::CudaLinearSystems cudalienarSolver;
+  tps::ArmaLinearSystems armalienarSolver;
   uint numberOfThreads = std::thread::hardware_concurrency();
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;

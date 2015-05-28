@@ -13,7 +13,7 @@ public:
 private:
   void createMatrixA();
   void createBs();
-  void freeResources();
+  std::vector<float> solveLinearSystem(arma::mat A, arma::vec b);
   arma::mat A;
   arma::vec bx, by;
 };
