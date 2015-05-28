@@ -34,5 +34,5 @@ target_link_libraries(tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib
 
 add_custom_target (
 	cleanShit
-	COMMAND ${CMAKE_COMMAND} -E remove result-* confis/tps.config*
+	COMMAND ${CMAKE_COMMAND} -E remove result-* confis/tps.config* tps.configs
 )
