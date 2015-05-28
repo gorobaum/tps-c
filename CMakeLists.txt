@@ -39,5 +39,5 @@ add_custom_target (
 
 add_custom_target(
   cleanConfigurations
-  COMMAND ${CMAKE_COMMAND} -E remove confis/tps.config* tps.configs
+  COMMAND ${CMAKE_COMMAND} -E remove configuration/tps.config* tps.configs
 )
