@@ -19,34 +19,7 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 
-void memoryEstimation(int width, int height, int numberOfCps) {
-  int floatSize = sizeof(float);
-  int doubleSize = sizeof(double);
-  int ucharSize = sizeof(uchar);
-
-  int systemDimention = numberOfCps+3;
-
-  size_t avail;
-  size_t total;
-  cudaMemGetInfo( &avail, &total );
-  size_t used = total - avail;
-  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
-
-  double solutionsMemory = 2.0*systemDimention*floatSize/(1024*1024);
-  std::cout << "GPU Memory occupied by the linear systems solutions = " << solutionsMemory << "MB" << std::endl;
-
-  double coordinatesMemory = 2.0*width*height*doubleSize/(1024*1024);
-  std::cout << "GPU Memory occupied by the coordinates calculation = " << coordinatesMemory << "MB" << std::endl;
-
-  double keypointsMemory = 2.0*numberOfCps*floatSize/(1024*1024);
-  std::cout << "GPU Memory occupied by the keypoints = " << keypointsMemory << "MB" << std::endl;
-
-  double pixelsMemory = 2.0*width*height*ucharSize/(1024*1024);
-  std::cout << "GPU Memory occupied by the pixels = " << pixelsMemory << "MB" << std::endl;
-
-  double totalMemory = solutionsMemory+coordinatesMemory+keypointsMemory+pixelsMemory;
-  std::cout << "Total GPU memory occupied = " << totalMemory << "MB" << std::endl;
-}
+bool createKeypointImages = true;
 
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
                     std::vector< cv::Mat >& cvTarImgs, std::vector< std::string >& outputNames, 
@@ -74,6 +47,25 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   percentages.push_back(percentage);
 }
 
+void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
+    std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
+    std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
+    double fgExecTime = (double)cv::getTickCount();
+
+    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
+    fg.run();
+    if (createKeypointImages) {
+      fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);
+      fg.drawFeatureImage(cvRefImg, cvTarImg, outputName+"matches-Tar"+extension);
+    }
+
+    fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
+    referencesKPs.push_back(fg.getReferenceKeypoints());
+    targetsKPs.push_back(fg.getTargetKeypoints());
+    std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
+    std::cout << "============================================" << std::endl;
+}
+
 int main(int argc, char** argv) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -84,7 +76,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  // int minHessian = 400;
+  // Reading the main file
   std::ifstream infile;
   infile.open(argv[1]);
 
@@ -105,42 +97,33 @@ int main(int argc, char** argv) {
   std::vector< std::string > outputNames;
   std::vector< float > percentages;
 
-  bool createKeypointImages = true;
-
-  int count = 0;
-  for (line; std::getline(infile, line); infile.eof(), count++) {
+  // Reading each iteration configuration file
+  int nFiles = 0;
+  for (line; std::getline(infile, line); infile.eof(), nFiles++) {
     readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
   }
 
   std::vector< std::vector< std::vector<float> > > referencesKPs;
   std::vector< std::vector< std::vector<float> > > targetsKPs;
 
+  // Generating the Control Points for each pair of reference and target images
   std::cout << "============================================" << std::endl;
-  for (int i = 0; i < count; i++) {
-    std::cout << "Generating the CPS for entry number " << i << std::endl;
-    double fgExecTime = (double)cv::getTickCount();
-    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i]);
-    fg.run();
-    if (createKeypointImages) {
-      fg.drawKeypointsImage(cvTarImgs[i], outputNames[i]+"keypoints-Tar"+extension);
-      fg.drawFeatureImage(cvRefImg, cvTarImgs[i], outputNames[i]+"matches-Tar"+extension);
-    }
-    fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
-    referencesKPs.push_back(fg.getReferenceKeypoints());
-    targetsKPs.push_back(fg.getTargetKeypoints());
-    std::cout << "FeatureGenerator execution time: " << fgExecTime << std::endl;
-    std::cout << "============================================" << std::endl;
+  for (int i = 0; i < nFiles; i++) {
+    std::cout << "Generating the CPs for entry number " << i << std::endl;
+    runFeatureGeneration(referenceImage, targetImages[i], percentages[i], outputNames[i], cvTarImgs[i], cvRefImg, referencesKPs, targetsKPs, extension);
   }
 
+  // Verifying the total memory occupation inside the GPU
   size_t avail;
   size_t total;
   cudaMemGetInfo( &avail, &total );
   size_t used = (total - avail)/(1024*1024);
   std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
 
+  // Allocating the maximun possible of free memory in the GPU
   std::vector< tps::CudaMemory > cudaMemories;
   std::cout << "============================================" << std::endl;
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < nFiles; i++) {
     int lastI = i;
     while(used <= 1800) {
       std::cout << "Entry number " << i << " will run." << std::endl;
@@ -152,21 +135,18 @@ int main(int argc, char** argv) {
       used = (total - avail)/(1024*1024);
       std::cout << "Device used memory = " << used << "MB" << std::endl;
       i++;
-      if (i >= count) break;
+      if (i >= nFiles) break;
       else std::cout << "--------------------------------------------" << std::endl;
     }
 
+    // Execution of the TPS, both in the Host and in the Device
     std::cout << "============================================" << std::endl;
     for (int j = lastI; j < i; j++) {
       std::cout << "#Execution = " << j << std::endl;
       std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-      // double BasicTPSExecTime = (double)cv::getTickCount();
-      // tps::BasicTPS BasicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Basic"+extension);
-      // BasicTPS.run();
-      // BasicTPSExecTime = ((double)cv::getTickCount() - BasicTPSExecTime)/cv::getTickFrequency();
-      // std::cout << "Basic TPS execution time: " << BasicTPSExecTime << std::endl;
+
       double ParallelTpsExecTime = (double)cv::getTickCount();
       tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
       parallelTPS.run();
