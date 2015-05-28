@@ -13,15 +13,9 @@ cudaError_t checkCuda(cudaError_t result)
 }
 
 void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
-  allocCudaCoord();
   allocCudaSolution();
   allocCudaKeypoints();
   allocCudaImagePixels(image);
-}
-
-void tps::CudaMemory::allocCudaCoord() {
-  checkCuda(cudaMalloc(&coordinateCol, imageWidth*imageHeight*sizeof(double)));
-  checkCuda(cudaMalloc(&coordinateRow, imageWidth*imageHeight*sizeof(double)));
 }
 
 void tps::CudaMemory::allocCudaSolution() {
@@ -73,17 +67,14 @@ double tps::CudaMemory::memoryEstimation() {
   int ucharSize = sizeof(unsigned char);
 
   double solutionsMemory = 2.0*systemDim*floatSize/(1024*1024);
-  double coordinatesMemory = 2.0*imageWidth*imageHeight*doubleSize/(1024*1024);
   double keypointsMemory = 2.0*numberOfCps*floatSize/(1024*1024);
   double pixelsMemory = 2.0*imageWidth*imageHeight*ucharSize/(1024*1024);
 
-  double totalMemory = solutionsMemory+coordinatesMemory+keypointsMemory+pixelsMemory;
+  double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
   return totalMemory;
 }
 
 void tps::CudaMemory::freeMemory() {
-  cudaFree(coordinateCol);
-  cudaFree(coordinateRow);
   cudaFree(solutionCol);
   cudaFree(solutionRow);
   cudaFree(keypointCol);

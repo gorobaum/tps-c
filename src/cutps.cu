@@ -42,28 +42,22 @@ __device__ double cudaBilinearInterpolation(double col, double row, unsigned cha
 }
 
 // Kernel definition
-__global__ void cudaRegistredImage(double* cudaImageCoordX, double* cudaImageCoordY, unsigned char* cudaImage, unsigned char* cudaRegImage, int width, int height) {
+__global__ void tpsCuda(unsigned char* cudaImage, unsigned char* cudaRegImage, float* colSolutions, float* rowSolutions, int width, int height, float* cudaKeyCol, float* cudaKeyRow, uint numOfKeys) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
-
-  double newX = cudaImageCoordX[x*height+y];
-  double newY = cudaImageCoordY[x*height+y];
-  cudaRegImage[x*height+y] = cudaBilinearInterpolation(newX, newY, cudaImage, width, height);
-}
-
-// Kernel definition
-__global__ void tpsCuda(double* cudaImageCoord, int width, int height, float* solution, float* cudaKeyCol, float* cudaKeyRow, uint numOfKeys)
-{
-  int x = blockDim.x*blockIdx.x + threadIdx.x;
-  int y = blockDim.y*blockIdx.y + threadIdx.y;
-  double newCoord = solution[0] + x*solution[1] + y*solution[2];
+  double newCol = colSolutions[0] + x*colSolutions[1] + y*colSolutions[2];
+  double newRow = rowSolutions[0] + x*rowSolutions[1] + y*rowSolutions[2];
 
   for (uint i = 0; i < numOfKeys; i++) {
     double r = (x-cudaKeyCol[i])*(x-cudaKeyCol[i]) + (y-cudaKeyRow[i])*(y-cudaKeyRow[i]);
-    if (r != 0.0) newCoord += r*log(r) * solution[i+3];
+    if (r != 0.0) {
+      newCol += r*log(r) * colSolutions[i+3];
+      newRow += r*log(r) * rowSolutions[i+3];
+    }
   }
-  if (x*height+y < width*height)
-    cudaImageCoord[x*height+y] = newCoord;
+  if (x*height+y < width*height) {
+    cudaRegImage[x*height+y] = cudaBilinearInterpolation(newCol, newRow, cudaImage, width, height);
+  }
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {
@@ -82,28 +76,7 @@ void showExecutionTimestartTimeRecord(cudaEvent_t *start, cudaEvent_t *stop, std
   std::cout << output << elapsedTime << " ms\n";
 }
 
-void runTPSCUDA(tps::CudaMemory cm, int width, int height, int numberOfCPs) {
-  dim3 threadsPerBlock(32, 32);
-  dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
-
-  runTPSCUDAForCoord(cm.getCoordinateCol(), cm.getSolutionCol(), threadsPerBlock, numBlocks, width, height,
-              cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
-  runTPSCUDAForCoord(cm.getCoordinateRow(), cm.getSolutionRow(), threadsPerBlock, numBlocks, width, height,
-              cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
-}
-
-void runTPSCUDAForCoord(double* cudaImageCoord, float* cudaSolution, dim3 threadsPerBlock, dim3 numBlocks, int width, int height,
-                float* keypointCol, float* keypointRow, int numberOfCP) {
-  cudaEvent_t start, stop;
-  startTimeRecord(&start, &stop);
-
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cudaImageCoord, width, height, cudaSolution, keypointCol, keypointRow, numberOfCP);
-  cudaDeviceSynchronize(); 
-
-  showExecutionTimestartTimeRecord(&start, &stop, "callKernel execution time = ");
-}
-
-unsigned char* runRegImage(tps::CudaMemory cm, int width, int height) {
+unsigned char* runTPSCUDA(tps::CudaMemory cm, int width, int height, int numberOfCPs) {
   dim3 threadsPerBlock(32, 32);
   dim3 numBlocks(std::ceil(1.0*width/threadsPerBlock.x), std::ceil(1.0*height/threadsPerBlock.y));
 
@@ -116,10 +89,11 @@ unsigned char* runRegImage(tps::CudaMemory cm, int width, int height) {
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-  cudaRegistredImage<<<numBlocks, threadsPerBlock>>>(cm.getCoordinateCol(), cm.getCoordinateRow(), cm.getTargetImage(), cm.getRegImage(), width, height);
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionCol(), cm.getSolutionRow(), 
+                                          width, height, cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
   checkCuda(cudaMemcpy(regImage, cm.getRegImage(), width*height*sizeof(unsigned char), cudaMemcpyDeviceToHost));
-  
-  showExecutionTimestartTimeRecord(&start, &stop, "cudaRegistredImage execution time = ");
+
+  showExecutionTimestartTimeRecord(&start, &stop, "callKernel execution time = ");
   return regImage;
 }

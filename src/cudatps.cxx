@@ -9,11 +9,7 @@
 void tps::CudaTPS::run() {
   cudalienarSolver.solveLinearSystems(cm_);
 
-  runTPSCUDA(cm_, width, height, referenceKeypoints_.size());
-
-  // std::cout << cudaGetErrorString(cudaGetLastError()) << std::endl;
-
-  regImage = runRegImage(cm_, width, height);
+  regImage = runTPSCUDA(cm_, width, height, referenceKeypoints_.size());
 
   registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);

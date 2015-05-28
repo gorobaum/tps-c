@@ -22,8 +22,6 @@ public:
   void freeMemory();
   void allocCudaMemory(tps::Image& image);
   double memoryEstimation();
-  double* getCoordinateCol() { return coordinateCol; };
-  double* getCoordinateRow() { return coordinateRow; };
   float* getSolutionCol() { return solutionCol; };
   float* getSolutionRow() { return solutionRow; };
   float* getKeypointCol() { return keypointCol; };
@@ -33,7 +31,6 @@ public:
   std::vector<float> getHostSolCol();
   std::vector<float> getHostSolRow();
 private:
-  void allocCudaCoord();
   void allocCudaSolution();
   void allocCudaKeypoints();
   void allocCudaImagePixels(tps::Image& image);
