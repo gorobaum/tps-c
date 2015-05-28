@@ -3,6 +3,8 @@
 
 #include "cplinearsystems.h"
 
+#include <opencv2/core/core.hpp>
+
 namespace tps {
 
 class OPCVLinearSystems : public CPLinearSystems {

@@ -3,11 +3,15 @@
 void tps::ArmaLinearSystems::solveLinearSystems() {
   createMatrixA();
   createBs();
-  double solverExec = (double)cv::getTickCount();
+
+  arma::wall_clock timer;
+  timer.tic();
+
   solutionCol = solveLinearSystem(A, bx);
   solutionRow = solveLinearSystem(A, by);
-  solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
-  std::cout << "Arma solver execution time: " << solverExec << std::endl;
+
+  double time = timer.toc();
+  std::cout << "Arma solver execution time: " << time << std::endl;
 
 }
 

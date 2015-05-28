@@ -3,21 +3,25 @@
 
 #include "featuredetector.h"
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/nonfree/features2d.hpp>
+
 namespace tps {
 	
 class FeatureGenerator : public FeatureDetector {
 public:
-  FeatureGenerator(Image referenceImage, Image targetImage, float percentage, cv::Mat refImg, cv::Mat tarImg):
+  FeatureGenerator(Image referenceImage, Image targetImage, float percentage):
     FeatureDetector(referenceImage, targetImage),
-    percentage_(percentage),
-    refImg_(refImg),
-    tarImg_(tarImg) {};
-  void run(bool createFeatureImage);
-  void saveFeatureImage();
+    percentage_(percentage) {};
+  void run();
+  void drawKeypointsImage(cv::Mat tarImg, std::string filename);
+  void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
 private:
   float percentage_;
-  cv::Mat refImg_;
-  cv::Mat tarImg_;
   int gridSizeCol, gridSizeRow;
   float colStep, rowStep;
   std::vector<float> applySenoidalDeformationTo(float x, float y);

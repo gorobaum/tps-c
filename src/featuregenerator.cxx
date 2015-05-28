@@ -1,14 +1,10 @@
 #include "featuregenerator.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 #include <iostream>
 #include <vector>
 #include <cmath>
 
-void tps::FeatureGenerator::run(bool createFeatureImage) {
+void tps::FeatureGenerator::run() {
   gridSizeCol = referenceImage_.getWidth()*percentage_;
   gridSizeRow = referenceImage_.getHeight()*percentage_;
   colStep = referenceImage_.getWidth()*1.0/(gridSizeCol-1);
@@ -19,7 +15,6 @@ void tps::FeatureGenerator::run(bool createFeatureImage) {
   std::cout << "rowStep = " << rowStep << std::endl;
   createReferenceImageFeatures();
   createTargetImageFeatures();
-  if (createFeatureImage) saveFeatureImage();
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {
@@ -55,7 +50,17 @@ std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, fl
   return newPoint;
 }
 
-void tps::FeatureGenerator::saveFeatureImage() {
+void tps::FeatureGenerator::drawKeypointsImage(cv::Mat tarImg, std::string filename) {
+  std::vector<int> compression_params;
+  compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+  compression_params.push_back(95);
+  
+  cv::Mat img_matches;
+  drawKeypoints(tarImg, keypoints_tar, img_matches, cv::Scalar::all(-1), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+  cv::imwrite(filename.c_str(), img_matches, compression_params);
+}
+
+void tps::FeatureGenerator::drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
   compression_params.push_back(95);
@@ -69,10 +74,9 @@ void tps::FeatureGenerator::saveFeatureImage() {
     }
 
   cv::Mat img_matches;
-  drawMatches(refImg_, keypoints_ref, tarImg_, keypoints_tar,
+  drawMatches(refImg, keypoints_ref, tarImg, keypoints_tar,
               matches, img_matches, cv::Scalar::all(-1), cv::Scalar::all(-1),
               std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-  drawKeypoints(tarImg_, keypoints_tar, img_matches, cv::Scalar::all(-1), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
-  cv::imwrite("refkeypoints-cp.png", img_matches, compression_params);
+  cv::imwrite(filename.c_str(), img_matches, compression_params);
 }

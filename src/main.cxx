@@ -14,6 +14,11 @@
 #include <cstring>
 #include <cstdio>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/nonfree/features2d.hpp>
+
 void memoryEstimation(int width, int height, int numberOfCps) {
   int floatSize = sizeof(float);
   int doubleSize = sizeof(double);
@@ -100,6 +105,8 @@ int main(int argc, char** argv) {
   std::vector< std::string > outputNames;
   std::vector< float > percentages;
 
+  bool createKeypointImages = true;
+
   int count = 0;
   for (line; std::getline(infile, line); infile.eof(), count++) {
     readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
@@ -112,8 +119,12 @@ int main(int argc, char** argv) {
   for (int i = 0; i < count; i++) {
     std::cout << "Generating the CPS for entry number " << i << std::endl;
     double fgExecTime = (double)cv::getTickCount();
-    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i], cvRefImg, cvTarImgs[i]);
-    fg.run(true);
+    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImages[i], percentages[i]);
+    fg.run();
+    if (createKeypointImages) {
+      fg.drawKeypointsImage(cvTarImgs[i], outputNames[i]+"keypoints-Tar"+extension);
+      fg.drawFeatureImage(cvRefImg, cvTarImgs[i], outputNames[i]+"matches-Tar"+extension);
+    }
     fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
     referencesKPs.push_back(fg.getReferenceKeypoints());
     targetsKPs.push_back(fg.getTargetKeypoints());

@@ -3,8 +3,10 @@
 #include "cusolver_common.h"
 #include "cusolverDn.h"
 
+#include <armadillo>
 #include <cstdlib>
 #include <iostream>
+#include <cassert>
 #include <cublas_v2.h>
 
 inline
@@ -22,11 +24,12 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
 
-  double solverExec = (double)cv::getTickCount();
+  arma::wall_clock timer;
+  timer.tic();
   solveLinearSystem(bx, cm.getSolutionCol());
   solveLinearSystem(by, cm.getSolutionRow());
-  solverExec = ((double)cv::getTickCount() - solverExec)/cv::getTickFrequency();
-  std::cout << "Cuda solver execution time: " << solverExec << std::endl;
+  double time = timer.toc();
+  std::cout << "Cuda solver execution time: " << time << std::endl;
 
   solutionCol = cm.getHostSolCol();
   solutionRow = cm.getHostSolRow();
