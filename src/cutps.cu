@@ -42,7 +42,8 @@ __device__ double cudaBilinearInterpolation(double col, double row, unsigned cha
 }
 
 // Kernel definition
-__global__ void tpsCuda(unsigned char* cudaImage, unsigned char* cudaRegImage, float* colSolutions, float* rowSolutions, int width, int height, float* cudaKeyCol, float* cudaKeyRow, uint numOfKeys) {
+__global__ void tpsCuda(unsigned char* cudaImage, unsigned char* cudaRegImage, float* colSolutions, float* rowSolutions, 
+                        float* cudaKeyCol, float* cudaKeyRow, int width, int height, uint numOfKeys) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   double newCol = colSolutions[0] + x*colSolutions[1] + y*colSolutions[2];
@@ -90,7 +91,7 @@ unsigned char* runTPSCUDA(tps::CudaMemory cm, int width, int height, int numberO
   startTimeRecord(&start, &stop);
 
   tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionCol(), cm.getSolutionRow(), 
-                                          width, height, cm.getKeypointCol(), cm.getKeypointRow(), numberOfCPs);
+                                          cm.getKeypointCol(), cm.getKeypointRow(), width, height, numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
   checkCuda(cudaMemcpy(regImage, cm.getRegImage(), width*height*sizeof(unsigned char), cudaMemcpyDeviceToHost));
 

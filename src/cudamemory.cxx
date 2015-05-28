@@ -12,10 +12,10 @@ cudaError_t checkCuda(cudaError_t result)
     return result;
 }
 
-void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
+void tps::CudaMemory::allocCudaMemory(unsigned char* imagePixels) {
   allocCudaSolution();
   allocCudaKeypoints();
-  allocCudaImagePixels(image);
+  allocCudaImagePixels(imagePixels);
 }
 
 void tps::CudaMemory::allocCudaSolution() {
@@ -38,9 +38,9 @@ void tps::CudaMemory::allocCudaKeypoints() {
   free(hostKeypointRow);
 }
 
-void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
+void tps::CudaMemory::allocCudaImagePixels(unsigned char* imagePixels) {
   checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(unsigned char)));
-  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice));
+  checkCuda(cudaMemcpy(targetImage, imagePixels, imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice));
   checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(unsigned char)));
 }
 

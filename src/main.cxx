@@ -48,7 +48,8 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
 }
 
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
-    std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
+    std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, 
+    std::vector< std::vector< std::vector<float> > >& referencesKPs, 
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
     double fgExecTime = (double)cv::getTickCount();
 
@@ -129,7 +130,7 @@ int main(int argc, char** argv) {
       std::cout << "Entry number " << i << " will run." << std::endl;
       tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
       if (used+cm.memoryEstimation() > 1800) break;
-      cm.allocCudaMemory(targetImages[i]);
+      cm.allocCudaMemory(targetImages[i].getPixelVector());
       cudaMemories.push_back(cm);
       cudaMemGetInfo( &avail, &total );
       used = (total - avail)/(1024*1024);

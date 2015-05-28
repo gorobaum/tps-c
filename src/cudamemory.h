@@ -2,12 +2,11 @@
 #define TPS_CUDAMEMORY_H_
 
 #include <iostream>
+#include <vector>
 
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
-
-#include "image.h"
 
 namespace tps {
   
@@ -20,7 +19,7 @@ public:
     numberOfCps(referenceKeypoints.size()),
     systemDim(numberOfCps+3) {};
   void freeMemory();
-  void allocCudaMemory(tps::Image& image);
+  void allocCudaMemory(unsigned char* imagePixels);
   double memoryEstimation();
   float* getSolutionCol() { return solutionCol; };
   float* getSolutionRow() { return solutionRow; };
@@ -33,7 +32,7 @@ public:
 private:
   void allocCudaSolution();
   void allocCudaKeypoints();
-  void allocCudaImagePixels(tps::Image& image);
+  void allocCudaImagePixels(unsigned char* imagePixels);
   std::vector<float> cudaToHost(float *cudaMemory);
   int imageWidth;
   int imageHeight;
