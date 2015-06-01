@@ -35,7 +35,7 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
     for (int col = 0; col < cvTarImg.size().width; col++)
       for (int row = 0; row < cvTarImg.size().height; row++)
         vecImage[col][row] = cvTarImg.at<uchar>(row, col);
-  tps::Image targetImage = tps::Image(vecImage, cvTarImg.size().width, cvTarImg.size().height);
+  tps::Image targetImage = tps::Image(vecImage, cvTarImg.size().width, cvTarImg.size().height, 1);
   cvTarImgs.push_back(cvTarImg);
   targetImages.push_back(targetImage);
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
     for (int col = 0; col < cvRefImg.size().width; col++)
       for (int row = 0; row < cvRefImg.size().height; row++)
         vecImage[col][row] = cvRefImg.at<uchar>(row, col);
-  tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height);
+  tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height, 1);
   std::vector< cv::Mat > cvTarImgs;
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;

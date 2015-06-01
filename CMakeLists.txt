@@ -9,10 +9,6 @@ find_package(ITK REQUIRED)
 
 include(${ITK_USE_FILE}) # see vtkModuleAPI.cmake:110
 
-
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries."
-       ${VTK_BUILD_SHARED_LIBS})
-
 include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
 cuda_add_executable(tps
