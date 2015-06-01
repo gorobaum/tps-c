@@ -21,7 +21,8 @@ public:
 		targetImage_(targetImage),
     width(targetImage.getWidth()),
     height(targetImage.getHeight()),
-		registredImage(targetImage.getWidth(), targetImage.getHeight()) {};
+    slices(targetImage.getSlices()),
+		registredImage(targetImage.getWidth(), targetImage.getHeight(), targetImage.getSlices()) {};
 	virtual void run() = 0;
 protected:
 	std::vector< std::vector<float> > referenceKeypoints_;
@@ -30,6 +31,7 @@ protected:
 	tps::Image targetImage_;
   int width;
   int height;
+  int slices;
 	tps::Image registredImage;
 	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
 };
