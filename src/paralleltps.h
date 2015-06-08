@@ -26,6 +26,7 @@ private:
   uint numberOfThreads = std::thread::hardware_concurrency();
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;
+  std::vector<float> solutionSlice;
 	void runThread(uint tid);
 };
 

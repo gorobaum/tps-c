@@ -45,9 +45,9 @@ void tps::CudaMemory::allocCudaKeypoints() {
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
-  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(unsigned char)));
-  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice));
-  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(unsigned char)));
+  checkCuda(cudaMalloc(&targetImage, imageSize*sizeof(unsigned char)));
+  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageSize*sizeof(unsigned char), cudaMemcpyHostToDevice));
+  checkCuda(cudaMalloc(&regImage, imageSize*sizeof(unsigned char)));
 }
 
 std::vector<float> tps::CudaMemory::getHostSolCol() {
@@ -78,7 +78,7 @@ double tps::CudaMemory::memoryEstimation() {
 
   double solutionsMemory = 3.0*systemDim*floatSize/(1024*1024);
   double keypointsMemory = 3.0*numberOfCps*floatSize/(1024*1024);
-  double pixelsMemory = 2.0*imageWidth*imageHeight*ucharSize/(1024*1024);
+  double pixelsMemory = 2.0*imageSize*ucharSize/(1024*1024);
 
   double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
   return totalMemory;

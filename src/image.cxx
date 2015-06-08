@@ -64,18 +64,18 @@ void tps::Image::save(std::string filename) {
 
 uchar* tps::Image::getPixelVector() {
   uchar* vector = (uchar*)malloc(width_*height_*sizeof(uchar));
-  for (int col = 0; col < width_; col++)
-    for (int row = 0; row < height_; row++)
-      for (int slice = 0; slice < slices_; slice++)
+  for (int slice = 0; slice < slices_; slice++)
+    for (int col = 0; col < width_; col++)
+      for (int row = 0; row < height_; row++)
         vector[slice*height_*width_+col*height_+row] = (uchar)image[col][row][slice];
   return vector;
 }
 
 void tps::Image::setPixelVector(uchar* vector) {
-  for (int col = 0; col < width_; col++)
-    for (int row = 0; row < height_; row++) 
-      for (int slice = 0; slice < slices_; slice++) {
+  for (int slice = 0; slice < slices_; slice++)
+    for (int col = 0; col < width_; col++)
+      for (int row = 0; row < height_; row++) {
         uchar newValue = vector[slice*height_*width_+col*height_+row];
         changePixelAt(col, row, slice, newValue);
-  }
+      }
 }

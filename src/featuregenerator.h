@@ -22,9 +22,9 @@ public:
   void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
 private:
   float percentage_;
-  int gridSizeCol, gridSizeRow;
-  float colStep, rowStep;
-  std::vector<float> applySenoidalDeformationTo(float x, float y);
+  int gridSizeCol, gridSizeRow, gridSizeSlice;
+  float colStep, rowStep, sliceStep;
+  std::vector<float> applySenoidalDeformationTo(float x, float y, float z);
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
   std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;

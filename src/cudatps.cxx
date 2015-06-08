@@ -9,7 +9,7 @@
 void tps::CudaTPS::run() {
   cudalienarSolver.solveLinearSystems(cm_);
 
-  regImage = runTPSCUDA(cm_, width, height, referenceKeypoints_.size());
+  regImage = runTPSCUDA(cm_, width, height, slices, referenceKeypoints_.size());
 
   registredImage.setPixelVector(regImage);
   registredImage.save(outputName_);

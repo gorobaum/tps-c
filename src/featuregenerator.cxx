@@ -7,46 +7,54 @@
 void tps::FeatureGenerator::run() {
   gridSizeCol = referenceImage_.getWidth()*percentage_;
   gridSizeRow = referenceImage_.getHeight()*percentage_;
+  gridSizeSlice = referenceImage_.getSlices()*percentage_;
   colStep = referenceImage_.getWidth()*1.0/(gridSizeCol-1);
   rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow-1);
+  sliceStep = referenceImage_.getSlices()*1.0/(gridSizeSlice-1);
   std::cout << "gridSizeCol = " << gridSizeCol << std::endl;
   std::cout << "gridSizeRow = " << gridSizeRow << std::endl;
+  std::cout << "gridSizeRow = " << gridSizeSlice << std::endl;
   std::cout << "colStep = " << colStep << std::endl;
   std::cout << "rowStep = " << rowStep << std::endl;
+  std::cout << "rowStep = " << sliceStep << std::endl;
   createReferenceImageFeatures();
   createTargetImageFeatures();
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {
-  for (int col = 0; col < gridSizeCol; col++)
-    for (int row = 0; row < gridSizeRow; row++) {
-      std::vector<float> newCP;
-      newCP.push_back(col*colStep);
-      newCP.push_back(row*rowStep);
-      referenceKeypoints.push_back(newCP);
-      cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
-      keypoints_ref.push_back(newKP);
-    }
+  for (int slice = 0; slice < gridSizeSlice; slice++)
+    for (int col = 0; col < gridSizeCol; col++)
+      for (int row = 0; row < gridSizeRow; row++) {
+        std::vector<float> newCP;
+        newCP.push_back(col*colStep);
+        newCP.push_back(row*rowStep);
+        newCP.push_back(slice*sliceStep);
+        referenceKeypoints.push_back(newCP);
+        cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
+        keypoints_ref.push_back(newKP);
+      }
 }
 
 void tps::FeatureGenerator::createTargetImageFeatures() {
-  for (int col = 0; col < gridSizeCol; col++)
-    for (int row = 0; row < gridSizeRow; row++) {
-      int pos = col*gridSizeRow+row;
-      std::vector<float> referenceCP = referenceKeypoints[pos];
-      std::vector<float> newPoint = applySenoidalDeformationTo(referenceCP[0], referenceCP[1]);
-      targetKeypoints.push_back(newPoint);
-      cv::KeyPoint newKP(newPoint[0], newPoint[1], 0.1);
-      keypoints_tar.push_back(newKP);
-    }
+  for (int slice = 0; slice < gridSizeSlice; slice++)
+    for (int col = 0; col < gridSizeCol; col++)
+      for (int row = 0; row < gridSizeRow; row++) {
+        int pos = slice*gridSizeCol*gridSizeRow+col*gridSizeRow+row;
+        std::vector<float> referenceCP = referenceKeypoints[pos];
+        std::vector<float> newPoint = applySenoidalDeformationTo(referenceCP[0], referenceCP[1], referenceCP[2]);
+        targetKeypoints.push_back(newPoint);
+        cv::KeyPoint newKP(newPoint[0], newPoint[1], 0.1);
+        keypoints_tar.push_back(newKP);
+      }
 }
 
-std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y) {
+std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y, float z) {
   float newX = x-8*std::sin(y/16);
   float newY = y+4*std::cos(x/32);
   std::vector<float> newPoint;
   newPoint.push_back(newX);
   newPoint.push_back(newY);
+  newPoint.push_back(z);
   return newPoint;
 }
 

@@ -3,6 +3,6 @@
 
 #include "cudamemory.h"
 
-unsigned char* runTPSCUDA(tps::CudaMemory cm, int width, int height, int numberOfCPs);
+unsigned char* runTPSCUDA(tps::CudaMemory cm, int width, int height, int slices, int numberOfCPs);
 
 #endif
