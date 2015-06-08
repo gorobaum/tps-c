@@ -17,6 +17,7 @@ private:
   void createBs();
   cv::Mat bx;
   cv::Mat by;
+  cv::Mat bz;
   cv::Mat A;
 };
 

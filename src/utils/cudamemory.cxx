@@ -21,21 +21,27 @@ void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
 void tps::CudaMemory::allocCudaSolution() {
   checkCuda(cudaMalloc(&solutionCol, systemDim*sizeof(float)));
   checkCuda(cudaMalloc(&solutionRow, systemDim*sizeof(float)));
+  checkCuda(cudaMalloc(&solutionSlice, systemDim*sizeof(float)));
 }
 
 void tps::CudaMemory::allocCudaKeypoints() {
   float* hostKeypointCol = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
   float* hostKeypointRow = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
+  float* hostKeypointSlice = (float*)malloc(referenceKeypoints_.size()*sizeof(float));
   for (uint i = 0; i < referenceKeypoints_.size(); i++) {
     hostKeypointCol[i] = referenceKeypoints_[i][0];
     hostKeypointRow[i] = referenceKeypoints_[i][1];
+    hostKeypointSlice[i] = referenceKeypoints_[i][2];
   }
   checkCuda(cudaMalloc(&keypointCol, numberOfCps*sizeof(float)));
   checkCuda(cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice));
   checkCuda(cudaMalloc(&keypointRow, numberOfCps*sizeof(float)));
   cudaMemcpy(keypointRow, hostKeypointRow, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
+  checkCuda(cudaMalloc(&keypointSlice, numberOfCps*sizeof(float)));
+  cudaMemcpy(keypointSlice, hostKeypointSlice, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
   free(hostKeypointCol);
   free(hostKeypointRow);
+  free(hostKeypointSlice);
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
@@ -52,6 +58,10 @@ std::vector<float> tps::CudaMemory::getHostSolRow() {
   return cudaToHost(solutionRow);
 }
 
+std::vector<float> tps::CudaMemory::getHostSolSlice() {
+  return cudaToHost(solutionSlice);
+}
+
 std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
     float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
     cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);
@@ -66,8 +76,8 @@ double tps::CudaMemory::memoryEstimation() {
   int doubleSize = sizeof(double);
   int ucharSize = sizeof(unsigned char);
 
-  double solutionsMemory = 2.0*systemDim*floatSize/(1024*1024);
-  double keypointsMemory = 2.0*numberOfCps*floatSize/(1024*1024);
+  double solutionsMemory = 3.0*systemDim*floatSize/(1024*1024);
+  double keypointsMemory = 3.0*numberOfCps*floatSize/(1024*1024);
   double pixelsMemory = 2.0*imageWidth*imageHeight*ucharSize/(1024*1024);
 
   double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
@@ -77,8 +87,10 @@ double tps::CudaMemory::memoryEstimation() {
 void tps::CudaMemory::freeMemory() {
   cudaFree(solutionCol);
   cudaFree(solutionRow);
+  cudaFree(solutionSlice);
   cudaFree(keypointCol);
   cudaFree(keypointRow);
+  cudaFree(keypointSlice);
   cudaFree(targetImage);
   cudaFree(regImage);
 }

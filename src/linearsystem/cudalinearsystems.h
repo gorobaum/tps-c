@@ -16,7 +16,7 @@ private:
   void createMatrixA();
   void createBs();
   void freeResources();
-  float *bx, *by, *A;
+  float *bx, *by, *bz, *A;
 };
 
 } //namepsace

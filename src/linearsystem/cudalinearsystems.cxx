@@ -28,11 +28,13 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   timer.tic();
   solveLinearSystem(bx, cm.getSolutionCol());
   solveLinearSystem(by, cm.getSolutionRow());
+  solveLinearSystem(bz, cm.getSolutionSlice());
   double time = timer.toc();
   std::cout << "Cuda solver execution time: " << time << std::endl;
 
   solutionCol = cm.getHostSolCol();
   solutionRow = cm.getHostSolRow();
+  solutionSlice = cm.getHostSolSlice();
 
   freeResources();
 }
@@ -98,22 +100,26 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
 void tps::CudaLinearSystems::createMatrixA() {
   A = (float*)malloc(systemDimension*systemDimension*sizeof(float));
 
- for (uint i = 0; i < referenceKeypoints_.size()+3; i++)
-  for (uint j = 0; j < referenceKeypoints_.size()+3; j++)
+ for (uint i = 0; i < systemDimension; i++)
+  for (uint j = 0; j < systemDimension; j++)
     A[i*systemDimension+j] = 0.0;
 
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
     A[0*systemDimension+j+3] = 1;
     A[1*systemDimension+j+3] = referenceKeypoints_[j][0];
     A[2*systemDimension+j+3] = referenceKeypoints_[j][1];
+    A[3*systemDimension+j+3] = referenceKeypoints_[j][2];
     A[(j+3)*systemDimension+0] = 1;
     A[(j+3)*systemDimension+1] = referenceKeypoints_[j][0];
     A[(j+3)*systemDimension+2] = referenceKeypoints_[j][1];
+    A[(j+3)*systemDimension+3] = referenceKeypoints_[j][2];
   }
 
   for (uint i = 0; i < referenceKeypoints_.size(); i++)
     for (uint j = 0; j < referenceKeypoints_.size(); j++) {
-      float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], referenceKeypoints_[i][1], referenceKeypoints_[j][1]);
+      float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], 
+                                referenceKeypoints_[i][1], referenceKeypoints_[j][1],
+                                referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
       if (r != 0.0) A[(i+3)*systemDimension+j+3] = r*log(r);
     }
 }
@@ -121,13 +127,16 @@ void tps::CudaLinearSystems::createMatrixA() {
 void tps::CudaLinearSystems::createBs() {
   bx = (float*)malloc(systemDimension*sizeof(float));
   by = (float*)malloc(systemDimension*sizeof(float));
+  bz = (float*)malloc(systemDimension*sizeof(float));
   for (uint j = 0; j < 3; j++) {
     bx[j] = 0.0;
     by[j] = 0.0;
+    bz[j] = 0.0;
   }
   for (uint i = 0; i < targetKeypoints_.size(); i++) {
     bx[i+3] = targetKeypoints_[i][0];
     by[i+3] = targetKeypoints_[i][1];
+    bz[i+3] = targetKeypoints_[i][2];
   }
 }
 

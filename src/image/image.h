@@ -9,7 +9,12 @@ namespace tps {
 
 class Image {
 public:
+<<<<<<< HEAD:src/image/image.h
 	Image(std::vector< std::vector<int> > matImage, int width, int height, int slices) {
+=======
+	Image() {};
+	Image(std::vector< std::vector< std::vector<int> > > matImage, int width, int height, int slices) {
+>>>>>>> b8daae3... cudamemory, OPCV and CudaLinearSystem in 3D:src/image.h
 		width_ = width;
 		height_ = height;
 		slices_ = slices;
@@ -19,21 +24,25 @@ public:
 		width_ = width;
 		height_ = height;
 		slices_ = slices;
-		image = std::vector< std::vector<int> >(width_, std::vector<int>(height_, 0));
+		image = std::vector< std::vector< std::vector<int> > >(width_, std::vector< std::vector<int> > (height_, std::vector<int>(slices_, 0)));
 	};
-	std::vector< std::vector<int> > getImage() {return image;};
+	std::vector< std::vector< std::vector<int> > > getImage() {return image;};
 	void save(std::string filename);
 	int getWidth() { return width_; };
 	int getHeight() { return height_; };
 	int getSlices() { return slices_; };
-	void changePixelAt(int col, int row, int value);
-	int getPixelAt(int col, int row);
-	int bilinearInterpolation(float col, float row);
-	int NNInterpolation(float col, float row);
+	void changePixelAt(int col, int row, int slice, int value);
+	int getPixelAt(int col, int row, int slice);
+	int trilinearInterpolation(float col, float row, float slice);
+	int NNInterpolation(float col, float row, float slice);
 	unsigned char* getPixelVector();
 	void setPixelVector(unsigned char* vector);
 private:
+<<<<<<< HEAD:src/image/image.h
 	std::vector<std::vector<int> > image;
+=======
+	std::vector< std::vector< std::vector<int> > > image;
+>>>>>>> b8daae3... cudamemory, OPCV and CudaLinearSystem in 3D:src/image.h
 	int width_;
 	int height_;
 	int slices_;
