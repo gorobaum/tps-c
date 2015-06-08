@@ -15,7 +15,7 @@ private:
   void createBs();
   std::vector<float> solveLinearSystem(arma::mat A, arma::vec b);
   arma::mat A;
-  arma::vec bx, by;
+  arma::vec bx, by, bz;
 };
 
 } //namepsace

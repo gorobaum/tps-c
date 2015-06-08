@@ -132,7 +132,8 @@ int main(int argc, char** argv) {
     int lastI = i;
     while(used <= 1800) {
       std::cout << "Entry number " << i << " will run." << std::endl;
-      tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), referencesKPs[i]);
+      tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), 
+                                           targetImages[i].getSlices(), referencesKPs[i]);
       if (used+cm.memoryEstimation() > 1800) break;
       cm.allocCudaMemory(targetImages[i]);
       cudaMemories.push_back(cm);

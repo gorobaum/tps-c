@@ -33,7 +33,7 @@ protected:
   int height;
   int slices;
 	tps::Image registredImage;
-	float computeRSquared(float x, float xi, float y, float yi) {return pow(x-xi,2) + pow(y-yi,2);};
+	float computeRSquared(float x, float xi, float y, float yi, float z, float zi) {return pow(x-xi,2) + pow(y-yi,2) + pow(z-zi,2);};
 };
 
 } // namespace

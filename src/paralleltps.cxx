@@ -1,15 +1,14 @@
-#include "basictps.h"
+#include "paralleltps.h"
 
 #include <cmath>
 #include <iostream>
 
-void tps::BasicTPS::run() {
-	lienarSolver.solveLinearSystems();
-	solutionCol = lienarSolver.getSolutionCol();
-	solutionRow = lienarSolver.getSolutionRow();
-	solutionSlice = lienarSolver.getSolutionSlice();
+void tps::ParallelTPS::runThread(uint tid) {
+	int chunck = width/numberOfThreads;
+	uint limit = (tid+1)*chunck;
+	if ((tid+1) == numberOfThreads) limit = width;
 	for (int slice = 0; slice < slices; slice++)
-		for (int col = 0; col < width; col++)
+		for (uint col = tid*chunck; col < limit; col++)
 			for (int row = 0; row < height; row++) {
 				double newCol = solutionCol[0] + col * solutionCol[1] + row * solutionCol[2] + slice * solutionCol[3];
 				double newRow = solutionRow[0] + col * solutionRow[1] + row * solutionRow[2] + slice * solutionRow[3];
@@ -27,5 +26,19 @@ void tps::BasicTPS::run() {
 			uchar value = targetImage_.trilinearInterpolation(newCol, newRow, newSlice);
 			registredImage.changePixelAt(col, row, slice, value);
 		}
-		registredImage.save(outputName_);
+}
+
+void tps::ParallelTPS::run() {
+  armalienarSolver.solveLinearSystems();
+	solutionCol = armalienarSolver.getSolutionCol();
+	solutionRow = armalienarSolver.getSolutionRow();
+	solutionSlice = armalienarSolver.getSolutionSlice();
+	std::vector<std::thread> th;
+
+	for (uint i = 0; i < numberOfThreads; ++i)
+    th.push_back(std::thread(&tps::ParallelTPS::runThread, this, i));
+
+  for(uint i = 0; i < numberOfThreads; ++i) th[i].join();
+
+	registredImage.save(outputName_);
 }

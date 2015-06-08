@@ -13,9 +13,8 @@ namespace tps {
   
 class CudaMemory {
 public:
-  CudaMemory(int width, int height, std::vector< std::vector<float> > referenceKeypoints) :
-    imageWidth(width),
-    imageHeight(height),
+  CudaMemory(int width, int height, int slices, std::vector< std::vector<float> > referenceKeypoints) :
+    imageSize(width*height*slices),
     referenceKeypoints_(referenceKeypoints),
     numberOfCps(referenceKeypoints.size()),
     systemDim(numberOfCps+4) {};
@@ -38,8 +37,7 @@ private:
   void allocCudaKeypoints();
   void allocCudaImagePixels(tps::Image& image);
   std::vector<float> cudaToHost(float *cudaMemory);
-  int imageWidth;
-  int imageHeight;
+  int imageSize;
   std::vector< std::vector<float> > referenceKeypoints_;
   int numberOfCps;
   int systemDim;

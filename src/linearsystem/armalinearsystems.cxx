@@ -9,6 +9,7 @@ void tps::ArmaLinearSystems::solveLinearSystems() {
 
   solutionCol = solveLinearSystem(A, bx);
   solutionRow = solveLinearSystem(A, by);
+  solutionSlice = solveLinearSystem(A, bz);
 
   double time = timer.toc();
   std::cout << "Arma solver execution time: " << time << std::endl;
@@ -32,14 +33,18 @@ void tps::ArmaLinearSystems::createMatrixA() {
     A(0,j+3) = 1;
     A(1,j+3) = referenceKeypoints_[j][0];
     A(2,j+3) = referenceKeypoints_[j][1];
+    A(3,j+3) = referenceKeypoints_[j][2];
     A(j+3,0) = 1;
     A(j+3,1) = referenceKeypoints_[j][0];
     A(j+3,2) = referenceKeypoints_[j][1];
+    A(j+3,3) = referenceKeypoints_[j][2];
   }
 
   for (uint i = 0; i < referenceKeypoints_.size(); i++)
     for (uint j = 0; j < referenceKeypoints_.size(); j++) {
-      float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], referenceKeypoints_[i][1], referenceKeypoints_[j][1]);
+      float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], 
+                                referenceKeypoints_[i][1], referenceKeypoints_[j][1],
+                                referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
       if (r != 0.0) A(j+3,i+3) = r*log(r);
     }
 }
@@ -47,8 +52,10 @@ void tps::ArmaLinearSystems::createMatrixA() {
 void tps::ArmaLinearSystems::createBs() {
   bx = arma::vec(systemDimension, arma::fill::zeros);
   by = arma::vec(systemDimension, arma::fill::zeros);
- for (uint i = 0; i < targetKeypoints_.size(); i++) {
+  bz = arma::vec(systemDimension, arma::fill::zeros);
+  for (uint i = 0; i < targetKeypoints_.size(); i++) {
     bx(i+3) = targetKeypoints_[i][0];
     by(i+3) = targetKeypoints_[i][1];
+    bz(i+3) = targetKeypoints_[i][2];
   }
 }
