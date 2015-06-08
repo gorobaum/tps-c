@@ -16,6 +16,7 @@ private:
   tps::OPCVLinearSystems lienarSolver;
   std::vector<float> solutionCol;
   std::vector<float> solutionRow;
+  std::vector<float> solutionSlice;
 };
 
 } // namespace

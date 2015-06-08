@@ -21,6 +21,16 @@
 
 bool createKeypointImages = true;
 
+std::vector< std::vector< std::vector<int> > > createImageVec(cv::Mat image) {
+  int slices = 1;
+  std::vector< std::vector< std::vector<int> > > vecImage(image.size().width, std::vector< std::vector<int> >(image.size().height, std::vector<int>(slices, 0)));
+  for (int col = 0; col < image.size().width; col++)
+    for (int row = 0; row < image.size().height; row++)
+      for (int slice = 0; slice < slices; slice++)
+        vecImage[col][row][slice] = image.at<uchar>(row, col);
+  return vecImage;
+}
+
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
                     std::vector< cv::Mat >& cvTarImgs, std::vector< std::string >& outputNames, 
                     std::vector< float >& percentages) {
@@ -30,10 +40,7 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   
   std::getline(infile, line);
   cv::Mat cvTarImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  std::vector< std::vector<int> > vecImage(cvTarImg.size().width, std::vector<int>(cvTarImg.size().height, 0));
-    for (int col = 0; col < cvTarImg.size().width; col++)
-      for (int row = 0; row < cvTarImg.size().height; row++)
-        vecImage[col][row] = cvTarImg.at<uchar>(row, col);
+  std::vector< std::vector< std::vector<int> > > vecImage = createImageVec(cvTarImg);
   tps::Image targetImage = tps::Image(vecImage, cvTarImg.size().width, cvTarImg.size().height, 1);
   cvTarImgs.push_back(cvTarImg);
   targetImages.push_back(targetImage);
@@ -87,10 +94,7 @@ int main(int argc, char** argv) {
   std::string extension = line.substr(pos);
 
   cv::Mat cvRefImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  std::vector< std::vector<int> > vecImage(cvRefImg.size().width, std::vector<int>(cvRefImg.size().height, 0));
-    for (int col = 0; col < cvRefImg.size().width; col++)
-      for (int row = 0; row < cvRefImg.size().height; row++)
-        vecImage[col][row] = cvRefImg.at<uchar>(row, col);
+  std::vector< std::vector< std::vector<int> > > vecImage = createImageVec(cvRefImg);
   tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height, 1);
   std::vector< cv::Mat > cvTarImgs;
   std::vector< tps::Image > targetImages;

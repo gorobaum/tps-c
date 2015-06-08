@@ -18,18 +18,21 @@ public:
     imageHeight(height),
     referenceKeypoints_(referenceKeypoints),
     numberOfCps(referenceKeypoints.size()),
-    systemDim(numberOfCps+3) {};
+    systemDim(numberOfCps+4) {};
   void freeMemory();
   void allocCudaMemory(tps::Image& image);
   double memoryEstimation();
   float* getSolutionCol() { return solutionCol; };
   float* getSolutionRow() { return solutionRow; };
+  float* getSolutionSlice() { return solutionSlice; };
   float* getKeypointCol() { return keypointCol; };
   float* getKeypointRow() { return keypointRow; };
+  float* getKeypointSlice() { return keypointSlice; };
   unsigned char* getTargetImage() { return targetImage; };
   unsigned char* getRegImage() { return regImage; };
   std::vector<float> getHostSolCol();
   std::vector<float> getHostSolRow();
+  std::vector<float> getHostSolSlice();
 private:
   void allocCudaSolution();
   void allocCudaKeypoints();
@@ -40,9 +43,8 @@ private:
   std::vector< std::vector<float> > referenceKeypoints_;
   int numberOfCps;
   int systemDim;
-  double *coordinateCol, *coordinateRow;
-  float *solutionCol, *solutionRow;
-  float *keypointCol, *keypointRow;
+  float *solutionCol, *solutionRow, *solutionSlice;
+  float *keypointCol, *keypointRow, *keypointSlice;
   unsigned char *targetImage, *regImage;
 };
 
