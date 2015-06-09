@@ -7,18 +7,27 @@
 void tps::FeatureGenerator::run() {
   gridSizeCol = referenceImage_.getWidth()*percentage_;
   gridSizeRow = referenceImage_.getHeight()*percentage_;
-  gridSizeSlice = referenceImage_.getSlices()*percentage_;
+  gridSizeSlice = 1;
   colStep = referenceImage_.getWidth()*1.0/(gridSizeCol-1);
   rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow-1);
-  sliceStep = referenceImage_.getSlices()*1.0/(gridSizeSlice-1);
+  sliceStep = 1;
+  std::cout << "referenceImage_.getSlices() = " << referenceImage_.getSlices() << std::endl;
   std::cout << "gridSizeCol = " << gridSizeCol << std::endl;
   std::cout << "gridSizeRow = " << gridSizeRow << std::endl;
-  std::cout << "gridSizeRow = " << gridSizeSlice << std::endl;
+  std::cout << "gridSizeSlice = " << gridSizeSlice << std::endl;
   std::cout << "colStep = " << colStep << std::endl;
   std::cout << "rowStep = " << rowStep << std::endl;
-  std::cout << "rowStep = " << sliceStep << std::endl;
+  std::cout << "sliceStep = " << sliceStep << std::endl;
   createReferenceImageFeatures();
   createTargetImageFeatures();
+  for (int i = 0; i < referenceKeypoints.size(); i++) {
+    std::cout << "referenceKeypoints[" << i << "] = " << referenceKeypoints[i][0] << std::endl;
+    std::cout << "referenceKeypoints[" << i << "] = " << referenceKeypoints[i][1] << std::endl;
+    std::cout << "referenceKeypoints[" << i << "] = " << referenceKeypoints[i][2] << std::endl;
+    std::cout << "targetKeypoints[" << i << "] = " << targetKeypoints[i][0] << std::endl;
+    std::cout << "targetKeypoints[" << i << "] = " << targetKeypoints[i][1] << std::endl;
+    std::cout << "targetKeypoints[" << i << "] = " << targetKeypoints[i][2] << std::endl;
+  }
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {
@@ -74,12 +83,13 @@ void tps::FeatureGenerator::drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std
   compression_params.push_back(95);
 
   std::vector<cv::DMatch> matches;
-  for (int col = 0; col < gridSizeCol; col++)
-    for (int row = 0; row < gridSizeRow; row++) {
-      int pos = col*gridSizeRow+row;
-      cv::DMatch match(pos, pos, -1);
-      matches.push_back(match);
-    }
+  for (int slice = 0; slice < gridSizeSlice; slice++)
+    for (int col = 0; col < gridSizeCol; col++)
+      for (int row = 0; row < gridSizeRow; row++) {
+        int pos = slice*gridSizeCol*gridSizeRow+col*gridSizeRow+row;
+        cv::DMatch match(pos, pos, -1);
+        matches.push_back(match);
+      }
 
   cv::Mat img_matches;
   drawMatches(refImg, keypoints_ref, tarImg, keypoints_tar,

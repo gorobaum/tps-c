@@ -30,14 +30,14 @@ void tps::OPCVLinearSystems::createMatrixA() {
   A = cv::Mat::zeros(systemDimension,systemDimension, CV_32F);
 
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
-    A.at<float>(0,j+3) = 1;
-    A.at<float>(1,j+3) = referenceKeypoints_[j][0];
-    A.at<float>(2,j+3) = referenceKeypoints_[j][1];
-    A.at<float>(3,j+3) = referenceKeypoints_[j][2];
-    A.at<float>(j+3,0) = 1;
-    A.at<float>(j+3,1) = referenceKeypoints_[j][0];
-    A.at<float>(j+3,2) = referenceKeypoints_[j][1];
-    A.at<float>(j+3,3) = referenceKeypoints_[j][2];
+    A.at<float>(0,j+4) = 1;
+    A.at<float>(1,j+4) = referenceKeypoints_[j][0];
+    A.at<float>(2,j+4) = referenceKeypoints_[j][1];
+    A.at<float>(3,j+4) = referenceKeypoints_[j][2];
+    A.at<float>(j+4,0) = 1;
+    A.at<float>(j+4,1) = referenceKeypoints_[j][0];
+    A.at<float>(j+4,2) = referenceKeypoints_[j][1];
+    A.at<float>(j+4,3) = referenceKeypoints_[j][2];
   }
 
   for (uint i = 0; i < referenceKeypoints_.size(); i++)
@@ -45,7 +45,7 @@ void tps::OPCVLinearSystems::createMatrixA() {
       float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], 
                                 referenceKeypoints_[i][1], referenceKeypoints_[j][1], 
                                 referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
-      if (r != 0.0) A.at<float>(i+3,j+3) = r*log(r);
+      if (r != 0.0) A.at<float>(i+4,j+4) = r*log(r);
     }
 }
 
@@ -54,8 +54,8 @@ void tps::OPCVLinearSystems::createBs() {
   by = cv::Mat::zeros(systemDimension, 1, CV_32F);
   bz = cv::Mat::zeros(systemDimension, 1, CV_32F);
   for (uint i = 0; i < referenceKeypoints_.size(); i++) {
-    bx.at<float>(i+3) = targetKeypoints_[i][0];
-    by.at<float>(i+3) = targetKeypoints_[i][1];
-    bz.at<float>(i+3) = targetKeypoints_[i][2];
+    bx.at<float>(i+4) = targetKeypoints_[i][0];
+    by.at<float>(i+4) = targetKeypoints_[i][1];
+    bz.at<float>(i+4) = targetKeypoints_[i][2];
   }
 }
