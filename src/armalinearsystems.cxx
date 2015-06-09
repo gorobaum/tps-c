@@ -30,14 +30,14 @@ void tps::ArmaLinearSystems::createMatrixA() {
   A = arma::mat(systemDimension, systemDimension, arma::fill::zeros);
 
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
-    A(0,j+3) = 1;
-    A(1,j+3) = referenceKeypoints_[j][0];
-    A(2,j+3) = referenceKeypoints_[j][1];
-    A(3,j+3) = referenceKeypoints_[j][2];
-    A(j+3,0) = 1;
-    A(j+3,1) = referenceKeypoints_[j][0];
-    A(j+3,2) = referenceKeypoints_[j][1];
-    A(j+3,3) = referenceKeypoints_[j][2];
+    A(0,j+4) = 1;
+    A(1,j+4) = referenceKeypoints_[j][0];
+    A(2,j+4) = referenceKeypoints_[j][1];
+    A(3,j+4) = referenceKeypoints_[j][2];
+    A(j+4,0) = 1;
+    A(j+4,1) = referenceKeypoints_[j][0];
+    A(j+4,2) = referenceKeypoints_[j][1];
+    A(j+4,3) = referenceKeypoints_[j][2];
   }
 
   for (uint i = 0; i < referenceKeypoints_.size(); i++)
@@ -45,8 +45,9 @@ void tps::ArmaLinearSystems::createMatrixA() {
       float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], 
                                 referenceKeypoints_[i][1], referenceKeypoints_[j][1],
                                 referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
-      if (r != 0.0) A(j+3,i+3) = r*log(r);
+      if (r != 0.0) A(j+4,i+4) = r*log(r);
     }
+    A.print();
 }
 
 void tps::ArmaLinearSystems::createBs() {
@@ -54,8 +55,8 @@ void tps::ArmaLinearSystems::createBs() {
   by = arma::vec(systemDimension, arma::fill::zeros);
   bz = arma::vec(systemDimension, arma::fill::zeros);
   for (uint i = 0; i < targetKeypoints_.size(); i++) {
-    bx(i+3) = targetKeypoints_[i][0];
-    by(i+3) = targetKeypoints_[i][1];
-    bz(i+3) = targetKeypoints_[i][2];
+    bx(i+4) = targetKeypoints_[i][0];
+    by(i+4) = targetKeypoints_[i][1];
+    bz(i+4) = targetKeypoints_[i][2];
   }
 }
