@@ -47,7 +47,6 @@ void tps::ArmaLinearSystems::createMatrixA() {
                                 referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
       if (r != 0.0) A(j+4,i+4) = r*log(r);
     }
-    A.print();
 }
 
 void tps::ArmaLinearSystems::createBs() {
