@@ -9,12 +9,7 @@ namespace tps {
 
 class Image {
 public:
-<<<<<<< HEAD:src/image/image.h
-	Image(std::vector< std::vector<int> > matImage, int width, int height, int slices) {
-=======
-	Image() {};
 	Image(std::vector< std::vector< std::vector<int> > > matImage, int width, int height, int slices) {
->>>>>>> b8daae3... cudamemory, OPCV and CudaLinearSystem in 3D:src/image.h
 		width_ = width;
 		height_ = height;
 		slices_ = slices;
@@ -38,11 +33,7 @@ public:
 	unsigned char* getPixelVector();
 	void setPixelVector(unsigned char* vector);
 private:
-<<<<<<< HEAD:src/image/image.h
-	std::vector<std::vector<int> > image;
-=======
 	std::vector< std::vector< std::vector<int> > > image;
->>>>>>> b8daae3... cudamemory, OPCV and CudaLinearSystem in 3D:src/image.h
 	int width_;
 	int height_;
 	int slices_;
