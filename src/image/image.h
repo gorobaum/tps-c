@@ -13,11 +13,11 @@ public:
 		width_ = width;
 		height_ = height;
 		image = matImage;
-	}
+	};
 	Image(int width, int height) {
 		width_ = width;
 		height_ = height;
-		image = std::vector<std::vector<int> >(width_, std::vector<int>(height_));
+		image = std::vector<std::vector<int> >(width_, std::vector<int>(height_, 0));
 	}
 	std::vector<std::vector<int> > getImage() {return image;}
 	void save(std::string filename);

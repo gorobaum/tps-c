@@ -2,7 +2,7 @@
 #define TPS_CUDALINEARSYSTEMS_H_
 
 #include "cplinearsystems.h"
-#include "cudamemory.h"
+#include "utils/cudamemory.h"
 
 namespace tps {
 

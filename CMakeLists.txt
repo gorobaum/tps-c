@@ -17,21 +17,26 @@ include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
 cuda_add_executable(tps
   src/main.cxx
-  src/image.cxx
-  src/cudamemory.cxx
-  src/featuregenerator.cxx
-  src/OPCVlinearsystems.cxx
-  src/cudalinearsystems.cxx
-  src/armalinearsystems.cxx
-  src/basictps.cxx
-  src/paralleltps.cxx
-  src/cudatps.cxx
-  src/cutps.cu
+
+  src/image/image.cxx
+
+  src/utils/cudamemory.cxx
+
+  src/feature/featuregenerator.cxx
+
+  src/linearsystem/OPCVlinearsystems.cxx
+  src/linearsystem/cudalinearsystems.cxx
+  src/linearsystem/armalinearsystems.cxx
+
+  src/tps/basictps.cxx
+  src/tps/paralleltps.cxx
+  src/tps/cudatps.cxx
+  src/tps/cutps.cu
   )
 
-# TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef")
 
+# TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
 target_link_libraries(tps 
     ${ITK_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} 

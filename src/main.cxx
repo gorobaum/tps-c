@@ -1,10 +1,10 @@
-#include "image.h"
-#include "featuregenerator.h"
-#include "tps.h"
-#include "cudatps.h"
-#include "basictps.h"
-#include "paralleltps.h"
-#include "cudamemory.h"
+#include "image/image.h"
+#include "feature/featuregenerator.h"
+#include "tps/tps.h"
+#include "tps/cudatps.h"
+#include "tps/basictps.h"
+#include "tps/paralleltps.h"
+#include "utils/cudamemory.h"
 
 #include <string>
 #include <sstream>

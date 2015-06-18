@@ -1,7 +1,7 @@
 #ifndef TPS_FEATURE_DETECTOR_H_
 #define TPS_FEATURE_DETECTOR_H_
 
-#include "image.h"
+#include "image/image.h"
 
 namespace tps {
 

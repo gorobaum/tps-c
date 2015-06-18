@@ -7,7 +7,7 @@
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
 
-#include "image.h"
+#include "image/image.h"
 
 namespace tps {
   
