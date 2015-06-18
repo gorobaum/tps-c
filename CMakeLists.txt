@@ -1,13 +1,19 @@
-
 cmake_minimum_required (VERSION 2.8)
 
 project (tps)
-find_package(OpenCV REQUIRED)
-find_package(CUDA QUIET REQUIRED)
-find_package(Armadillo REQUIRED)
 
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_30,code=sm_30)
-include_directories (src "${ARMADILLO_INCLUDE_DIRS}")
+find_package(OpenCV REQUIRED)
+find_package(Armadillo REQUIRED)
+find_package(CUDA REQUIRED)
+find_package(ITK REQUIRED)
+
+include(${ITK_USE_FILE}) # see vtkModuleAPI.cmake:110
+
+
+OPTION(BUILD_SHARED_LIBS "Build with shared libraries."
+       ${VTK_BUILD_SHARED_LIBS})
+
+include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
 cuda_add_executable(tps
   src/main.cxx
@@ -20,17 +26,19 @@ cuda_add_executable(tps
   src/basictps.cxx
   src/paralleltps.cxx
   src/cudatps.cxx
-  src/cutps.cu)
-
-MESSAGE(${ARMADILLO_INCLUDE_DIRS})
-
-LIST(APPEND CUDA_NVCC_FLAGS)
+  src/cutps.cu
+  )
 
 # TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef")
 
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS_DEBUG}")
-
-target_link_libraries(tps ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} /opt/cuda/lib64/libcusolver.so ${CUDA_CUBLAS_LIBRARIES} ${ARMADILLO_LIBRARIES})
+target_link_libraries(tps 
+    ${ITK_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} 
+    ${OpenCV_LIBS} 
+    /opt/cuda/lib64/libcusolver.so 
+    ${CUDA_CUBLAS_LIBRARIES} 
+    ${ARMADILLO_LIBRARIES})
 
 add_custom_target (
 	cleanResults

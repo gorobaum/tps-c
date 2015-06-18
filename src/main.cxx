@@ -13,11 +13,17 @@
 #include <vector>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
+
+#include <itkImage.h>
+#include <itkImageIOBase.h>
+#include <itkImageFileReader.h>
+#include <itkImageRegionIterator.h>
 
 bool createKeypointImages = true;
 
@@ -30,7 +36,7 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   
   std::getline(infile, line);
   cv::Mat cvTarImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  std::vector< std::vector<int> > vecImage(cvTarImg.size().width, std::vector<int>(cvTarImg.size().height, 0));
+  std::vector< std::vector<int> > vecImage(cvTarImg.size().width, std::vector<int>(cvTarImg.size().height));
     for (int col = 0; col < cvTarImg.size().width; col++)
       for (int row = 0; row < cvTarImg.size().height; row++)
         vecImage[col][row] = cvTarImg.at<uchar>(row, col);
@@ -87,7 +93,7 @@ int main(int argc, char** argv) {
   std::string extension = line.substr(pos);
 
   cv::Mat cvRefImg = cv::imread(line, CV_LOAD_IMAGE_GRAYSCALE);
-  std::vector< std::vector<int> > vecImage(cvRefImg.size().width, std::vector<int>(cvRefImg.size().height, 0));
+  std::vector< std::vector<int> > vecImage(cvRefImg.size().width, std::vector<int>(cvRefImg.size().height));
     for (int col = 0; col < cvRefImg.size().width; col++)
       for (int row = 0; row < cvRefImg.size().height; row++)
         vecImage[col][row] = cvRefImg.at<uchar>(row, col);
