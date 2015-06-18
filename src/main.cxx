@@ -20,11 +20,6 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 
-#include <itkImage.h>
-#include <itkImageIOBase.h>
-#include <itkImageFileReader.h>
-#include <itkImageRegionIterator.h>
-
 bool createKeypointImages = true;
 
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
