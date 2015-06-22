@@ -15,19 +15,20 @@ cuda_add_executable(tps
   src/main.cxx
 
   src/image/image.cxx
+  src/image/itkimageloader.cxx
 
-  src/utils/cudamemory.cxx
+  # src/utils/cudamemory.cxx
 
-  src/feature/featuregenerator.cxx
+  # src/feature/featuregenerator.cxx
 
-  src/linearsystem/OPCVlinearsystems.cxx
-  src/linearsystem/cudalinearsystems.cxx
-  src/linearsystem/armalinearsystems.cxx
+  # src/linearsystem/OPCVlinearsystems.cxx
+  # src/linearsystem/cudalinearsystems.cxx
+  # src/linearsystem/armalinearsystems.cxx
 
-  src/tps/basictps.cxx
-  src/tps/paralleltps.cxx
-  src/tps/cudatps.cxx
-  src/tps/cutps.cu
+  # src/tps/basictps.cxx
+  # src/tps/paralleltps.cxx
+  # src/tps/cudatps.cxx
+  # src/tps/cutps.cu
   )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef")

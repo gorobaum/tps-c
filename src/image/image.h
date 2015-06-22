@@ -9,34 +9,26 @@ namespace tps {
 
 class Image {
 public:
-	Image(std::vector< std::vector< std::vector<int> > > matImage, int width, int height, int slices) {
-		width_ = width;
-		height_ = height;
-		slices_ = slices;
-		image = matImage;
+	Image(std::vector< std::vector< std::vector<short> > > matImage, std::vector<int> dimensions) :
+		dimensions_(dimensions) {
+			image = matImage;
 	};
-	Image(int width, int height, int slices) {
-		width_ = width;
-		height_ = height;
-		slices_ = slices;
-		image = std::vector< std::vector< std::vector<int> > >(width_, std::vector< std::vector<int> > (height_, std::vector<int>(slices_, 0)));
+	Image(std::vector<int> dimensions) :
+		dimensions_(dimensions) {
+			image = std::vector< std::vector< std::vector<short> > >(dimensions[0], std::vector< std::vector<short> > (dimensions[1], std::vector<short>(dimensions[2], 0)));
 	};
-	std::vector< std::vector< std::vector<int> > > getImage() {return image;};
+	std::vector< std::vector< std::vector<short> > > getImage() {return image;};
 	void save(std::string filename);
-	int getWidth() { return width_; };
-	int getHeight() { return height_; };
-	int getSlices() { return slices_; };
-	void changePixelAt(int col, int row, int slice, int value);
-	int getPixelAt(int col, int row, int slice);
-	int trilinearInterpolation(float col, float row, float slice);
-	int NNInterpolation(float col, float row, float slice);
-	unsigned char* getPixelVector();
-	void setPixelVector(unsigned char* vector);
+	std::vector<int> getDimensions() { return dimensions_; };
+	void changePixelAt(int x, int y, int z, short value);
+	short getPixelAt(int x, int y, int z);
+	short trilinearInterpolation(float x, float y, float z);
+	short NNInterpolation(float x, float y, float z);
+	short* getPixelVector();
+	void setPixelVector(short* vector);
 private:
-	std::vector< std::vector< std::vector<int> > > image;
-	int width_;
-	int height_;
-	int slices_;
+	std::vector< std::vector< std::vector<short> > > image;
+	std::vector<int> dimensions_;
 	int getNearestInteger(float number) {
 		if ((number - std::floor(number)) <= 0.5) return std::floor(number);
 		return std::floor(number) + 1.0;

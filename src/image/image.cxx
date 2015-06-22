@@ -4,31 +4,31 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-void tps::Image::changePixelAt(int col, int row, int slice, int value) {
-  if (col >= 0 && col < width_-1 && row >= 0 && row < height_-1 && slice >= 0 && slice <= slices_-1)
-    image[col][row][slice] = value;
+void tps::Image::changePixelAt(int x, int y, int z, short value) {
+  if (x >= 0 && x < dimensions_[0]-1 && y >= 0 && y < dimensions_[1]-1 && z >= 0 && z <= dimensions_[2]-1)
+    image[x][y][z] = value;
 }
 
-int tps::Image::getPixelAt(int col, int row, int slice) {
-  if (row > height_-1 || row < 0)
+short tps::Image::getPixelAt(int x, int y, int z) {
+  if (x > dimensions_[0]-1 || x < 0)
     return 0;
-  else if (col > width_-1 || col < 0)
+  else if (y > dimensions_[1]-1 || y < 0)
     return 0;
-  else if (slice > slices_-1 || slice < 0)
+  else if (z > dimensions_[2]-1 || z < 0)
     return 0;
   else {
-    return image[col][row][slice];
+    return image[x][y][z];
   }
 }
 
-int tps::Image::trilinearInterpolation(float col, float row, float slice) {
-  int u = trunc(col);
-  int v = trunc(row);
-  int w = trunc(slice);
+short tps::Image::trilinearInterpolation(float x, float y, float z) {
+  int u = trunc(x);
+  int v = trunc(y);
+  int w = trunc(z);
 
-  int xd = (col - u);
-  int yd = (row - v);
-  int zd = (slice - w);
+  int xd = (x - u);
+  int yd = (y - v);
+  int zd = (z - w);
 
   uchar c00 = getPixelAt(u, v, w)*(1-xd)+getPixelAt(u+1, v, w)*xd;
   uchar c10 = getPixelAt(u, v+1, w)*(1-xd)+getPixelAt(u+1, v+1, w)*xd;
@@ -41,11 +41,11 @@ int tps::Image::trilinearInterpolation(float col, float row, float slice) {
   return c0*(1-zd)+c1*zd;
 }
 
-int tps::Image::NNInterpolation(float col, float row, float slice) {
-  int nearCol = getNearestInteger(col);
-  int nearRow = getNearestInteger(row);
-  int nearSlice = getNearestInteger(slice);
-  int aux = getPixelAt(nearCol, nearRow, nearSlice);
+short tps::Image::NNInterpolation(float x, float y, float z) {
+  int nearX = getNearestInteger(x);
+  int nearY = getNearestInteger(y);
+  int nearZ = getNearestInteger(z);
+  int aux = getPixelAt(nearX, nearY, nearZ);
   return aux;
 }
 
@@ -54,28 +54,28 @@ void tps::Image::save(std::string filename) {
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
   compression_params.push_back(95);
 
-  cv::Mat savImage = cv::Mat::zeros(height_, width_, CV_8U);
-  for (int col = 0; col < width_; col++)
-    for (int row = 0; row < height_; row++)
-      savImage.at<uchar>(row, col) = (uchar)image[col][row][0];
+  cv::Mat savImage = cv::Mat::zeros(dimensions_[1], dimensions_[0], CV_8U);
+  for (int x = 0; x < dimensions_[0]; x++)
+    for (int y = 0; y < dimensions_[1]; y++)
+      savImage.at<uchar>(y, x) = (uchar)image[x][y][0];
 
   cv::imwrite(filename.c_str(), savImage, compression_params);
 }
 
-uchar* tps::Image::getPixelVector() {
-  uchar* vector = (uchar*)malloc(width_*height_*sizeof(uchar));
-  for (int slice = 0; slice < slices_; slice++)
-    for (int col = 0; col < width_; col++)
-      for (int row = 0; row < height_; row++)
-        vector[slice*height_*width_+col*height_+row] = (uchar)image[col][row][slice];
+short* tps::Image::getPixelVector() {
+  short* vector = (short*)malloc(dimensions_[0]*dimensions_[1]*dimensions_[2]*sizeof(short));
+  for (int z = 0; z < dimensions_[2]; z++)
+    for (int x = 0; x < dimensions_[0]; x++)
+      for (int y = 0; y < dimensions_[1]; y++)
+        vector[z*dimensions_[1]*dimensions_[0]+x*dimensions_[1]+y] = (short)image[x][y][z];
   return vector;
 }
 
-void tps::Image::setPixelVector(uchar* vector) {
-  for (int slice = 0; slice < slices_; slice++)
-    for (int col = 0; col < width_; col++)
-      for (int row = 0; row < height_; row++) {
-        uchar newValue = vector[slice*height_*width_+col*height_+row];
-        changePixelAt(col, row, slice, newValue);
+void tps::Image::setPixelVector(short* vector) {
+  for (int z = 0; z < dimensions_[2]; z++)
+    for (int x = 0; x < dimensions_[0]; x++)
+      for (int y = 0; y < dimensions_[1]; y++) {
+        short newValue = vector[z*dimensions_[1]*dimensions_[0]+x*dimensions_[1]+y];
+        changePixelAt(x, y, z, newValue);
       }
 }
