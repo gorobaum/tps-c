@@ -4,6 +4,19 @@ import math
 import numpy as np
 from scipy import ndimage
 
+def deformRotate(imagePixels):
+  xc = imagePixels.shape[0]/2
+  yc = imagePixels.shape[1]/2
+  print(xc)
+  deformedPixels = np.ndarray(imagePixels.shape)
+  deformedPixels.fill(255)
+  for x in range(-128, 128):
+    for y in range(-128,128):
+      X = x*math.sin(-math.pi/72)-y*math.cos(-math.pi/72)
+      Y = x*math.cos(-math.pi/72)+y*math.sin(-math.pi/72)
+      deformedPixels[x+xc,y+yc] = bilinear(imagePixels, X+xc, Y+yc)
+  return deformedPixels
+
 def deformSinusiodal(imagePixels):
   deformedPixels = np.ndarray(imagePixels.shape)
   print(deformedPixels.shape)
@@ -37,5 +50,5 @@ def getPixel(pixels, col, row):
     return pixels[row, col]
 
 staticImage = scipy.misc.imread(sys.argv[1], True)
-movingImage = deformSinusiodal(staticImage)
+movingImage = deformRotate(staticImage)
 scipy.misc.imsave(sys.argv[2], movingImage)
