@@ -1,11 +1,10 @@
 #include "image/image.h"
 #include "image/itkimageloader.h"
 #include "feature/featuregenerator.h"
-// #include "tps/tps.h"
+#include "utils/cudamemory.h"
+#include "tps/tps.h"
 // #include "tps/cudatps.h"
-// #include "tps/basictps.h"
-// #include "tps/paralleltps.h"
-// #include "utils/cudamemory.h"
+#include "tps/paralleltps.h"
 
 #include <string>
 #include <sstream>
@@ -96,57 +95,56 @@ int main(int argc, char** argv) {
     runFeatureGeneration(referenceImage, targetImages[i], percentages[i], referencesKPs, targetsKPs);
   }
 
-  // // Verifying the total memory occupation inside the GPU
-  // size_t avail;
-  // size_t total;
-  // cudaMemGetInfo( &avail, &total );
-  // size_t used = (total - avail)/(1024*1024);
-  // std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
+  // Verifying the total memory occupation inside the GPU
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo( &avail, &total );
+  size_t used = (total - avail)/(1024*1024);
+  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
 
-  // // Allocating the maximun possible of free memory in the GPU
-  // std::vector< tps::CudaMemory > cudaMemories;
-  // std::cout << "============================================" << std::endl;
-  // for (int i = 0; i < nFiles; i++) {
-  //   int lastI = i;
-  //   while(used <= 1800) {
-  //     std::cout << "Entry number " << i << " will run." << std::endl;
-  //     tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getWidth(), targetImages[i].getHeight(), 
-  //                                          targetImages[i].getSlices(), referencesKPs[i]);
-  //     if (used+cm.memoryEstimation() > 1800) break;
-  //     cm.allocCudaMemory(targetImages[i]);
-  //     cudaMemories.push_back(cm);
-  //     cudaMemGetInfo( &avail, &total );
-  //     used = (total - avail)/(1024*1024);
-  //     std::cout << "Device used memory = " << used << "MB" << std::endl;
-  //     i++;
-  //     if (i >= nFiles) break;
-  //     else std::cout << "--------------------------------------------" << std::endl;
-  //   }
+  // Allocating the maximun possible of free memory in the GPU
+  std::vector< tps::CudaMemory > cudaMemories;
+  std::cout << "============================================" << std::endl;
+  for (int i = 0; i < nFiles; i++) {
+    int lastI = i;
+    while(used <= 1800) {
+      std::cout << "Entry number " << i << " will run." << std::endl;
+      tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getDimensions(), referencesKPs[i]);
+      if (used+cm.memoryEstimation() > 1800) break;
+      cm.allocCudaMemory(targetImages[i]);
+      cudaMemories.push_back(cm);
+      cudaMemGetInfo( &avail, &total );
+      used = (total - avail)/(1024*1024);
+      std::cout << "Device used memory = " << used << "MB" << std::endl;
+      i++;
+      if (i >= nFiles) break;
+      else std::cout << "--------------------------------------------" << std::endl;
+    }
 
-  //   // Execution of the TPS, both in the Host and in the Device
-  //   std::cout << "============================================" << std::endl;
-  //   for (int j = lastI; j < i; j++) {
-  //     std::cout << "#Execution = " << j << std::endl;
-  //     std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
-  //     std::cout << "#Percentage = " << percentages[j] << std::endl;
-  //     std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+    // Execution of the TPS, both in the Host and in the Device
+    std::cout << "============================================" << std::endl;
+    for (int j = lastI; j < i; j++) {
+      std::cout << "#Execution = " << j << std::endl;
+      std::cout << "#Keypoints = " << referencesKPs[j].size() << std::endl;
+      std::cout << "#Percentage = " << percentages[j] << std::endl;
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-  //     double ParallelTpsExecTime = (double)cv::getTickCount();
-  //     tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-  //     parallelTPS.run();
-  //     ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-  //     std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      double ParallelTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      parallelTPS.run();
+      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
-  //     std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+      // std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-  //     double CUDAcTpsExecTime = (double)cv::getTickCount();
-  //     tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
-  //     CUDActps.run();
-  //     CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-  //     std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
-  //     cudaMemories[j].freeMemory();
-  //     std::cout << "============================================" << std::endl;
-  //   }
-  // }
+      // double CUDAcTpsExecTime = (double)cv::getTickCount();
+      // tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
+      // CUDActps.run();
+      // CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+      // cudaMemories[j].freeMemory();
+      // std::cout << "============================================" << std::endl;
+    }
+  }
   return 0;
 }

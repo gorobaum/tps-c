@@ -7,7 +7,7 @@ find_package(Armadillo REQUIRED)
 find_package(CUDA REQUIRED)
 find_package(ITK REQUIRED)
 
-include(${ITK_USE_FILE}) # see vtkModuleAPI.cmake:110
+include(${ITK_USE_FILE})
 
 include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
@@ -17,7 +17,7 @@ cuda_add_executable(tps
   src/image/image.cxx
   src/image/itkimageloader.cxx
 
-  # src/utils/cudamemory.cxx
+  src/utils/cudamemory.cxx
 
   src/feature/featuregenerator.cxx
 

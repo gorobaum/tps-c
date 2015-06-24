@@ -13,25 +13,25 @@ namespace tps {
   
 class CudaMemory {
 public:
-  CudaMemory(int width, int height, int slices, std::vector< std::vector<float> > referenceKeypoints) :
-    imageSize(width*height*slices),
+  CudaMemory(std::vector<int> dimensions, std::vector< std::vector<float> > referenceKeypoints) :
+    imageSize(dimensions[0]*dimensions[1]*dimensions[2]),
     referenceKeypoints_(referenceKeypoints),
     numberOfCps(referenceKeypoints.size()),
     systemDim(numberOfCps+4) {};
   void freeMemory();
   void allocCudaMemory(tps::Image& image);
   double memoryEstimation();
-  float* getSolutionCol() { return solutionCol; };
-  float* getSolutionRow() { return solutionRow; };
-  float* getSolutionSlice() { return solutionSlice; };
-  float* getKeypointCol() { return keypointCol; };
-  float* getKeypointRow() { return keypointRow; };
-  float* getKeypointSlice() { return keypointSlice; };
-  unsigned char* getTargetImage() { return targetImage; };
-  unsigned char* getRegImage() { return regImage; };
-  std::vector<float> getHostSolCol();
-  std::vector<float> getHostSolRow();
-  std::vector<float> getHostSolSlice();
+  float* getSolutionX() { return solutionX; };
+  float* getSolutionY() { return solutionY; };
+  float* getSolutionZ() { return solutionZ; };
+  float* getKeypointX() { return keypointX; };
+  float* getKeypointY() { return keypointY; };
+  float* getKeypointZ() { return keypointZ; };
+  short* getTargetImage() { return targetImage; };
+  short* getRegImage() { return regImage; };
+  std::vector<float> getHostSolX();
+  std::vector<float> getHostSolY();
+  std::vector<float> getHostSolZ();
 private:
   void allocCudaSolution();
   void allocCudaKeypoints();
@@ -41,9 +41,9 @@ private:
   std::vector< std::vector<float> > referenceKeypoints_;
   int numberOfCps;
   int systemDim;
-  float *solutionCol, *solutionRow, *solutionSlice;
-  float *keypointCol, *keypointRow, *keypointSlice;
-  unsigned char *targetImage, *regImage;
+  float *solutionX, *solutionY, *solutionZ;
+  float *keypointX, *keypointY, *keypointZ;
+  short *targetImage, *regImage;
 };
 
 } // namespace
