@@ -25,7 +25,7 @@ cuda_add_executable(tps
   # src/linearsystem/cudalinearsystems.cxx
   src/linearsystem/armalinearsystems.cxx
 
-  # src/tps/basictps.cxx
+  src/tps/basictps.cxx
   src/tps/paralleltps.cxx
   # src/tps/cudatps.cxx
   # src/tps/cutps.cu

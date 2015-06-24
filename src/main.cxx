@@ -3,7 +3,8 @@
 #include "feature/featuregenerator.h"
 #include "utils/cudamemory.h"
 #include "tps/tps.h"
-// #include "tps/cudatps.h"
+#include "tps/cudatps.h"
+#include "tps/basictps.h"
 #include "tps/paralleltps.h"
 
 #include <string>
@@ -129,11 +130,11 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double ParallelTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      parallelTPS.run();
-      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      double basicTpsExecTime = (double)cv::getTickCount();
+      tps::BasicTPS basicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"basic"+extension);
+      basicTPS.run();
+      basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
