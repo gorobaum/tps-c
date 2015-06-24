@@ -5,7 +5,7 @@
 #include <cmath>
 
 #define PI 3.14159265
-#define ANG -PI/72.0
+#define ANG PI/72.0
 
 void tps::FeatureGenerator::run() {
   std::vector<int> dimensions = referenceImage_.getDimensions();
@@ -52,13 +52,12 @@ std::vector<float> tps::FeatureGenerator::applyXRotationalDeformationTo(float x,
   std::vector<int> dimensions = referenceImage_.getDimensions();
   float yC = dimensions[1]/2.0;
   float zC = dimensions[2]/2.0;
-  float newY = (y-yC)*std::sin(ang)-(z-zC)*std::cos(ang);
-  float newZ = (y-yC)*std::cos(ang)-(z-zC)*std::sin(ang);
-  if (x == 90 && y == 108 && z == 90) {
-    std::cout << "newX = " << newX << std::endl;
-    std::cout << "newY = " << newY << std::endl;
-    std::cout << "newZ = " << newZ << std::endl;
-  }
+  float newY = y*std::cos(ang)-z*std::sin(ang);
+  float newZ = z*std::cos(ang)+y*std::sin(ang);
+  std::cout << "y = " << y << std::endl;
+  std::cout << "newY = " << newY << std::endl;
+  std::cout << "z = " << z << std::endl;
+  std::cout << "newZ = " << newZ << std::endl;
   std::vector<float> newPoint;
   newPoint.push_back(x);
   newPoint.push_back(newY);
