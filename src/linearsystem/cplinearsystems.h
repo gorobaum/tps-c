@@ -12,9 +12,9 @@ public:
     referenceKeypoints_(referenceKeypoints),
     targetKeypoints_(targetKeypoints),
     systemDimension(referenceKeypoints_.size()+4) {};
-  std::vector<float> getSolutionCol() {return solutionCol;};
-  std::vector<float> getSolutionRow() {return solutionRow;};
-  std::vector<float> getSolutionSlice() {return solutionSlice;};
+  std::vector<float> getSolutionX() {return solutionX;};
+  std::vector<float> getSolutionY() {return solutionY;};
+  std::vector<float> getSolutionZ() {return solutionZ;};
 protected:
   virtual void createMatrixA() = 0;
   virtual void createBs() = 0;
@@ -22,9 +22,9 @@ protected:
   std::vector< std::vector<float> > referenceKeypoints_;
   std::vector< std::vector<float> > targetKeypoints_;
   int systemDimension;
-  std::vector<float> solutionCol;
-  std::vector<float> solutionRow;
-  std::vector<float> solutionSlice;
+  std::vector<float> solutionX;
+  std::vector<float> solutionY;
+  std::vector<float> solutionZ;
 };
 
 } //namespace

@@ -7,9 +7,9 @@ void tps::ArmaLinearSystems::solveLinearSystems() {
   arma::wall_clock timer;
   timer.tic();
 
-  solutionCol = solveLinearSystem(A, bx);
-  solutionRow = solveLinearSystem(A, by);
-  solutionSlice = solveLinearSystem(A, bz);
+  solutionX = solveLinearSystem(A, bx);
+  solutionY = solveLinearSystem(A, by);
+  solutionZ = solveLinearSystem(A, bz);
 
   double time = timer.toc();
   std::cout << "Arma solver execution time: " << time << std::endl;

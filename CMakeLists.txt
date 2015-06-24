@@ -15,7 +15,7 @@ cuda_add_executable(tps
   src/main.cxx
 
   src/image/image.cxx
-  src/image/itkimageloader.cxx
+  src/image/itkimagehandler.cxx
 
   src/utils/cudamemory.cxx
 
@@ -23,10 +23,10 @@ cuda_add_executable(tps
 
   # src/linearsystem/OPCVlinearsystems.cxx
   # src/linearsystem/cudalinearsystems.cxx
-  # src/linearsystem/armalinearsystems.cxx
+  src/linearsystem/armalinearsystems.cxx
 
   # src/tps/basictps.cxx
-  # src/tps/paralleltps.cxx
+  src/tps/paralleltps.cxx
   # src/tps/cudatps.cxx
   # src/tps/cutps.cu
   )

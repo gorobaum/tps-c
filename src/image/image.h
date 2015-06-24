@@ -18,7 +18,6 @@ public:
 			image = std::vector< std::vector< std::vector<short> > >(dimensions[0], std::vector< std::vector<short> > (dimensions[1], std::vector<short>(dimensions[2], 0)));
 	};
 	std::vector< std::vector< std::vector<short> > > getImage() {return image;};
-	void save(std::string filename);
 	std::vector<int> getDimensions() { return dimensions_; };
 	void changePixelAt(int x, int y, int z, short value);
 	short getPixelAt(int x, int y, int z);

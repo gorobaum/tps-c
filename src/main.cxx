@@ -1,5 +1,5 @@
 #include "image/image.h"
-#include "image/itkimageloader.h"
+#include "image/itkimagehandler.h"
 #include "feature/featuregenerator.h"
 #include "utils/cudamemory.h"
 #include "tps/tps.h"
@@ -30,7 +30,7 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   std::string line;
   
   std::getline(infile, line);
-  tps::Image targetImage = tps::ITKImageLoader::loadImageData(line);
+  tps::Image targetImage = tps::ITKImageHandler::loadImageData(line);
   targetImages.push_back(targetImage);
 
   std::string outputName;
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   std::size_t pos = line.find('.');
   std::string extension = line.substr(pos);
 
-  tps::Image referenceImage = tps::ITKImageLoader::loadImageData(line);
+  tps::Image referenceImage = tps::ITKImageHandler::loadImageData(line);
 
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
       ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
       std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
-      // std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
       // double CUDAcTpsExecTime = (double)cv::getTickCount();
       // tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
