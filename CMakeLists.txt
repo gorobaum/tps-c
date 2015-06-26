@@ -22,13 +22,13 @@ cuda_add_executable(tps
   src/feature/featuregenerator.cxx
 
   # src/linearsystem/OPCVlinearsystems.cxx
-  # src/linearsystem/cudalinearsystems.cxx
+  src/linearsystem/cudalinearsystems.cxx
   src/linearsystem/armalinearsystems.cxx
 
   src/tps/basictps.cxx
   src/tps/paralleltps.cxx
-  # src/tps/cudatps.cxx
-  # src/tps/cutps.cu
+  src/tps/cudatps.cxx
+  src/tps/cutps.cu
   )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef")

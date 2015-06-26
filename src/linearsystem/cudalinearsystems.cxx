@@ -26,15 +26,15 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
 
   arma::wall_clock timer;
   timer.tic();
-  solveLinearSystem(bx, cm.getSolutionCol());
-  solveLinearSystem(by, cm.getSolutionRow());
-  solveLinearSystem(bz, cm.getSolutionSlice());
+  solveLinearSystem(bx, cm.getSolutionX());
+  solveLinearSystem(by, cm.getSolutionY());
+  solveLinearSystem(bz, cm.getSolutionZ());
   double time = timer.toc();
   std::cout << "Cuda solver execution time: " << time << std::endl;
 
-  solutionCol = cm.getHostSolCol();
-  solutionRow = cm.getHostSolRow();
-  solutionSlice = cm.getHostSolSlice();
+  solutionX = cm.getHostSolX();
+  solutionY = cm.getHostSolY();
+  solutionZ = cm.getHostSolZ();
 
   freeResources();
 }
@@ -120,7 +120,7 @@ void tps::CudaLinearSystems::createMatrixA() {
       float r = computeRSquared(referenceKeypoints_[i][0], referenceKeypoints_[j][0], 
                                 referenceKeypoints_[i][1], referenceKeypoints_[j][1],
                                 referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
-      if (r != 0.0) A[(i+4)*systemDimension+j+3] = r*log(r);
+      if (r != 0.0) A[(i+4)*systemDimension+j+4] = r*log(r);
     }
 }
 

@@ -50,14 +50,8 @@ void tps::FeatureGenerator::createTargetImageFeatures() {
 
 std::vector<float> tps::FeatureGenerator::applyXRotationalDeformationTo(float x, float y, float z, float ang) {
   std::vector<int> dimensions = referenceImage_.getDimensions();
-  float yC = dimensions[1]/2.0;
-  float zC = dimensions[2]/2.0;
   float newY = y*std::cos(ang)-z*std::sin(ang);
   float newZ = z*std::cos(ang)+y*std::sin(ang);
-  std::cout << "y = " << y << std::endl;
-  std::cout << "newY = " << newY << std::endl;
-  std::cout << "z = " << z << std::endl;
-  std::cout << "newZ = " << newZ << std::endl;
   std::vector<float> newPoint;
   newPoint.push_back(x);
   newPoint.push_back(newY);

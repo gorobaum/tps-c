@@ -130,21 +130,21 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double basicTpsExecTime = (double)cv::getTickCount();
-      tps::BasicTPS basicTPS = tps::BasicTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"basic"+extension);
-      basicTPS.run();
-      basicTpsExecTime = ((double)cv::getTickCount() - basicTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Basic TPS execution time: " << basicTpsExecTime << std::endl;
+      double parallelTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      parallelTPS.run();
+      parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      // double CUDAcTpsExecTime = (double)cv::getTickCount();
-      // tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
-      // CUDActps.run();
-      // CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
-      // std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
-      // cudaMemories[j].freeMemory();
-      // std::cout << "============================================" << std::endl;
+      double CUDAcTpsExecTime = (double)cv::getTickCount();
+      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
+      CUDActps.run();
+      CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
+      cudaMemories[j].freeMemory();
+      std::cout << "============================================" << std::endl;
     }
   }
   return 0;
