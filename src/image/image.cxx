@@ -5,6 +5,22 @@ void tps::Image::changePixelAt(int x, int y, int z, short value) {
     image[x][y][z] = value;
 }
 
+std::vector<short> tps::Image::getMinMax() {
+  short min = 0;
+  short max = 0;
+  for (int z = 0; z < dimensions_[2]; z++)
+    for (int x = 0; x < dimensions_[0]; x++)
+      for (int y = 0; y < dimensions_[1]; y++) {
+        short value = image[x][y][z];
+        if (value < min) min = value;
+        if (value > max) max = value;
+      }
+  std::vector<short> minMax;
+  minMax.push_back(min);
+  minMax.push_back(max);
+  return minMax;
+}
+
 short tps::Image::getPixelAt(int x, int y, int z) {
   if (x > dimensions_[0]-1 || x < 0)
     return 0;
@@ -34,7 +50,10 @@ short tps::Image::trilinearInterpolation(float x, float y, float z) {
   short c0 = c00*(1-yd)+c10*yd;
   short c1 = c01*(1-yd)+c11*yd;
 
-  return c0*(1-zd)+c1*zd;
+  short newValue = c0*(1-zd)+c1*zd;
+  if (newValue < 0) newValue = 0;
+
+  return newValue;
 }
 
 short tps::Image::NNInterpolation(float x, float y, float z) {

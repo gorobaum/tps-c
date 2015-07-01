@@ -51,7 +51,9 @@ __device__ short cudaTrilinearInterpolation(double x, double y, double z, short*
   short c0 = c00*(1-yd)+c10*yd;
   short c1 = c01*(1-yd)+c11*yd;
 
-  return c0*(1-zd)+c1*zd;
+  short result = c0*(1-zd)+c1*zd;
+  if (result < 0) result = 0;
+  return result;
 }
 
 // Kernel definition
@@ -74,8 +76,9 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
       newZ += r*log(r) * solutionZ[i+4];
     }
   }
-  if (z*height*width+x*height+y < width*height*slices)
+  if (z*height*width+x*height+y < width*height*slices) {
     cudaRegImage[z*height*width+x*height+y] = cudaTrilinearInterpolation(newX, newY, newZ, cudaImage, width, height, slices);
+  }
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {

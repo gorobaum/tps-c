@@ -19,6 +19,7 @@ public:
 	};
 	std::vector< std::vector< std::vector<short> > > getImage() {return image;};
 	std::vector<int> getDimensions() { return dimensions_; };
+	std::vector<short> getMinMax();
 	void changePixelAt(int x, int y, int z, short value);
 	short getPixelAt(int x, int y, int z);
 	short trilinearInterpolation(float x, float y, float z);
