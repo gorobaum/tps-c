@@ -66,6 +66,18 @@ std::vector<float> tps::CudaMemory::getHostSolZ() {
   return cudaToHost(solutionZ);
 }
 
+void tps::CudaMemory::setSolutionX(float* solution) {
+  checkCuda(cudaMemcpy(solutionX, solution, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+}
+
+void tps::CudaMemory::setSolutionY(float* solution) {
+  checkCuda(cudaMemcpy(solutionY, solution, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+}
+
+void tps::CudaMemory::setSolutionZ(float* solution) {
+  checkCuda(cudaMemcpy(solutionZ, solution, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+}
+
 std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
     float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
     cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);

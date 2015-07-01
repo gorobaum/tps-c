@@ -130,11 +130,11 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double parallelTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      parallelTPS.run();
-      parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
+      // double parallelTpsExecTime = (double)cv::getTickCount();
+      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      // parallelTPS.run();
+      // parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
