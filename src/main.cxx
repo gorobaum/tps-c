@@ -1,5 +1,6 @@
 #include "image/image.h"
 #include "image/itkimagehandler.h"
+#include "image/imagedeformation.h"
 #include "feature/featuregenerator.h"
 #include "utils/cudamemory.h"
 #include "tps/tps.h"
@@ -83,6 +84,9 @@ int main(int argc, char** argv) {
   std::string extension = line.substr(pos);
 
   tps::Image referenceImage = tps::ITKImageHandler::loadImageData(line);
+
+  tps::ImageDeformation id = tps::ImageDeformation(referenceImage, "bio-Def.nii.gz");
+  id.apply3DSinDeformation();
 
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;

@@ -16,6 +16,7 @@ cuda_add_executable(tps
 
   src/image/image.cxx
   src/image/itkimagehandler.cxx
+  src/image/imagedeformation.cxx
 
   src/utils/cudamemory.cxx
 

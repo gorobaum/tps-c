@@ -5,7 +5,6 @@ numFiles = 0
 n = int(sys.argv[1])
 for i in range(2, n, 2):
   numFiles = numFiles + 1
-  fileName = 'tps.config'+str(numFiles)
   filepath = '../configurations/tps.config'+str(numFiles)
   f = open(filepath,'w')
   f.write('images/'+sys.argv[2]+'\n')
