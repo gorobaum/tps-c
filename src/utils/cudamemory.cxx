@@ -81,8 +81,11 @@ double tps::CudaMemory::memoryEstimation() {
   int ucharSize = sizeof(short);
 
   double solutionsMemory = 3.0*systemDim*floatSize/(1024*1024);
+  // std::cout << "solutionsMemory = " << solutionsMemory << std::endl;
   double keypointsMemory = 3.0*numberOfCps*floatSize/(1024*1024);
+  // std::cout << "keypointsMemory = " << keypointsMemory << std::endl;
   double pixelsMemory = 2.0*imageSize*ucharSize/(1024*1024);
+  // std::cout << "pixelsMemory = " << pixelsMemory << std::endl;
 
   double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
   return totalMemory;
