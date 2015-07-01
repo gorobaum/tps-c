@@ -22,9 +22,9 @@ short tps::Image::trilinearInterpolation(float x, float y, float z) {
   int v = trunc(y);
   int w = trunc(z);
 
-  int xd = (x - u);
-  int yd = (y - v);
-  int zd = (z - w);
+  float xd = (x - u);
+  float yd = (y - v);
+  float zd = (z - w);
 
   short c00 = getPixelAt(u, v, w)*(1-xd)+getPixelAt(u+1, v, w)*xd;
   short c10 = getPixelAt(u, v+1, w)*(1-xd)+getPixelAt(u+1, v+1, w)*xd;
