@@ -21,6 +21,11 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 
+#include "cuda.h"
+#include "cuda_runtime.h"
+#include "cuda_occupancy.h"
+
+
 bool createKeypointImages = true;
 
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages, 
@@ -63,6 +68,9 @@ int main(int argc, char** argv) {
     std::cout << "Precisa passar o arquivo de configuração coração! \n";    
     return 0;
   }
+
+  cudaDeviceReset();
+  cudaThreadExit();
 
   // Reading the main file
   std::ifstream infile;
@@ -130,11 +138,11 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double parallelTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      parallelTPS.run();
-      parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
+      // double parallelTpsExecTime = (double)cv::getTickCount();
+      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      // parallelTPS.run();
+      // parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
@@ -147,5 +155,7 @@ int main(int argc, char** argv) {
       std::cout << "============================================" << std::endl;
     }
   }
+  cudaThreadExit();
+  cudaDeviceReset();
   return 0;
 }
