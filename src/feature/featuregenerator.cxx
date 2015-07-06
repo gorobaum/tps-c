@@ -43,9 +43,20 @@ void tps::FeatureGenerator::createTargetImageFeatures() {
       for (int y = 0; y < gridSizeY; y++) {
         int pos = z*gridSizeX*gridSizeY+x*gridSizeY+y;
         std::vector<float> referenceCP = referenceKeypoints[pos];
-        std::vector<float> newPoint = applyXRotationalDeformationTo(referenceCP[0], referenceCP[1], referenceCP[2], ANG);
+        std::vector<float> newPoint = applySinDeformationTo(referenceCP[0], referenceCP[1], referenceCP[2]);
         targetKeypoints.push_back(newPoint);
       }
+}
+
+std::vector<float> tps::FeatureGenerator::applySinDeformationTo(float x, float y, float z) {
+  std::vector<float> newPoint;
+  float newX = x - 4.0*std::sin(y/32.0) + 2.0*std::cos(z/16.0);
+  float newY = y - 4.0*std::cos(x/8.0) + 2.0*std::sin(z/16.0);
+  float newZ = z + 4.0*std::sin(x/32.0) - 4.0*std::cos(y/16.0);
+  newPoint.push_back(newX);
+  newPoint.push_back(newY);
+  newPoint.push_back(newZ);
+  return newPoint;
 }
 
 std::vector<float> tps::FeatureGenerator::applyXRotationalDeformationTo(float x, float y, float z, float ang) {

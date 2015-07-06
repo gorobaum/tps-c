@@ -16,6 +16,7 @@ private:
   int gridSizeX, gridSizeY, gridSizeZ;
   float xStep, yStep, zStep;
   std::vector<float> applyXRotationalDeformationTo(float x, float y, float z, float ang);
+  std::vector<float> applySinDeformationTo(float x, float y, float z);
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
 };
