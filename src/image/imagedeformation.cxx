@@ -9,20 +9,20 @@ void tps::ImageDeformation::apply3DSinDeformation() {
   for(int x = 0; x < dimensions[0]; x++)
     for(int y = 0; y < dimensions[1]; y++)
       for(int z = 0; z < dimensions[2]; z++) {
-        std::vector<int> newPoint = newPointSinDef(x, y, z);
-        short newVoxel = image_.trilinearInterpolation(x, y, z);
-        result.changePixelAt(newPoint[0], newPoint[1], newPoint[2], newVoxel);
+        std::vector<float> newPoint = newPointSinDef(x, y, z);
+        short newVoxel = image_.trilinearInterpolation(newPoint[0], newPoint[1], newPoint[2]);
+        result.changePixelAt(x, y, z, newVoxel);
       }
   tps::ITKImageHandler::saveImageData(result, outputName_);
 }
 
-std::vector<int> tps::ImageDeformation::newPointSinDef(int x, int y, int z) {
-  std::vector<int> newPoint;
-  float newX = x - 4.0*std::sin(y/32.0) + 2.0*std::cos(z/16.0);
-  float newY = y - 4.0*std::cos(x/8.0)  + 2.0*std::sin(z/16.0);
-  float newZ = z + 4.0*std::sin(x/32.0) - 4.0*std::cos(y/16.0);
-  newPoint.push_back(getNearestInteger(newX));
-  newPoint.push_back(getNearestInteger(newY));
-  newPoint.push_back(getNearestInteger(newZ));
+std::vector<float> tps::ImageDeformation::newPointSinDef(int x, int y, int z) {
+  std::vector<float> newPoint;
+  float newX = x + 2.0*std::sin(y/32.0);
+  float newY = y - 4.0*std::cos(z/8.0);
+  float newZ = z + 2.0*std::sin(x/16.0);
+  newPoint.push_back(newX);
+  newPoint.push_back(newY);
+  newPoint.push_back(newZ);
   return newPoint;
 }

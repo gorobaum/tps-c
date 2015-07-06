@@ -85,8 +85,8 @@ int main(int argc, char** argv) {
 
   tps::Image referenceImage = tps::ITKImageHandler::loadImageData(line);
 
-  // tps::ImageDeformation id = tps::ImageDeformation(referenceImage, "bio-Def.nii.gz");
-  // id.apply3DSinDeformation();
+  tps::ImageDeformation id = tps::ImageDeformation(referenceImage, "bio-Def.nii.gz");
+  id.apply3DSinDeformation();
 
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;

@@ -17,7 +17,7 @@ public:
   void apply3DSinDeformation();
   tps::Image getResult() { return result; };
 private:
-  std::vector<int> newPointSinDef(int x, int y, int z);
+  std::vector<float> newPointSinDef(int x, int y, int z);
   tps::Image image_;
   tps::Image result;
   std::string outputName_;
