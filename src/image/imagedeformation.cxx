@@ -18,9 +18,9 @@ void tps::ImageDeformation::apply3DSinDeformation() {
 
 std::vector<float> tps::ImageDeformation::newPointSinDef(int x, int y, int z) {
   std::vector<float> newPoint;
-  float newX = x + 2.0*std::sin(y/32.0);
-  float newY = y - 4.0*std::cos(z/8.0);
-  float newZ = z + 2.0*std::sin(x/16.0);
+  float newX = x + 2.0*std::sin(y/32.0) - 2.0*std::cos(z/16.0);
+  float newY = y - 4.0*std::cos(z/8.0) + 8.0*std::sin(x/32.0);
+  float newZ = z + 2.0*std::sin(x/16.0) - 4.0*std::cos(y/16.0);
   newPoint.push_back(newX);
   newPoint.push_back(newY);
   newPoint.push_back(newZ);
