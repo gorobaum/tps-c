@@ -24,6 +24,9 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   createMatrixA();
   createBs();
 
+  float deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory before the solver = " << deviceMemoryBefore << std::endl;
+
   arma::wall_clock timer;
   timer.tic();
   solveLinearSystem(bx, cm.getSolutionX());
@@ -32,11 +35,22 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   double time = timer.toc();
   std::cout << "Cuda solver execution time: " << time << std::endl;
 
+  deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory before after the solver = " << deviceMemoryBefore << std::endl;
+
   solutionX = cm.getHostSolX();
   solutionY = cm.getHostSolY();
   solutionZ = cm.getHostSolZ();
 
   freeResources();
+}
+
+float tps::CudaLinearSystems::getDeviceUsedMemory() {
+  size_t avail;
+  size_t total;
+  cudaMemGetInfo(&avail, &total);
+  size_t used = (total - avail)/(1024*1024);
+  return used;
 }
 
 void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
@@ -50,6 +64,9 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   float *d_work = NULL;
   float *d_tau = NULL;
   int *devInfo = NULL;
+
+  float deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory before the exec = " << deviceMemoryBefore << std::endl;
 
   cusolverStatus_t cusolver_status;
   cublasStatus_t cublas_status;
@@ -88,13 +105,22 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
     systemDimension);
   cudaDeviceSynchronize();
 
+  deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory after the exec= " << deviceMemoryBefore << std::endl;
+
   checkCuda(cudaFree(cudaA));
   checkCuda(cudaFree(d_tau));
   checkCuda(cudaFree(devInfo));
   checkCuda(cudaFree(d_work));
 
+  deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory after the frees = " << deviceMemoryBefore << std::endl;
+
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);
+
+  deviceMemoryBefore = getDeviceUsedMemory();
+  std::cout << "Device memory after the destroys = " << deviceMemoryBefore << std::endl;
 }
 
 void tps::CudaLinearSystems::createMatrixA() {

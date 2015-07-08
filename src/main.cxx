@@ -123,6 +123,7 @@ int main(int argc, char** argv) {
     while(used <= 1800) {
       std::cout << "Entry number " << i << " will run." << std::endl;
       tps::CudaMemory cm = tps::CudaMemory(targetImages[i].getDimensions(), referencesKPs[i]);
+      std::cout << "Device memory estimation " << cm.memoryEstimation() << std::endl;
       if (used+cm.memoryEstimation() > 1800) break;
       cm.allocCudaMemory(targetImages[i]);
       cudaMemories.push_back(cm);

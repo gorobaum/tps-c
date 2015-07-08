@@ -1,6 +1,6 @@
 - Profiling do código
-- Verificar o gasto médio de memória do cuSolver
-- Verificar a saida do NVVP sem o cuSolver
+- Verificar o gasto médio de memória do cuSolver - (Ok, falta entender os dados)
+- Verificar a saida do NVVP sem o cuSolver (Ok - o trafego de dados entre a GPU é resultado do cuSolver)
 
 Otimização:
 - Manter o número de threads por bloco em um múltiplo de 32 - OK

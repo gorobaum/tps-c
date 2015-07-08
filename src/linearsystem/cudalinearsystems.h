@@ -13,6 +13,7 @@ public:
 private:
   void solveLinearSystem(float *B, float *cudaSolution);
   std::vector<float> pointerToVector(float *pointer);
+  float getDeviceUsedMemory();
   void createMatrixA();
   void createBs();
   void freeResources();
