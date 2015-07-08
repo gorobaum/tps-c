@@ -59,7 +59,7 @@ __device__ short cudaTrilinearInterpolation(double x, double y, double z, short*
 // Kernel definition
 __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX, float* solutionY, 
                         float* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
-                        float* keyZ, uint numOfKeys) {
+                        float* keyZ, int numOfKeys) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   int z = blockDim.z*blockIdx.z + threadIdx.z;
@@ -68,7 +68,7 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
   double newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
   double newZ = solutionZ[0] + x*solutionZ[1] + y*solutionZ[2] + z*solutionZ[3];
 
-  for (uint i = 0; i < numOfKeys; i++) {
+  for (int i = 0; i < numOfKeys; i++) {
     double r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
     if (r != 0.0) {
       newX += r*log(r) * solutionX[i+4];
@@ -98,7 +98,7 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 }
 
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
-  dim3 threadsPerBlock(10, 10, 10);
+  dim3 threadsPerBlock(8, 8, 8);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
