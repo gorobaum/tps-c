@@ -2,7 +2,7 @@
 #define TPS_CUDATPS_H_
 
 #include "tps.h"
-#include "linearsystem/cudalinearsystems.h"
+#include "linearsystem/armalinearsystems.h"
 #include "utils/cudamemory.h"
 
 namespace tps {
@@ -15,7 +15,7 @@ class CudaTPS : public TPS {
       cm_(cm) {}; 
     void run();
   private:
-    tps::CudaLinearSystems lienarSolver;
+    tps::ArmaLinearSystems lienarSolver;
     tps::CudaMemory& cm_;
     float* solutionPointer(std::vector<float> solution);
     short *regImage;  
