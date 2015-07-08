@@ -29,9 +29,9 @@ public:
   float* getKeypointZ() { return keypointZ; };
   short* getTargetImage() { return targetImage; };
   short* getRegImage() { return regImage; };
-  void setSolX(std::vector<float> solution);
   void setSolY(std::vector<float> solution);
   void setSolZ(std::vector<float> solution);
+  void setSolX(std::vector<float> solution);
   std::vector<float> getHostSolX();
   std::vector<float> getHostSolY();
   std::vector<float> getHostSolZ();
