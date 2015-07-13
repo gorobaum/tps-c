@@ -57,7 +57,7 @@ __device__ short cudaTrilinearInterpolation(float x, float y, float z, short* im
 }
 
 // Kernel definition
-__global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX, float* solutionY, 
+__global__ void tpsCuda(cudaTextureObject_t textObj, short* cudaRegImage, float* solutionX, float* solutionY, 
                         float* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
                         float* keyZ, int numOfKeys) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
@@ -76,9 +76,8 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
       newZ += r*log(r) * solutionZ[i+4];
     }
   }
-  if (z*height*width+x*height+y < width*height*slices) {
-    cudaRegImage[z*height*width+x*height+y] = cudaTrilinearInterpolation(newX, newY, newZ, cudaImage, width, height, slices);
-  }
+  if (z*height*width+x*height+y < width*height*slices)
+    cudaRegImage[z*height*width+x*height+y] = (short)tex3D<float>(textObj, newX , newY, newZ);
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {
@@ -113,7 +112,7 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
                                           cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
                                           cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
