@@ -77,7 +77,7 @@ __global__ void tpsCuda(cudaTextureObject_t textObj, short* cudaRegImage, float*
     }
   }
   if (z*height*width+x*height+y < width*height*slices)
-    cudaRegImage[z*height*width+x*height+y] = (short)tex3D<float>(textObj, newX , newY, newZ);
+    cudaRegImage[z*height*width+x*height+y] = (short)tex3D<float>(textObj, newZ , newY, newX);
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {
