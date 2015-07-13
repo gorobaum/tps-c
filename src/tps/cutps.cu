@@ -26,15 +26,15 @@ __device__ short cudaGetPixel(int x, int y, int z, short* image, int width, int 
 }
 
 // Kernel definition
-__device__ short cudaTrilinearInterpolation(double x, double y, double z, short* image, 
+__device__ short cudaTrilinearInterpolation(float x, float y, float z, short* image, 
                                             int width, int height, int slices) {
   int u = trunc(x);
   int v = trunc(y);
   int w = trunc(z);
 
-  double xd = (x - u);
-  double yd = (y - v);
-  double zd = (z - w);
+  float xd = (x - u);
+  float yd = (y - v);
+  float zd = (z - w);
 
   short c00 = cudaGetPixel(u, v, w, image, width, height, slices)*(1-xd)
             + cudaGetPixel(u+1, v, w, image, width, height, slices)*xd;
@@ -64,12 +64,12 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   int z = blockDim.z*blockIdx.z + threadIdx.z;
 
-  double newX = solutionX[0] + x*solutionX[1] + y*solutionX[2] + z*solutionX[3];
-  double newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
-  double newZ = solutionZ[0] + x*solutionZ[1] + y*solutionZ[2] + z*solutionZ[3];
+  float newX = solutionX[0] + x*solutionX[1] + y*solutionX[2] + z*solutionX[3];
+  float newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
+  float newZ = solutionZ[0] + x*solutionZ[1] + y*solutionZ[2] + z*solutionZ[3];
 
   for (int i = 0; i < numOfKeys; i++) {
-    double r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
+    float r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
     if (r != 0.0) {
       newX += r*log(r) * solutionX[i+4];
       newY += r*log(r) * solutionY[i+4];
