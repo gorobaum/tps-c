@@ -56,8 +56,6 @@ __device__ short cudaTrilinearInterpolation(float x, float y, float z, short* im
   return result;
 }
 
-extern __shared__ float keys[];
-
 // Kernel definition
 __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX, float* solutionY, 
                         float* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
@@ -66,6 +64,7 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   int z = blockDim.z*blockIdx.z + threadIdx.z;
 
+  extern __shared__ float keys[];
 
   float newX = solutionX[0] + x*solutionX[1] + y*solutionX[2] + z*solutionX[3];
   float newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
@@ -116,7 +115,7 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-  tpsCuda<<<gridSize, blockSize>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionX(), 
+  tpsCuda<<<gridSize, blockSize, 3*sizeof(float)*numberOfCPs>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionX(), 
                                           cm.getSolutionY(), cm.getSolutionZ(), dimensions[0], dimensions[1], 
                                           dimensions[2], cm.getKeypointX(), cm.getKeypointY(), cm.getKeypointZ(), 
                                           numberOfCPs);
