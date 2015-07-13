@@ -26,15 +26,15 @@ __device__ short cudaGetPixel(int x, int y, int z, short* image, int width, int 
 }
 
 // Kernel definition
-__device__ short cudaTrilinearInterpolation(double x, double y, double z, short* image, 
+__device__ short cudaTrilinearInterpolation(float x, float y, float z, short* image, 
                                             int width, int height, int slices) {
   int u = trunc(x);
   int v = trunc(y);
   int w = trunc(z);
 
-  double xd = (x - u);
-  double yd = (y - v);
-  double zd = (z - w);
+  float xd = (x - u);
+  float yd = (y - v);
+  float zd = (z - w);
 
   short c00 = cudaGetPixel(u, v, w, image, width, height, slices)*(1-xd)
             + cudaGetPixel(u+1, v, w, image, width, height, slices)*xd;
@@ -56,6 +56,8 @@ __device__ short cudaTrilinearInterpolation(double x, double y, double z, short*
   return result;
 }
 
+extern __shared__ float keys[];
+
 // Kernel definition
 __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX, float* solutionY, 
                         float* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
@@ -64,12 +66,13 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
   int y = blockDim.y*blockIdx.y + threadIdx.y;
   int z = blockDim.z*blockIdx.z + threadIdx.z;
 
-  double newX = solutionX[0] + x*solutionX[1] + y*solutionX[2] + z*solutionX[3];
-  double newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
-  double newZ = solutionZ[0] + x*solutionZ[1] + y*solutionZ[2] + z*solutionZ[3];
+
+  float newX = solutionX[0] + x*solutionX[1] + y*solutionX[2] + z*solutionX[3];
+  float newY = solutionY[0] + x*solutionY[1] + y*solutionY[2] + z*solutionY[3];
+  float newZ = solutionZ[0] + x*solutionZ[1] + y*solutionZ[2] + z*solutionZ[3];
 
   for (int i = 0; i < numOfKeys; i++) {
-    double r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
+    float r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
     if (r != 0.0) {
       newX += r*log(r) * solutionX[i+4];
       newY += r*log(r) * solutionY[i+4];
@@ -98,10 +101,10 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 }
 
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
-  dim3 threadsPerBlock(8, 8, 8);
-  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
-                 std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
-                 std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
+  dim3 blockSize(8, 8, 8);
+  dim3 gridSize(std::ceil(1.0*dimensions[0]/blockSize.x),
+                 std::ceil(1.0*dimensions[1]/blockSize.y),
+                 std::ceil(1.0*dimensions[2]/blockSize.z));
 
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
@@ -113,9 +116,10 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
-                                          cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
-                                          cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
+  tpsCuda<<<gridSize, blockSize>>>(cm.getTargetImage(), cm.getRegImage(), cm.getSolutionX(), 
+                                          cm.getSolutionY(), cm.getSolutionZ(), dimensions[0], dimensions[1], 
+                                          dimensions[2], cm.getKeypointX(), cm.getKeypointY(), cm.getKeypointZ(), 
+                                          numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
   checkCuda(cudaMemcpy(regImage, cm.getRegImage(), dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short), cudaMemcpyDeviceToHost));
 
