@@ -1,6 +1,7 @@
 #include "cudamemory.h"
 
 #include <cassert>
+#include <cstring>
 
 inline
 cudaError_t checkCuda(cudaError_t result)
@@ -49,8 +50,39 @@ void tps::CudaMemory::allocCudaKeypoints() {
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
-  checkCuda(cudaMalloc(&targetImage, imageSize*sizeof(short)));
-  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageSize*sizeof(short), cudaMemcpyHostToDevice));
+  std::vector<int> dimensions = image.getDimensions();
+
+  cudaExtent volumeExtent = make_cudaExtent(dimensions[0], dimensions[1], dimensions[2]);
+
+  cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+  cudaMalloc3DArray(&cuArray, &channelDesc, volumeExtent, 0);
+
+  cudaMemcpy3DParms copyParams = {0};
+  copyParams.srcPtr   = make_cudaPitchedPtr((void*)image.getFloatPixelVector(), volumeExtent.width*sizeof(float), volumeExtent.width, volumeExtent.height);
+  copyParams.dstArray = cuArray;
+  copyParams.extent   = volumeExtent;
+  copyParams.kind     = cudaMemcpyHostToDevice;
+  cudaMemcpy3D(&copyParams);
+
+  struct cudaResourceDesc resDesc;
+  memset(&resDesc, 0, sizeof(resDesc));
+  resDesc.resType = cudaResourceTypeArray;
+  resDesc.res.array.array = cuArray;
+
+  struct cudaTextureDesc texDesc;
+  memset(&texDesc, 0, sizeof(texDesc));
+  texDesc.addressMode[0]   = cudaAddressModeBorder;
+  texDesc.addressMode[1]   = cudaAddressModeBorder;
+  texDesc.addressMode[2]   = cudaAddressModeBorder;
+  texDesc.filterMode       = cudaFilterModeLinear;
+  texDesc.readMode         = cudaReadModeElementType;
+  texDesc.normalizedCoords = 0;
+
+  // Create texture object
+  texObj = 0;
+  cudaCreateTextureObject(&texObj, &resDesc, &texDesc, NULL);
+
   checkCuda(cudaMalloc(&regImage, imageSize*sizeof(short)));
 }
 
