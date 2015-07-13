@@ -78,7 +78,7 @@ __global__ void tpsCuda(cudaTextureObject_t textObj, short* cudaRegImage, float*
     }
   }
   if (z*height*width+x*height+y < width*height*slices)
-    cudaRegImage[z*height*width+x*height+y] = (short)tex3D<float>(textObj, newZ , newY, newX);
+    cudaRegImage[z*height*width+x*height+y] = (short)tex3D<float>(textObj, newX , newY, newZ);
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {
@@ -113,7 +113,11 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
+<<<<<<< HEAD
   tpsCuda<<<gridSize, blockSize>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
+=======
+  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
+>>>>>>> cdb8c44... I just need to correct the orienttion of the 3D texture
                                           cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
                                           cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
