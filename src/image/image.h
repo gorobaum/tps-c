@@ -29,6 +29,7 @@ public:
 	short trilinearInterpolation(float x, float y, float z);
 	short NNInterpolation(float x, float y, float z);
 	short* getPixelVector();
+	float* getFloatPixelVector();
 	void setPixelVector(short* vector);
 private:
 	short* image;

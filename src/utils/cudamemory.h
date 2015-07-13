@@ -32,6 +32,7 @@ public:
   float* getKeypointY() { return keypointY; };
   float* getKeypointZ() { return keypointZ; };
   short* getTargetImage() { return targetImage; };
+  cudaTextureObject_t getTexObj() { return texObj; };
   short* getRegImage() { return regImage; };
   std::vector<float> getHostSolX();
   std::vector<float> getHostSolY();
@@ -48,6 +49,8 @@ private:
   float *solutionX, *solutionY, *solutionZ;
   float *keypointX, *keypointY, *keypointZ;
   short *targetImage, *regImage;
+  cudaTextureObject_t texObj;
+  cudaArray* cuArray;
 };
 
 } // namespace
