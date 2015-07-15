@@ -113,11 +113,7 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-<<<<<<< 28b7720c5cc9fd11b8ebfcdb226a8de5ec1016bc
   tpsCuda<<<gridSize, blockSize>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
-=======
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
->>>>>>> I just need to correct the orienttion of the 3D texture
                                           cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
                                           cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
