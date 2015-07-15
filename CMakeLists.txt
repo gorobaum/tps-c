@@ -11,6 +11,10 @@ include(${ITK_USE_FILE})
 
 include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xptxas -v")
+
+cuda_compile(CUTPS_O src/tps/cutps.cu)
+
 cuda_add_executable(tps
   src/main.cxx
 
@@ -32,10 +36,11 @@ cuda_add_executable(tps
   src/tps/basictps.cxx
   src/tps/paralleltps.cxx
   src/tps/cudatps.cxx
-  src/tps/cutps.cu
+  ${CUTPS_O}
   )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive -include cstddef -w")
+
 
 # TODO: Fix CUDA_cusolver_LIBRARY in FindCUDA.cmake
 target_link_libraries(tps 
