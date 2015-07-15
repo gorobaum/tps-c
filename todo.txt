@@ -7,9 +7,9 @@ Otimização:
 - Não utilizar unsigned em loops - OK
 - Utilizar shared memory - Ok, O tempo de alocação da memória praticamente dobra o tempo de execução do kernel
 - Salvar as imagens como textura - Ta funfando ta lindo ta biito
-- Garantir o acesso agrupado a memória
 - Calcular a ocupação dos recursos da GPU
 - Balancear o número de threads com os recursos da GPU
+- Garantir o acesso agrupado a memória
 - Verificar a diferença de eficiência e eficacia entre double e float
 - Paralelizar a execução do código entre GPU e CPU utilizando cuda streams
 - Paralelizar a execução dos kerneis
