@@ -6,7 +6,7 @@ Otimização:
 - Manter o número de threads por bloco em um múltiplo de 32 - OK
 - Não utilizar unsigned em loops - OK
 - Utilizar shared memory - Ok, O tempo de alocação da memória praticamente dobra o tempo de execução do kernel
-- Salvar as imagens como textura
+- Salvar as imagens como textura - Ta funfando ta lindo ta biito
 - Garantir o acesso agrupado a memória
 - Calcular a ocupação dos recursos da GPU
 - Balancear o número de threads com os recursos da GPU

@@ -70,10 +70,11 @@ __global__ void tpsCuda(cudaTextureObject_t textObj, short* cudaRegImage, float*
 
   for (int i = 0; i < numOfKeys; i++) {
     float r = (x-keyX[i])*(x-keyX[i]) + (y-keyY[i])*(y-keyY[i]) + (z-keyZ[i])*(z-keyZ[i]);
+    float logR = r*log(r);
     if (r != 0.0) {
-      newX += r*log(r) * solutionX[i+4];
-      newY += r*log(r) * solutionY[i+4];
-      newZ += r*log(r) * solutionZ[i+4];
+      newX += logR * solutionX[i+4];
+      newY += logR * solutionY[i+4];
+      newZ += logR * solutionZ[i+4];
     }
   }
 
