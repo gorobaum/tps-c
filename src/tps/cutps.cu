@@ -98,10 +98,10 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 }
 
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
-  dim3 threadsPerBlock(8, 8, 8);
-  dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
-                 std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
-                 std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
+  dim3 blockSize(8, 8, 8);
+  dim3 gridSize(std::ceil(1.0*dimensions[0]/blockSize.x),
+                 std::ceil(1.0*dimensions[1]/blockSize.y),
+                 std::ceil(1.0*dimensions[2]/blockSize.z));
 
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
@@ -113,7 +113,7 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
 
-  tpsCuda<<<numBlocks, threadsPerBlock>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
+  tpsCuda<<<gridSize, blockSize>>>(cm.getTexObj(), cm.getRegImage(), cm.getSolutionX(), cm.getSolutionY(), 
                                           cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
                                           cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
