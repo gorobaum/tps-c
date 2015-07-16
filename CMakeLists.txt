@@ -11,7 +11,7 @@ include(${ITK_USE_FILE})
 
 include_directories(src "${ARMADILLO_INCLUDE_DIRS}")
 
-set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xptxas -v")
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xptxas -v -arch=sm_30")
 
 cuda_compile(CUTPS_O src/tps/cutps.cu)
 
