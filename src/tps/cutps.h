@@ -5,6 +5,8 @@
 
 #include "utils/cudamemory.h"
 
+int getBlockSize();
+
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs);
 
 #endif
