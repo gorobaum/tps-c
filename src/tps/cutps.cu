@@ -109,6 +109,15 @@ int getBlockSize() {
 
   for (int blockSize = 1; blockSize <= 512; blockSize++) {
     int numBlocks;        // Occupancy in terms of active blocks
+
+    // These variables are used to convert occupancy to warps
+    int device;
+    cudaDeviceProp prop;
+    int activeWarps;
+    int maxWarps;
+
+    cudaGetDevice(&device);
+    cudaGetDeviceProperties(&prop, device);
     
     cudaOccupancyMaxActiveBlocksPerMultiprocessor(
         &numBlocks,
@@ -116,14 +125,21 @@ int getBlockSize() {
         blockSize,
         0);
 
-    int activeWarps = numBlocks * blockSize / prop.warpSize;
-    int maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+    activeWarps = numBlocks * blockSize / prop.warpSize;
+    maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+    std::cout << "blockSize: " << blockSize << std::endl;
+    std::cout << "activeWarps: " << activeWarps << std::endl;
+    std::cout << "maxWarps: " << maxWarps << std::endl;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
-    if (maxOccupancy <= currentOccupancy) {
+    std::cout << "currentOccupancy: " << currentOccupancy << std::endl;
+    if (maxOccupancy < currentOccupancy) {
       maxOccupancy = currentOccupancy;
       maxOccupancyBlockSize = blockSize;
     }
   }
+
+  std::cout << "Max occupancy at: " << maxOccupancy / 100 << std::endl;
+  std::cout << "Max maxOccupancyBlockSize at: " << maxOccupancyBlockSize / 100 << std::endl;
   return maxOccupancyBlockSize;
 }
 
