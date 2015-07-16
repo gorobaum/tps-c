@@ -97,6 +97,44 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
   std::cout << output << elapsedTime << " ms\n";
 }
 
+int getBlockSize() {
+  int maxOccupancyBlockSize = 0;
+  float maxOccupancy = 0.0;
+  for (int blockSize = 1; blockSize <= 512; blockSize++) {
+    int numBlocks;        // Occupancy in terms of active blocks
+
+    // These variables are used to convert occupancy to warps
+    int device;
+    cudaDeviceProp prop;
+    int activeWarps;
+    int maxWarps;
+
+    cudaGetDevice(&device);
+    cudaGetDeviceProperties(&prop, device);
+    
+    cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+        &numBlocks,
+        tpsCuda,
+        blockSize,
+        0);
+
+    activeWarps = numBlocks * blockSize / prop.warpSize;
+    maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+    std::cout << "blockSize: " << blockSize << std::endl;
+    std::cout << "activeWarps: " << activeWarps << std::endl;
+    std::cout << "maxWarps: " << maxWarps << std::endl;
+    float currentOccupancy = 1.0*activeWarps/maxWarps;
+    std::cout << "currentOccupancy: " << currentOccupancy << std::endl;
+    if (maxOccupancy < currentOccupancy) {
+      maxOccupancy = currentOccupancy;
+      maxOccupancyBlockSize = blockSize;
+    }
+  }
+  std::cout << "Max occupancy at: " << maxOccupancy / 100 << std::endl;
+  std::cout << "Max maxOccupancyBlockSize at: " << maxOccupancyBlockSize / 100 << std::endl;
+  return maxOccupancyBlockSize;
+}
+
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
   dim3 threadsPerBlock(8, 8, 8);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
@@ -105,10 +143,12 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
 
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
-  for (int slice = 0; slice < dimensions[2]; slice++)
-    for (int col = 0; col < dimensions[0]; col++)
-      for (int row = 0; row < dimensions[1]; row++)
-        regImage[slice*dimensions[1]*dimensions[0]+col*dimensions[1]+row] = 0;
+  getBlockSize();
+
+  for (int z = 0; z < dimensions[2]; z++)
+    for (int y = 0; y < dimensions[0]; y++)
+      for (int x = 0; x < dimensions[1]; x++)
+        regImage[z*dimensions[1]*dimensions[0]+y*dimensions[1]+x] = 0;
 
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
