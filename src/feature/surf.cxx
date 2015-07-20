@@ -12,10 +12,6 @@ void tps::Surf::extractDescriptors() {
 
 void tps::Surf::matchDescriptors() {
 	std::vector<cv::DMatch> matches;
-  if ( descriptors_ref.empty() )
-   cvError(0,"MatchFinder","1st descriptor empty",__FILE__,__LINE__);    
-  if ( descriptors_tar.empty() )
-   cvError(0,"MatchFinder","2nd descriptor empty",__FILE__,__LINE__);
   matcher.match(descriptors_ref, descriptors_tar, matches);
 
   double max_dist = 0; double min_dist = 100;

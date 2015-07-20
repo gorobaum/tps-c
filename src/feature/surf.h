@@ -19,7 +19,7 @@ public:
 	Surf(cv::Mat referenceImage, cv::Mat targetImage, int minHessian):
 		referenceImage_(referenceImage), 
 		targetImage_(targetImage),
-		detector(minHessian) {};
+		detector(minHessian, 8) {};
 	void run();
   void drawKeypointsImage(cv::Mat tarImg, std::string filename);
   void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
