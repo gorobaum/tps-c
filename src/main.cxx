@@ -54,6 +54,16 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   percentages.push_back(percentage);
 }
 
+std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> newKP, int height) {
+  std::vector< std::vector< float >> newKPS;
+  for (std::vector<std::vector< float >>::iterator it = newKP.begin() ; it != newKP.end(); ++it) {
+    std::vector< float > newPoint = *it;
+    newPoint[1] += height;
+    newKPS.push_back(newPoint);
+  }
+  return newKPS;
+}
+
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
     std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
@@ -62,12 +72,15 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
     fg.run();
 
+    cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
+
+    tps::Surf fsurf = tps::Surf(cvRefImg(rect), cvTarImg(rect), 400);
+    fsurf.run();
     // Manual Keypoints
-    std::vector< std::vector< float > > refNewKPs = {{1, 210}, {3, 236}, {20, 303}, {84, 334}, {51, 244}, {114, 196}, {136, 290}, {81, 215}, {160, 233}};
-    std::vector< std::vector< float > > tarNewKPs = {{5, 207}, {11, 235}, {22, 298}, {83, 332}, {45, 221}, {143, 212}, {139, 289}, {93, 207}, {158, 246}};
+    std::vector< std::vector< float >> refNewKPs = addHeight(fsurf.getReferenceKeypoints(), referenceImage.getHeight()/2);
+    std::vector< std::vector< float >> tarNewKPs = addHeight(fsurf.getTargetKeypoints(), referenceImage.getHeight()/2);
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
-
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);
       fg.drawFeatureImage(cvRefImg, cvTarImg, outputName+"matches-Tar"+extension);
