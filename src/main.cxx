@@ -59,7 +59,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
     double fgExecTime = (double)cv::getTickCount();
 
-    tps::Surf fg = tps::Surf(cvRefImg, cvTarImg, 400);
+    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
     fg.run();
 
     // Manual Keypoints
@@ -67,7 +67,6 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     std::vector< std::vector< float > > tarNewKPs = {{5, 207}, {11, 235}, {22, 298}, {83, 332}, {45, 221}, {143, 212}, {139, 289}, {93, 207}, {158, 246}};
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
-    fg.addNewMatches(refNewKPs.size());
 
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);

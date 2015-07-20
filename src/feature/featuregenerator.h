@@ -20,6 +20,8 @@ public:
   void run();
   void drawKeypointsImage(cv::Mat tarImg, std::string filename);
   void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
+  void addRefKeypoints(std::vector< std::vector< float > > newKPs);
+  void addTarKeypoints(std::vector< std::vector< float > > newKPs);
 private:
   float percentage_;
   int gridSizeCol, gridSizeRow;
@@ -27,6 +29,8 @@ private:
   std::vector<float> applySenoidalDeformationTo(float x, float y);
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
+  bool checkSector(float x, float y);
+  void addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< std::vector< float > > newKPs);
   std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;
 };
 
