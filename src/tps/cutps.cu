@@ -101,7 +101,6 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 int getBlockSize() {
   int maxOccupancyBlockSize = 0;
   float maxOccupancy = 0.0;
-
   int device;
   cudaDeviceProp prop;
   cudaGetDevice(&device);
@@ -109,15 +108,6 @@ int getBlockSize() {
 
   for (int blockSize = 1; blockSize <= 512; blockSize++) {
     int numBlocks;        // Occupancy in terms of active blocks
-
-    // These variables are used to convert occupancy to warps
-    int device;
-    cudaDeviceProp prop;
-    int activeWarps;
-    int maxWarps;
-
-    cudaGetDevice(&device);
-    cudaGetDeviceProperties(&prop, device);
     
     cudaOccupancyMaxActiveBlocksPerMultiprocessor(
         &numBlocks,
@@ -128,7 +118,7 @@ int getBlockSize() {
     int activeWarps = numBlocks * blockSize / prop.warpSize;
     int maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
-    if (maxOccupancy < currentOccupancy) {
+    if (maxOccupancy <= currentOccupancy) {
       maxOccupancy = currentOccupancy;
       maxOccupancyBlockSize = blockSize;
     }
