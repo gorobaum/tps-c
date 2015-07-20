@@ -54,18 +54,38 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   percentages.push_back(percentage);
 }
 
+std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> newKP, int height) {
+  std::vector< std::vector< float >> newKPS;
+  for (std::vector<std::vector< float >>::iterator it = newKP.begin() ; it != newKP.end(); ++it) {
+    std::vector< float > newPoint = *it;
+    newPoint[1] += height;
+    newKPS.push_back(newPoint);
+  }
+  return newKPS;
+}
+
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
     std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
     double fgExecTime = (double)cv::getTickCount();
 
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
+
     // Manual Keypoints
-    std::vector< std::vector< float > > refNewKPs = {{3, 209}, {6, 235}, {16, 279}, {35, 311}, {84, 335}, {51, 280}, {50, 245}, {68, 223}, {88, 209}, {113, 197}, {140, 206}, {160, 230}, {157, 259}, {140, 286}, {49, 206}, {71, 189}, {95, 183}, {119, 191}, {13, 179}, {18, 196}, {23, 259}, {164, 217}, {143, 201}};
-    std::vector< std::vector< float > > tarNewKPs = {{6, 209}, {10, 234}, {19, 278}, {38, 309}, {83, 333}, {50, 275}, {42, 217}, {69, 213}, {89, 210}, {115, 206}, {137, 210}, {155, 232}, {156, 259}, {139, 286}, {48, 205}, {71, 186}, {96, 183}, {123, 188}, {13, 179}, {18, 194}, {26, 258}, {167, 217}, {147, 195}};
+    // std::vector< std::vector< float > > refNewKPs = {{3, 209}, {6, 235}, {16, 279}, {35, 311}, {84, 335}, {51, 280}, {50, 245}, {68, 223}, {88, 209}, {113, 197}, {140, 206}, {160, 230}, {157, 259}, {140, 286}, {49, 206}, {71, 189}, {95, 183}, {119, 191}, {13, 179}, {18, 196}, {23, 259}, {164, 217}, {143, 201}};
+    // std::vector< std::vector< float > > tarNewKPs = {{6, 209}, {10, 234}, {19, 278}, {38, 309}, {83, 333}, {50, 275}, {42, 217}, {69, 213}, {89, 210}, {115, 206}, {137, 210}, {155, 232}, {156, 259}, {139, 286}, {48, 205}, {71, 186}, {96, 183}, {123, 188}, {13, 179}, {18, 194}, {26, 258}, {167, 217}, {147, 195}};
+
+    fg.run();
+
+    cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
+
+    tps::Surf fsurf = tps::Surf(cvRefImg(rect), cvTarImg(rect), 400);
+    fsurf.run();
+    // Manual Keypoints
+    std::vector< std::vector< float >> refNewKPs = addHeight(fsurf.getReferenceKeypoints(), referenceImage.getHeight()/2);
+    std::vector< std::vector< float >> tarNewKPs = addHeight(fsurf.getTargetKeypoints(), referenceImage.getHeight()/2);
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
-
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"Manualkeypoints-Tar"+extension);
       fg.drawFeatureImageWithoutMask(cvRefImg, cvTarImg, outputName+"Manualmatches-Tar"+extension);
