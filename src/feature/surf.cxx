@@ -26,7 +26,7 @@ void tps::Surf::matchDescriptors() {
   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 
   for (int i = 0; i < descriptors_ref.rows; i++)
-    if (matches[i].distance < 4*min_dist)
+    if (matches[i].distance < 5*min_dist)
       good_matches.push_back( matches[i]);
 
   for (uint i = 0; i < good_matches.size(); i++) {
@@ -67,10 +67,18 @@ void tps::Surf::drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string fil
 
 void tps::Surf::addRefKeypoints(std::vector< std::vector< float > > newKPs) {
   addKeypoints(keypoints_ref, newKPs);
+  for (std::vector<std::vector< float >>::iterator it = newKPs.begin() ; it != newKPs.end(); ++it) {
+    std::vector< float > newPoint = *it;
+    referenceKeypoints.push_back(newPoint);
+  }
 }
 
 void tps::Surf::addTarKeypoints(std::vector< std::vector< float > > newKPs) {
-  addKeypoints(keypoints_tar, newKPs); 
+  addKeypoints(keypoints_tar, newKPs);
+  for (std::vector<std::vector< float >>::iterator it = newKPs.begin() ; it != newKPs.end(); ++it) {
+    std::vector< float > newPoint = *it;
+    targetKeypoints.push_back(newPoint);
+  }
 }
 
 void tps::Surf::addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< std::vector< float > > newKPs) {
