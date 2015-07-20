@@ -65,6 +65,29 @@ void tps::Surf::drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string fil
   cv::imwrite(filename.c_str(), img_matches, compression_params);
 }
 
+void tps::Surf::addRefKeypoints(std::vector< std::vector< float > > newKPs) {
+  addKeypoints(keypoints_ref, newKPs);
+}
+
+void tps::Surf::addTarKeypoints(std::vector< std::vector< float > > newKPs) {
+  addKeypoints(keypoints_tar, newKPs); 
+}
+
+void tps::Surf::addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< std::vector< float > > newKPs) {
+  for (std::vector<std::vector< float >>::iterator it = newKPs.begin() ; it != newKPs.end(); ++it) {
+    std::vector< float > newPoint = *it;
+    cv::KeyPoint newKP(newPoint[0], newPoint[1], 0.1);
+    keypoints.push_back(newKP);
+  }
+}
+
+void tps::Surf::addNewMatches() {
+  for (int i = 1; i < 10; i++) {
+    cv::DMatch match(keypoints_ref.size()-i, keypoints_tar.size()-i, -1);
+    good_matches.push_back(match);
+  }
+}
+
 void tps::Surf::run() {
 	detectFeatures();
 	extractDescriptors();

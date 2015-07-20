@@ -25,6 +25,9 @@ public:
   void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
   std::vector< std::vector<float> > getReferenceKeypoints() {return referenceKeypoints;};
   std::vector< std::vector<float> > getTargetKeypoints() {return targetKeypoints;};
+  void addRefKeypoints(std::vector< std::vector< float > > newKPs);
+  void addTarKeypoints(std::vector< std::vector< float > > newKPs);
+  void addNewMatches();
 private:
 	cv::Mat referenceImage_;
 	cv::Mat targetImage_;
@@ -42,6 +45,7 @@ private:
 	void detectFeatures();
 	void extractDescriptors();
 	void matchDescriptors();
+	void addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< std::vector< float > > newKPs);
 };
 
 } // namespace
