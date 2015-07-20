@@ -100,17 +100,13 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 int getBlockSize() {
   int maxOccupancyBlockSize = 0;
   float maxOccupancy = 0.0;
+  int device;
+  cudaDeviceProp prop;
+  cudaGetDevice(&device);
+  cudaGetDeviceProperties(&prop, device);
+
   for (int blockSize = 1; blockSize <= 512; blockSize++) {
     int numBlocks;        // Occupancy in terms of active blocks
-
-    // These variables are used to convert occupancy to warps
-    int device;
-    cudaDeviceProp prop;
-    int activeWarps;
-    int maxWarps;
-
-    cudaGetDevice(&device);
-    cudaGetDeviceProperties(&prop, device);
     
     cudaOccupancyMaxActiveBlocksPerMultiprocessor(
         &numBlocks,
@@ -118,32 +114,27 @@ int getBlockSize() {
         blockSize,
         0);
 
-    activeWarps = numBlocks * blockSize / prop.warpSize;
-    maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
-    std::cout << "blockSize: " << blockSize << std::endl;
-    std::cout << "activeWarps: " << activeWarps << std::endl;
-    std::cout << "maxWarps: " << maxWarps << std::endl;
+    int activeWarps = numBlocks * blockSize / prop.warpSize;
+    int maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
-    std::cout << "currentOccupancy: " << currentOccupancy << std::endl;
-    if (maxOccupancy < currentOccupancy) {
+    if (maxOccupancy <= currentOccupancy) {
       maxOccupancy = currentOccupancy;
       maxOccupancyBlockSize = blockSize;
     }
   }
-  std::cout << "Max occupancy at: " << maxOccupancy / 100 << std::endl;
-  std::cout << "Max maxOccupancyBlockSize at: " << maxOccupancyBlockSize / 100 << std::endl;
   return maxOccupancyBlockSize;
 }
 
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
+  int maxBlockSize = getBlockSize();
+  
+  short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
+
+  
   dim3 threadsPerBlock(8, 8, 8);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
-
-  short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
-
-  getBlockSize();
 
   for (int z = 0; z < dimensions[2]; z++)
     for (int y = 0; y < dimensions[0]; y++)
