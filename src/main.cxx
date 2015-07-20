@@ -1,5 +1,6 @@
 #include "image/image.h"
 #include "feature/featuregenerator.h"
+#include "feature/surf.h"
 #include "tps/tps.h"
 #include "tps/cudatps.h"
 #include "tps/basictps.h"
@@ -58,7 +59,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
     double fgExecTime = (double)cv::getTickCount();
 
-    tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
+    tps::Surf fg = tps::Surf(cvRefImg, cvTarImg, 400);
     fg.run();
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);
@@ -153,11 +154,11 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double ParallelTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      parallelTPS.run();
-      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      // double ParallelTpsExecTime = (double)cv::getTickCount();
+      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      // parallelTPS.run();
+      // ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 

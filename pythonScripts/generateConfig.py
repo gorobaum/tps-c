@@ -8,14 +8,14 @@ for i in range(2, n, 2):
   fileName = 'tps.config'+str(numFiles)
   filepath = '../configurations/tps.config'+str(numFiles)
   f = open(filepath,'w')
-  f.write('images/grid-Tar.png\n')
+  f.write('images/vocal/test/IM_0415.png.png\n')
   porcentage = i*0.01
   name = 'result-'+str(porcentage)+'\n'
   f.write(name)
   f.write(str(porcentage)+'\n')
 
 f = open('../tps.configs', 'w')
-f.write('images/grid-Ref.png\n')
+f.write('images/IM_0414.png.png\n')
 for x in range(1, numFiles+1, 1):
   filename = 'configurations/tps.config'+str(x)+'\n'
   f.write(filename)

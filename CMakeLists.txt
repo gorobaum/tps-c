@@ -23,6 +23,7 @@ cuda_add_executable(tps
   src/utils/cudamemory.cxx
 
   src/feature/featuregenerator.cxx
+  src/feature/surf.cxx
 
   src/linearsystem/OPCVlinearsystems.cxx
   src/linearsystem/cudalinearsystems.cxx
