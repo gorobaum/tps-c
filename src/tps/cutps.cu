@@ -101,7 +101,7 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
 int getBlockSize() {
   int maxOccupancyBlockSize = 0;
   float maxOccupancy = 0.0;
-<<<<<<< 5d822668324543dfe387415d6e8ce2f86f33a8bc
+
   int device;
   cudaDeviceProp prop;
   cudaGetDevice(&device);
