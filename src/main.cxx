@@ -67,7 +67,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     std::vector< std::vector< float > > tarNewKPs = {{5, 207}, {11, 235}, {22, 298}, {83, 332}, {45, 221}, {143, 212}, {139, 289}, {93, 207}, {158, 246}};
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
-    fg.addNewMatches();
+    fg.addNewMatches(refNewKPs.size());
 
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);

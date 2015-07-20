@@ -27,7 +27,7 @@ public:
   std::vector< std::vector<float> > getTargetKeypoints() {return targetKeypoints;};
   void addRefKeypoints(std::vector< std::vector< float > > newKPs);
   void addTarKeypoints(std::vector< std::vector< float > > newKPs);
-  void addNewMatches();
+  void addNewMatches(int numbersOfNewKPs);
 private:
 	cv::Mat referenceImage_;
 	cv::Mat targetImage_;

@@ -26,7 +26,7 @@ void tps::Surf::matchDescriptors() {
   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 
   for (int i = 0; i < descriptors_ref.rows; i++)
-    if (matches[i].distance < 3*min_dist)
+    if (matches[i].distance < 4*min_dist)
       good_matches.push_back( matches[i]);
 
   for (uint i = 0; i < good_matches.size(); i++) {
@@ -81,8 +81,8 @@ void tps::Surf::addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< 
   }
 }
 
-void tps::Surf::addNewMatches() {
-  for (int i = 1; i < 10; i++) {
+void tps::Surf::addNewMatches(int numbersOfNewKPs) {
+  for (int i = 1; i < numbersOfNewKPs+1; i++) {
     cv::DMatch match(keypoints_ref.size()-i, keypoints_tar.size()-i, -1);
     good_matches.push_back(match);
   }
