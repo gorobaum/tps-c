@@ -5,10 +5,10 @@
 #include <cmath>
 
 void tps::FeatureGenerator::run() {
-  gridSizeCol = referenceImage_.getWidth()*percentage_;
-  gridSizeRow = referenceImage_.getHeight()*percentage_;
-  colStep = referenceImage_.getWidth()*1.0/(gridSizeCol-1);
-  rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow-1);
+  gridSizeCol = referenceImage_.getWidth()*percentage_ + 1;
+  gridSizeRow = referenceImage_.getHeight()*percentage_ + 1;
+  colStep = referenceImage_.getWidth()*1.0/(gridSizeCol);
+  rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow);
   std::cout << "gridSizeCol = " << gridSizeCol << std::endl;
   std::cout << "gridSizeRow = " << gridSizeRow << std::endl;
   std::cout << "colStep = " << colStep << std::endl;

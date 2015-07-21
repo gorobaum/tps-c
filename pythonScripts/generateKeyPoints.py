@@ -325,7 +325,7 @@ def drawRedCrosshair(surface, mousePos):
 def printVectorForC(vec):
   out = " = {"
   for i in vec:
-    out += "{%s, %s}, " % (i)
+    out += "{%s, %s}, " %tuple(i)
   out = out[:-2]
   out += "}"
   print out
@@ -358,12 +358,16 @@ def main():
     # draw_all(track_surface, data, clusters, points, right_points, left_points, \
     #         show_clusters, show_grid, show_edges, show_labels)
 
-    referencePoints = []
-    targetPoints = []
+    referencePoints = [[3, 209], [6, 235], [16, 279], [35, 311], [84, 335], [51, 280], [50, 245], [68, 223], [88, 209], [113, 197], [140, 206], [160, 230], [157, 259], [140, 286], [49, 206], [71, 189], [95, 183], [119, 191]]
+    targetPoints =    [[6, 209], [10, 234], [19, 278], [38, 309], [83, 333], [50, 275], [42, 217], [69, 213], [89, 210], [115, 206], [137, 210], [155, 232], [156, 259], [139, 286], [48, 205], [71, 186], [96, 183], [123, 188]]
     currentPoints = referencePoints
 
+    for point in referencePoints:
+      drawRedCrosshair(drawSurface, point)
+
+
     second_phase = False
-    currentKP = 0
+    currentKP = len(referencePoints)
 
 
     scale = 1.0
@@ -388,8 +392,8 @@ def main():
             running = False
 
         if mousePos[0] != -1:
-            currentMousePos = (mousePos[0] - int(offset[0]), mousePos[1] - int(offset[1]))
-            currentMousePos = (int(currentMousePos[0]/scale), int(currentMousePos[1]/scale))
+            currentMousePos = [mousePos[0] - int(offset[0]), mousePos[1] - int(offset[1])]
+            currentMousePos = [int(currentMousePos[0]/scale), int(currentMousePos[1]/scale)]
             if currentMousePos[0] >= 0 and currentMousePos[1] >= 0 :
               currentPoints.append(currentMousePos)
               drawRedCrosshair(drawSurface, currentMousePos)
@@ -405,6 +409,8 @@ def main():
           currentPoints = targetPoints
           filename = getTargetFileName()
           second_phase = True
+          for point in targetPoints:
+            drawRedCrosshair(drawSurface, point)
 
         window.blit(windowSurface, offset)
 
@@ -412,7 +418,7 @@ def main():
             export_screenshot(drawSurface, filename)
 
         pygame.display.update()
-
+    print referencePoints
     export_screenshot(targetKPSurface, getTargetFileName())
     printVectorForC(referencePoints)
     printVectorForC(targetPoints)
