@@ -365,6 +365,7 @@ def main():
     second_phase = False
     currentKP = 0
 
+
     scale = 1.0
     window.blit(windowSurface, (0,0))
     offset = [0, 0]
@@ -398,7 +399,7 @@ def main():
 
 
         if end_ref_phase:
-          export_screenshot(window, getReferenceFileName())
+          export_screenshot(drawSurface, getReferenceFileName())
           drawSurface.blit(targetSurface, (0,0))
           windowSurface.blit(targetSurface, (0,0))
           currentPoints = targetPoints
@@ -412,6 +413,7 @@ def main():
 
         pygame.display.update()
 
+    export_screenshot(targetKPSurface, getTargetFileName())
     printVectorForC(referencePoints)
     printVectorForC(targetPoints)
     pygame.quit()

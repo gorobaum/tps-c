@@ -19,7 +19,7 @@ void tps::FeatureGenerator::run() {
 
 bool tps::FeatureGenerator::checkSector(float col, float row) {
   if (col < (referenceImage_.getWidth()/2))
-    if (row > (referenceImage_.getHeight()/2))
+    if (row > (referenceImage_.getHeight()/2)-10)
       return false;
   return true;
 }
