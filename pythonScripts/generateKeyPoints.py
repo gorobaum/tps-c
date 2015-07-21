@@ -360,7 +360,7 @@ def main():
         window.fill(BLACK)
         redraw = False
         if scale != 1:
-            windowSurface = scale_surface(windowSurface, scale)
+            windowSurface = scale_surface(referenceSurface, scale)
             redraw = True
 
         # if mousePos[0] == -1:
