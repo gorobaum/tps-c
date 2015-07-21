@@ -60,13 +60,19 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     double fgExecTime = (double)cv::getTickCount();
 
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
-    fg.run();
-
     // Manual Keypoints
     std::vector< std::vector< float > > refNewKPs = {{3, 209}, {6, 235}, {16, 279}, {35, 311}, {84, 335}, {51, 280}, {50, 245}, {68, 223}, {88, 209}, {113, 197}, {140, 206}, {160, 230}, {157, 259}, {140, 286}, {49, 206}, {71, 189}, {95, 183}, {119, 191}};
     std::vector< std::vector< float > > tarNewKPs = {{6, 209}, {10, 234}, {19, 278}, {38, 309}, {83, 333}, {50, 275}, {42, 217}, {69, 213}, {89, 210}, {115, 206}, {137, 210}, {155, 232}, {156, 259}, {139, 286}, {48, 205}, {71, 186}, {96, 183}, {123, 188}};
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
+
+    if (createKeypointImages) {
+      fg.drawKeypointsImage(cvTarImg, outputName+"Manualkeypoints-Tar"+extension);
+      fg.drawFeatureImage(cvRefImg, cvTarImg, outputName+"Manualmatches-Tar"+extension);
+    }
+
+    fg.run();
+
 
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);

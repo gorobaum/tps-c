@@ -25,22 +25,22 @@ bool tps::FeatureGenerator::checkSector(float col, float row) {
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {
-  for (int col = 0; col < gridSizeCol; col++)
-    for (int row = 0; row < gridSizeRow; row++) {
+  for (int col = 0; col <= gridSizeCol; col++)
+    for (int row = 0; row <= gridSizeRow; row++) {
       if (checkSector(col*colStep, row*rowStep)) {
         std::vector<float> newCP;
         newCP.push_back(col*colStep);
         newCP.push_back(row*rowStep);
         referenceKeypoints.push_back(newCP);
+        targetKeypoints.push_back(newCP);
         cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
         keypoints_ref.push_back(newKP);
+        keypoints_tar.push_back(newKP);
       }
     }
 }
 
 void tps::FeatureGenerator::createTargetImageFeatures() {
-  targetKeypoints = referenceKeypoints;
-  keypoints_tar = keypoints_ref;
 }
 
 std::vector<float> tps::FeatureGenerator::applySenoidalDeformationTo(float x, float y) {
