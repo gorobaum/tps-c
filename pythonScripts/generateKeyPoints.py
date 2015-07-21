@@ -66,10 +66,6 @@ INTERACTION:
        Arrow keys: move image;
          + - keys: to scale image;
             v key: to create a screenshot .png file;
-            g key: to toggle on/off track grid;
-            c key: to toggle on/off clusters color;
-            e key: to toggle on/off clusters edges;
-            l key: to toggle on/off distance labels;
     ESC BACKSPACE: quit.
 """
 
@@ -246,10 +242,10 @@ def clear(surface):
     if clear:
         surface.fill((255, 255, 255))
 
-def handle_events(offset):
+def handle_events(offset, scale, second_phase):
     running = True
     mousePos = (-1,-1)
-    scale = 1
+    end_ref_phase = False
     step = 1    # The amount of pixels offset will move.
     factor = 0.1 # Proportion by which scale will increase/decrease.
     segmentation_changed = False
@@ -263,8 +259,7 @@ def handle_events(offset):
                event.key == K_q:
 
                 running = False
-
-        if pygame.mouse.get_pressed()[0]:
+        if event.type == MOUSEBUTTONUP:
           mousePos = pygame.mouse.get_pos()
 
         if event.type == KEYDOWN:
@@ -278,29 +273,31 @@ def handle_events(offset):
                 offset[1] -= step
             if event.key == K_v:
                 should_export_screenshot = True
-            if event.key == K_c:
-                toggle_clusters = True
+            if event.key == K_e:
+                end_ref_phase = True
+                if second_phase:
+                  running = False
             if event.unicode == "+":
                 scale += factor
                 offset[0] -= (SCREEN_SIZE[0] / 2 - offset[0]) * factor
                 offset[1] -= (SCREEN_SIZE[1] / 2 - offset[1]) * factor
             elif event.key == K_MINUS or event.key == K_KP_MINUS:
                 scale -= factor
+                if scale <= 0.0:
+                    scale = 0.1
                 offset[0] += (SCREEN_SIZE[0] / 2 - offset[0]) * factor
                 offset[1] += (SCREEN_SIZE[1] / 2 - offset[1]) * factor
 
-    return running, scale, offset, mousePos, segmentation_changed, \
+    return running, scale, offset, mousePos, end_ref_phase, segmentation_changed, \
            should_export_screenshot
-
 
 def scale_surface(surface, scale):
     new_size = [int(x * scale) for x in surface.get_size()]
-    surface = pygame.transform.rotozoom(surface, 0.0, scale)
+    surface = pygame.transform.scale(surface, new_size)
     TRACK_SURFACE_SIZE[0] = new_size[0]
     TRACK_SURFACE_SIZE[1] = new_size[1]
 
     return surface
-
 
 def scale_points(points, scale):
     scaled_points = [[(val * scale) for val in tuple] for tuple in points]
@@ -308,15 +305,15 @@ def scale_points(points, scale):
     return scaled_points
 
 # PNG CARA
-def export_screenshot(surface):
-    file_name = getTargetFileName()
-    file_name = os.path.splitext(file_name)[0] + ".png"
+def export_screenshot(surface, filename):
+    filename = os.path.splitext(filename)[0] + ".png"
+    filename = filename + "-result"
 
-    print("Exporting screenshot to file: " + file_name)
-    pygame.image.save(surface, file_name)
+    print("Exporting screenshot to file: " + filename)
+    pygame.image.save(surface, filename)
     print("Exportation finished.\n")
 
-def drawRedCrossHair(surface, mousePos):
+def drawRedCrosshair(surface, mousePos):
   x = mousePos[0]
   y = mousePos[1]
   surface.set_at((x,y), RED)
@@ -324,6 +321,14 @@ def drawRedCrossHair(surface, mousePos):
   surface.set_at((x-1,y), RED)
   surface.set_at((x,y+1), RED)
   surface.set_at((x,y-1), RED)
+
+def printVectorForC(vec):
+  out = " = {"
+  for i in vec:
+    out += "{%s, %s}, " % (i)
+  out = out[:-2]
+  out += "}"
+  print out
 
 def main():
     global SCREEN_SIZE
@@ -343,40 +348,72 @@ def main():
     pygame.key.set_repeat(100, 10)
 
     window = pygame.display.set_mode(SCREEN_SIZE)
+    drawSurface = pygame.Surface(referenceSurface.get_size(), pygame.SRCALPHA, 32)
+    drawSurface.blit(referenceSurface, (0,0))
     windowSurface = pygame.Surface(referenceSurface.get_size(), pygame.SRCALPHA, 32)
     windowSurface.blit(referenceSurface, (0,0))
+    targetKPSurface = pygame.Surface(referenceSurface.get_size(), pygame.SRCALPHA, 32)
+    targetKPSurface.blit(targetSurface, (0,0))
 
     # draw_all(track_surface, data, clusters, points, right_points, left_points, \
     #         show_clusters, show_grid, show_edges, show_labels)
 
+    referencePoints = []
+    targetPoints = []
+    currentPoints = referencePoints
+
+    second_phase = False
+    currentKP = 0
+
+    scale = 1.0
     window.blit(windowSurface, (0,0))
     offset = [0, 0]
     running = True
+    filename = getReferenceFileName()
     while running:
 
-        running, scale, offset, mousePos, segmentation_changed, should_export_screenshot,\
-         = handle_events(offset)
+        running, scale, offset, mousePos, end_ref_phase, segmentation_changed, should_export_screenshot,\
+         = handle_events(offset, scale, second_phase)
 
-        window.fill(BLACK)
-        redraw = False
-        if scale != 1:
-            windowSurface = scale_surface(referenceSurface, scale)
-            redraw = True
+        window.fill(GREEN)
+        windowSurface = scale_surface(drawSurface, scale)
 
         # if mousePos[0] == -1:
         # print mousePos
-        currentMousePos = (mousePos[0] - offset[0], mousePos[1] - offset[1])
-        drawRedCrossHair(windowSurface, currentMousePos)
+        if second_phase:
+          if currentKP != len(referencePoints):
+            drawRedCrosshair(drawSurface, referencePoints[currentKP])
+          else:
+            running = False
 
-        # if redraw:
-        # print offset
+        if mousePos[0] != -1:
+            currentMousePos = (mousePos[0] - int(offset[0]), mousePos[1] - int(offset[1]))
+            currentMousePos = (int(currentMousePos[0]/scale), int(currentMousePos[1]/scale))
+            if currentMousePos[0] >= 0 and currentMousePos[1] >= 0 :
+              currentPoints.append(currentMousePos)
+              drawRedCrosshair(drawSurface, currentMousePos)
+              if second_phase:
+                drawRedCrosshair(targetKPSurface, currentMousePos)
+                currentKP = currentKP + 1
+
+
+        if end_ref_phase:
+          export_screenshot(window, getReferenceFileName())
+          drawSurface.blit(targetSurface, (0,0))
+          windowSurface.blit(targetSurface, (0,0))
+          currentPoints = targetPoints
+          filename = getTargetFileName()
+          second_phase = True
+
         window.blit(windowSurface, offset)
 
         if should_export_screenshot:
-            export_screenshot(window)
+            export_screenshot(drawSurface, filename)
 
         pygame.display.update()
 
+    printVectorForC(referencePoints)
+    printVectorForC(targetPoints)
     pygame.quit()
 
 
