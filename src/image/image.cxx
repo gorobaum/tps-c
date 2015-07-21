@@ -4,6 +4,38 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+void tps::Image::createGridImage(int width, int height, int gridGranuarity) {
+  image = std::vector<std::vector<int> >(width_, std::vector<int>(height_, 255));
+  for (int col = width/2; col < width; col++) {
+    if ((col-(width/2))%20 == 0) {
+      for (int i = 0; i < height; i++) {
+        changePixelAt(col, i, 0);
+      }
+    }
+  }
+  for (int col = width/2; col > 0; col--) {
+    if (((width/2)-col)%20 == 0) {
+      for (int i = 0; i < height; i++) {
+        changePixelAt(col, i, 0);
+      }
+    }
+  }
+  for (int row = height/2; row < width; row++) {
+    if ((row-(height/2))%20 == 0) {
+      for (int i = 0; i < width; i++) {
+        changePixelAt(i, row, 0);
+      }
+    }
+  }
+  for (int row = height/2; row > 0; row--) {
+    if (((height/2)-row)%20 == 0) {
+      for (int i = 0; i < width; i++) {
+        changePixelAt(i, row, 0);
+      }
+    }
+  }
+}
+
 void tps::Image::changePixelAt(int col, int row, int value) {
   if (col >= 0 && col < width_-1 && row >= 0 && row < height_-1)
     image[col][row] = value;

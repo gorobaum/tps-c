@@ -112,6 +112,8 @@ int main(int argc, char** argv) {
       for (int row = 0; row < cvRefImg.size().height; row++)
         vecImage[col][row] = cvRefImg.at<uchar>(row, col);
   tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height);
+  tps::Image gridImage = tps::Image(referenceImage.getWidth(), referenceImage.getHeight(), 20);
+  gridImage.save("grid.png");
   std::vector< cv::Mat > cvTarImgs;
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;

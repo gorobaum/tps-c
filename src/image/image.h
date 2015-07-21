@@ -19,6 +19,11 @@ public:
 		height_ = height;
 		image = std::vector<std::vector<int> >(width_, std::vector<int>(height_, 0));
 	}
+		Image(int width, int height, int gridGranuarity) {
+		width_ = width;
+		height_ = height;
+		createGridImage(width, height, gridGranuarity);
+	}
 	std::vector<std::vector<int> > getImage() {return image;}
 	void save(std::string filename);
 	int getWidth() { return width_; }
@@ -33,6 +38,7 @@ private:
 	std::vector<std::vector<int> > image;
 	int width_;
 	int height_;
+	void createGridImage(int width, int height, int gridGranuarity);
 	int getNearestInteger(float number) {
 		if ((number - std::floor(number)) <= 0.5) return std::floor(number);
 		return std::floor(number) + 1.0;
