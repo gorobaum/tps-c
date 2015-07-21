@@ -111,9 +111,11 @@ int main(int argc, char** argv) {
     for (int col = 0; col < cvRefImg.size().width; col++)
       for (int row = 0; row < cvRefImg.size().height; row++)
         vecImage[col][row] = cvRefImg.at<uchar>(row, col);
+
   tps::Image referenceImage = tps::Image(vecImage, cvRefImg.size().width, cvRefImg.size().height);
   tps::Image gridImage = tps::Image(referenceImage.getWidth(), referenceImage.getHeight(), 20);
   gridImage.save("grid.png");
+
   std::vector< cv::Mat > cvTarImgs;
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;
@@ -144,6 +146,10 @@ int main(int argc, char** argv) {
 
   // Allocating the maximun possible of free memory in the GPU
   std::vector< tps::CudaMemory > cudaMemories;
+
+  tps::CudaMemory cmg = tps::CudaMemory(targetImages[0].getWidth(), targetImages[0].getHeight(), referencesKPs[0]);
+  cmg.allocCudaMemory(gridImage);
+
   std::cout << "============================================" << std::endl;
   for (int i = 0; i < nFiles; i++) {
     int lastI = i;
@@ -169,11 +175,19 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      // double ParallelTpsExecTime = (double)cv::getTickCount();
-      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      // parallelTPS.run();
-      // ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-      // std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      double ParallelTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      parallelTPS.run();
+      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+
+      double ParallelGridTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPSGrid = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], gridImage, outputNames[j]+"ParallelGrid"+extension);
+      parallelTPSGrid.run();
+      ParallelGridTpsExecTime = ((double)cv::getTickCount() - ParallelGridTpsExecTime)/cv::getTickFrequency();
+      std::cout << "ParallelGrid TPS execution time: " << ParallelGridTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
@@ -183,8 +197,18 @@ int main(int argc, char** argv) {
       CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
       std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
       cudaMemories[j].freeMemory();
+
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+
+      double GridcTpsExecTime = (double)cv::getTickCount();
+      tps::CudaTPS CUDAtpsGrid = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"CudaGrid"+extension, cmg);
+      CUDAtpsGrid.run();
+      GridcTpsExecTime = ((double)cv::getTickCount() - GridcTpsExecTime)/cv::getTickFrequency();
+      std::cout << "CudaGrid TPS execution time: " << GridcTpsExecTime << std::endl;
+      
       std::cout << "============================================" << std::endl;
     }
+    cmg.freeMemory();
   }
   return 0;
 }
