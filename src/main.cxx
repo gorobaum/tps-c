@@ -68,7 +68,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
 
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"Manualkeypoints-Tar"+extension);
-      fg.drawFeatureImage(cvRefImg, cvTarImg, outputName+"Manualmatches-Tar"+extension);
+      fg.drawFeatureImageWithoutMask(cvRefImg, cvTarImg, outputName+"Manualmatches-Tar"+extension);
     }
 
     fg.run();
@@ -76,7 +76,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
 
     if (createKeypointImages) {
       fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);
-      fg.drawFeatureImage(cvRefImg, cvTarImg, outputName+"matches-Tar"+extension);
+      fg.drawFeatureImageWithMask(cvRefImg, cvTarImg, outputName+"matches-Tar"+extension, refNewKPs.size());
     }
 
     fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();

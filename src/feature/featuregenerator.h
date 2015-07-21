@@ -19,9 +19,10 @@ public:
     percentage_(percentage) {};
   void run();
   void drawKeypointsImage(cv::Mat tarImg, std::string filename);
-  void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename);
   void addRefKeypoints(std::vector< std::vector< float > > newKPs);
   void addTarKeypoints(std::vector< std::vector< float > > newKPs);
+  void drawFeatureImageWithoutMask(cv::Mat refImg, cv::Mat tarImg, std::string filename);
+  void drawFeatureImageWithMask(cv::Mat refImg, cv::Mat tarImg, std::string filename, int number);
 private:
   float percentage_;
   int gridSizeCol, gridSizeRow;
@@ -30,6 +31,8 @@ private:
   void createReferenceImageFeatures();
   void createTargetImageFeatures();
   bool checkSector(float x, float y);
+  void drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename, std::vector<char> mask);
+  std::vector<std::vector<char>> createMasks(int number);
   void addKeypoints(std::vector<cv::KeyPoint> &keypoints, std::vector< std::vector< float > > newKPs);
   std::vector<cv::KeyPoint> keypoints_ref, keypoints_tar;
 };

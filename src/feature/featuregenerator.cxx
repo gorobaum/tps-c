@@ -4,6 +4,9 @@
 #include <vector>
 #include <cmath>
 
+#define RIGIDMASK 1
+#define NONRIGIDMASK 0
+
 void tps::FeatureGenerator::run() {
   gridSizeCol = referenceImage_.getWidth()*percentage_ + 1;
   gridSizeRow = referenceImage_.getHeight()*percentage_ + 1;
@@ -86,7 +89,42 @@ void tps::FeatureGenerator::addKeypoints(std::vector<cv::KeyPoint> &keypoints, s
   }
 }
 
-void tps::FeatureGenerator::drawFeatureImage(cv::Mat refImg, cv::Mat tarImg, std::string filename) {
+std::vector<std::vector<char>> tps::FeatureGenerator::createMasks(int number) {
+  int size = referenceKeypoints.size();
+  std::vector<std::vector<char>> masks = std::vector<std::vector<char>>( 2, std::vector<char>(size, 0));
+  for (int i = 0; i < size; i++) {
+    if (i > number) masks[0][i] = 1;
+    if (i < number) masks[1][i] = 1;
+  }
+  return masks;
+}
+
+void tps::FeatureGenerator::drawFeatureImageWithMask(cv::Mat refImg, cv::Mat tarImg, std::string filename, int number) {
+  std::vector<std::vector<char>> masks = createMasks(number);
+
+  std::vector<int> compression_params;
+  compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+  compression_params.push_back(95);
+
+  std::vector<cv::DMatch> matches;
+  for (int i = 0; i < targetKeypoints.size(); i++) {
+    cv::DMatch match(i, i, -1);
+    matches.push_back(match);
+  }
+
+  cv::Mat img_matches;
+  drawMatches(refImg, keypoints_ref, tarImg, keypoints_tar,
+              matches, img_matches, cv::Scalar(255,0,0), cv::Scalar::all(-1),
+              masks[NONRIGIDMASK], cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+  drawMatches(refImg, keypoints_ref, tarImg, keypoints_tar,
+              matches, img_matches, cv::Scalar(0,0,255), cv::Scalar(0,0,255),
+              masks[RIGIDMASK], cv::DrawMatchesFlags::DRAW_OVER_OUTIMG | cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+  cv::imwrite(filename.c_str(), img_matches, compression_params);
+}
+
+void tps::FeatureGenerator::drawFeatureImageWithoutMask(cv::Mat refImg, cv::Mat tarImg, std::string filename) {
   std::vector<int> compression_params;
   compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
   compression_params.push_back(95);
