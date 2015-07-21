@@ -16,6 +16,7 @@ for i in range(2, n, 2):
 
 f = open('../tps.configs', 'w')
 f.write('images/IM_0414.png.png\n')
+f.write('20\n')
 for x in range(1, numFiles+1, 1):
   filename = 'configurations/tps.config'+str(x)+'\n'
   f.write(filename)
