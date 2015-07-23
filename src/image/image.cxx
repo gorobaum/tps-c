@@ -6,34 +6,15 @@
 
 void tps::Image::createGridImage(int width, int height, int gridGranuarity) {
   image = std::vector<std::vector<int> >(width_, std::vector<int>(height_, 255));
-  for (int col = width/2; col < width; col++) {
-    if ((col-(width/2))%20 == 0) {
-      for (int i = 0; i < height; i++) {
-        changePixelAt(col, i, 0);
-      }
-    }
-  }
-  for (int col = width/2; col > 0; col--) {
-    if (((width/2)-col)%20 == 0) {
-      for (int i = 0; i < height; i++) {
-        changePixelAt(col, i, 0);
-      }
-    }
-  }
-  for (int row = height/2; row < width; row++) {
-    if ((row-(height/2))%20 == 0) {
-      for (int i = 0; i < width; i++) {
-        changePixelAt(i, row, 0);
-      }
-    }
-  }
-  for (int row = height/2; row > 0; row--) {
-    if (((height/2)-row)%20 == 0) {
-      for (int i = 0; i < width; i++) {
-        changePixelAt(i, row, 0);
-      }
-    }
-  }
+  float colStep = getWidth()*1.0/(gridGranuarity-1);
+  float rowStep = getHeight()*1.0/(gridGranuarity-1);
+  for (int col = 0; col <= gridGranuarity; col++)
+    for (int i = 0; i < width; i++)
+        changePixelAt(getNearestInteger(col*colStep), i, 0);
+
+  for (int row = 0; row <= gridGranuarity; row++)
+      for (int i = 0; i < width; i++)
+        changePixelAt(i, getNearestInteger(row*rowStep), 0);
 }
 
 void tps::Image::changePixelAt(int col, int row, int value) {
