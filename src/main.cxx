@@ -30,7 +30,8 @@ bool createKeypointImages = true;
 
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
                     std::vector< cv::Mat >& cvTarImgs, std::vector< std::string >& outputNames, 
-                    std::vector< float >& percentages) {
+                    std::vector< float >& percentages, std::vector< float >& distanceMetrics,
+                    std::vector< int >& vnOctaves, std::vector< int >& vnOctavesLayers) {
   std::ifstream infile;
   infile.open(filename.c_str());
   std::string line;
@@ -52,6 +53,18 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   std::getline(infile, line);
   float percentage = std::stof(line);
   percentages.push_back(percentage);
+
+  std::getline(infile, line);
+  float distanceMetric = std::stof(line);
+  distanceMetrics.push_back(distanceMetric);
+
+  std::getline(infile, line);
+  int nOctaves = std::stoi(line);
+  vnOctaves.push_back(nOctaves);
+
+  std::getline(infile, line);
+  int nOctavesLayers = std::stoi(line);
+  vnOctavesLayers.push_back(nOctavesLayers);
 }
 
 std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> newKP, int height) {
@@ -66,7 +79,8 @@ std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> 
 
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
     std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
-    std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension) {
+    std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension, float distanceMetric, 
+    int nOctaves, int nOctavesLayers) {
     double fgExecTime = (double)cv::getTickCount();
 
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
@@ -79,7 +93,7 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
 
     cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
 
-    tps::Surf fsurf = tps::Surf(cvRefImg(rect), cvTarImg(rect), 400);
+    tps::Surf fsurf = tps::Surf(cvRefImg(rect), cvTarImg(rect), 400, distanceMetric, nOctaves, nOctavesLayers);
     fsurf.run();
     // Manual Keypoints
     std::vector< std::vector< float >> refNewKPs = addHeight(fsurf.getReferenceKeypoints(), referenceImage.getHeight()/2);
@@ -143,11 +157,13 @@ int main(int argc, char** argv) {
   std::vector< tps::Image > targetImages;
   std::vector< std::string > outputNames;
   std::vector< float > percentages;
-
+  std::vector< float > distanceMetrics;
+  std::vector< int > vnOctaves;
+  std::vector< int > vnOctavesLayers;
   // Reading each iteration configuration file
   int nFiles = 0;
   for (line; std::getline(infile, line); infile.eof(), nFiles++) {
-    readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages);
+    readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages, distanceMetrics, vnOctaves, vnOctavesLayers);
   }
 
   std::vector< std::vector< std::vector<float> > > referencesKPs;
@@ -157,21 +173,19 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
   for (int i = 0; i < nFiles; i++) {
     std::cout << "Generating the CPs for entry number " << i << std::endl;
-    runFeatureGeneration(referenceImage, targetImages[i], percentages[i], outputNames[i], cvTarImgs[i], cvRefImg, referencesKPs, targetsKPs, extension);
+    runFeatureGeneration(referenceImage, targetImages[i], percentages[i], outputNames[i], cvTarImgs[i], cvRefImg, 
+                         referencesKPs, targetsKPs, extension, distanceMetrics[i], vnOctaves[i], vnOctavesLayers[i]);
   }
 
+  // Allocating the maximun possible of free memory in the GPU
+  std::vector< tps::CudaMemory > cudaMemories;
   // Verifying the total memory occupation inside the GPU
+
   size_t avail;
   size_t total;
   cudaMemGetInfo( &avail, &total );
   size_t used = (total - avail)/(1024*1024);
-  std::cout << "Device memory used: " << used/(1024*1024) << "MB" << std::endl;
-
-  // Allocating the maximun possible of free memory in the GPU
-  std::vector< tps::CudaMemory > cudaMemories;
-
-  tps::CudaMemory cmg = tps::CudaMemory(targetImages[0].getWidth(), targetImages[0].getHeight(), referencesKPs[0]);
-  cmg.allocCudaMemory(gridImage);
+  std::cout << "Device memory used: " << used << "MB" << std::endl;
 
   std::cout << "============================================" << std::endl;
   for (int i = 0; i < nFiles; i++) {
@@ -182,7 +196,7 @@ int main(int argc, char** argv) {
       if (used+cm.memoryEstimation() > 1800) break;
       cm.allocCudaMemory(targetImages[i]);
       cudaMemories.push_back(cm);
-      cudaMemGetInfo( &avail, &total );
+      cudaMemGetInfo(&avail, &total);
       used = (total - avail)/(1024*1024);
       std::cout << "Device used memory = " << used << "MB" << std::endl;
       i++;
@@ -198,19 +212,19 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double ParallelTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      parallelTPS.run();
-      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      // double ParallelTpsExecTime = (double)cv::getTickCount();
+      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      // parallelTPS.run();
+      // ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
-      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+      // std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      double ParallelGridTpsExecTime = (double)cv::getTickCount();
-      tps::ParallelTPS parallelTPSGrid = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], gridImage, outputNames[j]+"ParallelGrid"+extension);
-      parallelTPSGrid.run();
-      ParallelGridTpsExecTime = ((double)cv::getTickCount() - ParallelGridTpsExecTime)/cv::getTickFrequency();
-      std::cout << "ParallelGrid TPS execution time: " << ParallelGridTpsExecTime << std::endl;
+      // double ParallelGridTpsExecTime = (double)cv::getTickCount();
+      // tps::ParallelTPS parallelTPSGrid = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], gridImage, outputNames[j]+"ParallelGrid"+extension);
+      // parallelTPSGrid.run();
+      // ParallelGridTpsExecTime = ((double)cv::getTickCount() - ParallelGridTpsExecTime)/cv::getTickFrequency();
+      // std::cout << "ParallelGrid TPS execution time: " << ParallelGridTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
@@ -223,15 +237,17 @@ int main(int argc, char** argv) {
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
+      tps::CudaMemory cmg = tps::CudaMemory(targetImages[j].getWidth(), targetImages[j].getHeight(), referencesKPs[j]);
+      cmg.allocCudaMemory(gridImage);
       double GridcTpsExecTime = (double)cv::getTickCount();
       tps::CudaTPS CUDAtpsGrid = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"CudaGrid"+extension, cmg);
       CUDAtpsGrid.run();
       GridcTpsExecTime = ((double)cv::getTickCount() - GridcTpsExecTime)/cv::getTickFrequency();
       std::cout << "CudaGrid TPS execution time: " << GridcTpsExecTime << std::endl;
+      cmg.freeMemory();
       
       std::cout << "============================================" << std::endl;
     }
-    cmg.freeMemory();
   }
   return 0;
 }

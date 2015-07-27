@@ -3,10 +3,10 @@
 #include <cassert>
 
 inline
-cudaError_t checkCuda(cudaError_t result)
+cudaError_t checkCuda(cudaError_t result, std::string output)
 {
     if (result != cudaSuccess) {
-        std::cout << "CUDA Runtime Error: \n" << cudaGetErrorString(result) << std::endl;
+        std::cout << "CUDA Runtime Error found on function " << output << ": \n" << cudaGetErrorString(result) << std::endl;
         assert(result == cudaSuccess);
     }
     return result;
@@ -19,8 +19,8 @@ void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
 }
 
 void tps::CudaMemory::allocCudaSolution() {
-  checkCuda(cudaMalloc(&solutionCol, systemDim*sizeof(float)));
-  checkCuda(cudaMalloc(&solutionRow, systemDim*sizeof(float)));
+  checkCuda(cudaMalloc(&solutionCol, systemDim*sizeof(float)), "allocCudaSolution");
+  checkCuda(cudaMalloc(&solutionRow, systemDim*sizeof(float)), "allocCudaSolution");
 }
 
 void tps::CudaMemory::allocCudaKeypoints() {
@@ -30,18 +30,18 @@ void tps::CudaMemory::allocCudaKeypoints() {
     hostKeypointCol[i] = referenceKeypoints_[i][0];
     hostKeypointRow[i] = referenceKeypoints_[i][1];
   }
-  checkCuda(cudaMalloc(&keypointCol, numberOfCps*sizeof(float)));
-  checkCuda(cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice));
-  checkCuda(cudaMalloc(&keypointRow, numberOfCps*sizeof(float)));
+  checkCuda(cudaMalloc(&keypointCol, numberOfCps*sizeof(float)), "allocCudaKeypoints");
+  checkCuda(cudaMemcpy(keypointCol, hostKeypointCol, numberOfCps*sizeof(float), cudaMemcpyHostToDevice), "allocCudaKeypoints");
+  checkCuda(cudaMalloc(&keypointRow, numberOfCps*sizeof(float)), "allocCudaKeypoints");
   cudaMemcpy(keypointRow, hostKeypointRow, numberOfCps*sizeof(float), cudaMemcpyHostToDevice);
   free(hostKeypointCol);
   free(hostKeypointRow);
 }
 
 void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
-  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(unsigned char)));
-  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice));
-  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(unsigned char)));
+  checkCuda(cudaMalloc(&targetImage, imageWidth*imageHeight*sizeof(unsigned char)), "allocCudaImagePixels");
+  checkCuda(cudaMemcpy(targetImage, image.getPixelVector(), imageWidth*imageHeight*sizeof(unsigned char), cudaMemcpyHostToDevice), "allocCudaImagePixels");
+  checkCuda(cudaMalloc(&regImage, imageWidth*imageHeight*sizeof(unsigned char)), "allocCudaImagePixels");
 }
 
 std::vector<float> tps::CudaMemory::getHostSolCol() {
@@ -71,6 +71,7 @@ double tps::CudaMemory::memoryEstimation() {
   double pixelsMemory = 2.0*imageWidth*imageHeight*ucharSize/(1024*1024);
 
   double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
+  std::cout << "Total memory estimation = " << totalMemory << "MB" << std::endl;
   return totalMemory;
 }
 

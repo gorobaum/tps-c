@@ -10,10 +10,10 @@
 #include <cublas_v2.h>
 
 inline
-cudaError_t checkCuda(cudaError_t result)
+cudaError_t checkCuda(cudaError_t result, std::string output)
 {
     if (result != cudaSuccess) {
-        std::cout << "CUDA Runtime Error: \n" << cudaGetErrorString(result) << std::endl;
+        std::cout << "CUDA Runtime Error found on function " << output << ": \n" << cudaGetErrorString(result) << std::endl;
         assert(result == cudaSuccess);
     }
     return result;
@@ -58,18 +58,18 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   cublasCreate(&cublasH);
 
   // step 1: copy A and B to device
-  checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float)));
+  checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float)), "cudaA alloc");
 
-  checkCuda(cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice));
-  checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice));
+  checkCuda(cudaMemcpy(cudaA, A, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice), "cudaA memcpy");
+  checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice), "cudaB memcpy");
 
-  checkCuda(cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension));
-  checkCuda(cudaMalloc((void**)&devInfo, sizeof(int)));
+  checkCuda(cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension), "d_tau");
+  checkCuda(cudaMalloc((void**)&devInfo, sizeof(int)), "devInfo");
 
   // step 2: query working space of geqrf and ormqr
   cusolver_status = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
 
-  checkCuda(cudaMalloc((void**)&d_work, sizeof(float) * lwork));
+  checkCuda(cudaMalloc((void**)&d_work, sizeof(float) * lwork), "lwork");
 
   // step 3: compute QR factorization
   cusolver_status = cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
@@ -86,10 +86,10 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
     systemDimension);
   cudaDeviceSynchronize();
 
-  checkCuda(cudaFree(cudaA));
-  checkCuda(cudaFree(d_tau));
-  checkCuda(cudaFree(devInfo));
-  checkCuda(cudaFree(d_work));
+  checkCuda(cudaFree(cudaA), "frees");
+  checkCuda(cudaFree(d_tau), "frees");
+  checkCuda(cudaFree(devInfo), "frees");
+  checkCuda(cudaFree(d_work), "frees");
 
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);
