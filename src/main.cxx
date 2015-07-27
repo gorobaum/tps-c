@@ -107,6 +107,12 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
 
     cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
 
+    std::cout << "distanceMetric = " << distanceMetric << std::endl;
+    std::cout << "nfeatures = " << nfeatures << std::endl;
+    std::cout << "nOctaveLayers = " << nOctaveLayers << std::endl;
+    std::cout << "contrastThreshold = " << contrastThreshold << std::endl;
+    std::cout << "edgeThreshold = " << edgeThreshold << std::endl;
+    std::cout << "sigma = " << sigma << std::endl;
     tps::Sift fsift = tps::Sift(cvRefImg(rect), cvTarImg(rect), distanceMetric, nfeatures, nOctaveLayers, 
                                 contrastThreshold, edgeThreshold, sigma);
     fsift.run();
@@ -117,8 +123,8 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     fg.addTarKeypoints(tarNewKPs);
 
     if (createKeypointImages) {
-      fg.drawKeypointsImage(cvTarImg, outputName+"keypoints-Tar"+extension);
-      fg.drawFeatureImageWithMask(cvRefImg, cvTarImg, outputName+"matches-Tar"+extension, refNewKPs.size());
+      fg.drawKeypointsImage(cvTarImg, "keypoints-Tar"+outputName+extension);
+      fg.drawFeatureImageWithMask(cvRefImg, cvTarImg, "matches-Tar"+outputName+extension, 0);
     }
 
     fgExecTime = ((double)cv::getTickCount() - fgExecTime)/cv::getTickFrequency();
@@ -171,6 +177,7 @@ int main(int argc, char** argv) {
   std::vector< double > vCT;
   std::vector< double > vET;
   std::vector< double > vSigma;
+
   // Reading each iteration configuration file
   int nFiles = 0;
   for (line; std::getline(infile, line); infile.eof(), nFiles++)
@@ -185,8 +192,8 @@ int main(int argc, char** argv) {
   for (int i = 0; i < nFiles; i++) {
     std::cout << "Generating the CPs for entry number " << i << std::endl;
     runFeatureGeneration(referenceImage, targetImages[i], percentages[i], outputNames[i], cvTarImgs[i], cvRefImg, 
-                         referencesKPs, targetsKPs, extension, distanceMetrics[i], vnFeatures[i], vnOctavesLayers[i], vCT[i], vET[i],
-                         vSigma[i]);
+                         referencesKPs, targetsKPs, extension, distanceMetrics[i], vnFeatures[i], vnOctavesLayers[i], 
+                         vCT[i], vET[i], vSigma[i]);
   }
 
   // Allocating the maximun possible of free memory in the GPU
@@ -241,7 +248,7 @@ int main(int argc, char** argv) {
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
       double CUDAcTpsExecTime = (double)cv::getTickCount();
-      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
+      tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], "Cuda"+outputNames[j]+extension, cudaMemories[j]);
       CUDActps.run();
       CUDAcTpsExecTime = ((double)cv::getTickCount() - CUDAcTpsExecTime)/cv::getTickFrequency();
       std::cout << "Cuda TPS execution time: " << CUDAcTpsExecTime << std::endl;
@@ -252,7 +259,7 @@ int main(int argc, char** argv) {
       tps::CudaMemory cmg = tps::CudaMemory(targetImages[j].getWidth(), targetImages[j].getHeight(), referencesKPs[j]);
       cmg.allocCudaMemory(gridImage);
       double GridcTpsExecTime = (double)cv::getTickCount();
-      tps::CudaTPS CUDAtpsGrid = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"CudaGrid"+extension, cmg);
+      tps::CudaTPS CUDAtpsGrid = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], "CudaGrid"+outputNames[j]+extension, cmg);
       CUDAtpsGrid.run();
       GridcTpsExecTime = ((double)cv::getTickCount() - GridcTpsExecTime)/cv::getTickFrequency();
       std::cout << "CudaGrid TPS execution time: " << GridcTpsExecTime << std::endl;
