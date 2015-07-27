@@ -15,10 +15,16 @@ for i in range(1, n):
   f.write(str(porcentage)+'\n')
   distanceMetric = i*0.2
   f.write(str(distanceMetric)+'\n')
-  nOctaves = 4
-  f.write(str(nOctaves)+'\n')
-  nOctavesLayers = 2
+  nFeatures = 0
+  f.write(str(nFeatures)+'\n')
+  nOctavesLayers = 3
   f.write(str(nOctavesLayers)+'\n')
+  contrastThreshold = 0.04
+  f.write(str(contrastThreshold)+'\n')
+  edgeThreshold = 10
+  f.write(str(edgeThreshold)+'\n')
+  sigma = 1.6
+  f.write(str(sigma)+'\n')
   f.close()
 
 f = open('../tps.configs', 'w')

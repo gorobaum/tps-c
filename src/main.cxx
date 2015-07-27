@@ -1,6 +1,7 @@
 #include "image/image.h"
 #include "feature/featuregenerator.h"
 #include "feature/surf.h"
+#include "feature/sift.h"
 #include "tps/tps.h"
 #include "tps/cudatps.h"
 #include "tps/basictps.h"
@@ -31,7 +32,8 @@ bool createKeypointImages = true;
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages,
                     std::vector< cv::Mat >& cvTarImgs, std::vector< std::string >& outputNames, 
                     std::vector< float >& percentages, std::vector< float >& distanceMetrics,
-                    std::vector< int >& vnOctaves, std::vector< int >& vnOctavesLayers) {
+                    std::vector< int >& vnFeatures, std::vector< int >& vnOctavesLayers, 
+                    std::vector< double >& vCT, std::vector< double >& vET, std::vector< double >& vSigma) {
   std::ifstream infile;
   infile.open(filename.c_str());
   std::string line;
@@ -59,12 +61,24 @@ void readConfigFile(std::string filename, std::vector< tps::Image >& targetImage
   distanceMetrics.push_back(distanceMetric);
 
   std::getline(infile, line);
-  int nOctaves = std::stoi(line);
-  vnOctaves.push_back(nOctaves);
+  int nFeatures = std::stoi(line);
+  vnFeatures.push_back(nFeatures);
 
   std::getline(infile, line);
   int nOctavesLayers = std::stoi(line);
   vnOctavesLayers.push_back(nOctavesLayers);
+
+  std::getline(infile, line);
+  double contrastThreshold = std::stod(line);
+  vCT.push_back(contrastThreshold);
+
+  std::getline(infile, line);
+  double edgeThreshold = std::stod(line);
+  vET.push_back(edgeThreshold);
+
+  std::getline(infile, line);
+  double sigma = std::stod(line);
+  vSigma.push_back(sigma);
 }
 
 std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> newKP, int height) {
@@ -80,7 +94,7 @@ std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> 
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
     std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension, float distanceMetric, 
-    int nOctaves, int nOctavesLayers) {
+    int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma) {
     double fgExecTime = (double)cv::getTickCount();
 
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
@@ -93,11 +107,12 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
 
     cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
 
-    tps::Surf fsurf = tps::Surf(cvRefImg(rect), cvTarImg(rect), 400, distanceMetric, nOctaves, nOctavesLayers);
-    fsurf.run();
+    tps::Sift fsift = tps::Sift(cvRefImg(rect), cvTarImg(rect), distanceMetric, nfeatures, nOctaveLayers, 
+                                contrastThreshold, edgeThreshold, sigma);
+    fsift.run();
     // Manual Keypoints
-    std::vector< std::vector< float >> refNewKPs = addHeight(fsurf.getReferenceKeypoints(), referenceImage.getHeight()/2);
-    std::vector< std::vector< float >> tarNewKPs = addHeight(fsurf.getTargetKeypoints(), referenceImage.getHeight()/2);
+    std::vector< std::vector< float >> refNewKPs = addHeight(fsift.getReferenceKeypoints(), referenceImage.getHeight()/2);
+    std::vector< std::vector< float >> tarNewKPs = addHeight(fsift.getTargetKeypoints(), referenceImage.getHeight()/2);
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
 
@@ -151,13 +166,16 @@ int main(int argc, char** argv) {
   std::vector< std::string > outputNames;
   std::vector< float > percentages;
   std::vector< float > distanceMetrics;
-  std::vector< int > vnOctaves;
+  std::vector< int > vnFeatures;
   std::vector< int > vnOctavesLayers;
+  std::vector< double > vCT;
+  std::vector< double > vET;
+  std::vector< double > vSigma;
   // Reading each iteration configuration file
   int nFiles = 0;
-  for (line; std::getline(infile, line); infile.eof(), nFiles++) {
-    readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages, distanceMetrics, vnOctaves, vnOctavesLayers);
-  }
+  for (line; std::getline(infile, line); infile.eof(), nFiles++)
+    readConfigFile(line, targetImages, cvTarImgs, outputNames, percentages, distanceMetrics, vnFeatures, 
+                   vnOctavesLayers, vCT ,vET, vSigma);
 
   std::vector< std::vector< std::vector<float> > > referencesKPs;
   std::vector< std::vector< std::vector<float> > > targetsKPs;
@@ -167,7 +185,8 @@ int main(int argc, char** argv) {
   for (int i = 0; i < nFiles; i++) {
     std::cout << "Generating the CPs for entry number " << i << std::endl;
     runFeatureGeneration(referenceImage, targetImages[i], percentages[i], outputNames[i], cvTarImgs[i], cvRefImg, 
-                         referencesKPs, targetsKPs, extension, distanceMetrics[i], vnOctaves[i], vnOctavesLayers[i]);
+                         referencesKPs, targetsKPs, extension, distanceMetrics[i], vnFeatures[i], vnOctavesLayers[i], vCT[i], vET[i],
+                         vSigma[i]);
   }
 
   // Allocating the maximun possible of free memory in the GPU
