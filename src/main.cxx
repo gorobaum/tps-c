@@ -77,16 +77,6 @@ std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> 
   return newKPS;
 }
 
-std::vector< std::vector< float >> addHeight(std::vector< std::vector< float >> newKP, int height) {
-  std::vector< std::vector< float >> newKPS;
-  for (std::vector<std::vector< float >>::iterator it = newKP.begin() ; it != newKP.end(); ++it) {
-    std::vector< float > newPoint = *it;
-    newPoint[1] += height;
-    newKPS.push_back(newPoint);
-  }
-  return newKPS;
-}
-
 void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, float percentage,
     std::string outputName, cv::Mat cvTarImg, cv::Mat cvRefImg, std::vector< std::vector< std::vector<float> > >& referencesKPs, 
     std::vector< std::vector< std::vector<float> > >& targetsKPs, std::string extension, float distanceMetric, 
