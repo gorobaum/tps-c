@@ -26,6 +26,8 @@ public:
   float* getSolutionRow() { return solutionRow; };
   float* getKeypointCol() { return keypointCol; };
   float* getKeypointRow() { return keypointRow; };
+  void setSolutionCol(float* solution);
+  void setSolutionRow(float* solution);
   unsigned char* getTargetImage() { return targetImage; };
   unsigned char* getRegImage() { return regImage; };
   std::vector<float> getHostSolCol();

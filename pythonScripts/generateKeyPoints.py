@@ -409,6 +409,7 @@ def main():
           currentPoints = targetPoints
           filename = getTargetFileName()
           second_phase = True
+          currentKP = 0
           for point in targetPoints:
             drawRedCrosshair(drawSurface, point)
 

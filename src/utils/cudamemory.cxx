@@ -52,6 +52,14 @@ std::vector<float> tps::CudaMemory::getHostSolRow() {
   return cudaToHost(solutionRow);
 }
 
+void tps::CudaMemory::setSolutionCol(float* solution) {
+  checkCuda(cudaMemcpy(solutionCol, solution, systemDim*sizeof(float), cudaMemcpyHostToDevice), "Setting new solution");
+}
+
+void tps::CudaMemory::setSolutionRow(float* solution) {
+  checkCuda(cudaMemcpy(solutionRow, solution, systemDim*sizeof(float), cudaMemcpyHostToDevice), "Setting new solution");
+}
+
 std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
     float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
     cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);

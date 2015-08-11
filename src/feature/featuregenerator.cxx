@@ -32,11 +32,11 @@ void tps::FeatureGenerator::createReferenceImageFeatures() {
     for (int row = 0; row <= gridSizeRow; row++) {
       if (checkSector(col*colStep, row*rowStep)) {
         std::vector<float> newCP;
-        newCP.push_back(std::ceil(col*colStep));
-        newCP.push_back(std::ceil(row*rowStep));
+        newCP.push_back(col*colStep);
+        newCP.push_back(row*rowStep);
         referenceKeypoints.push_back(newCP);
         targetKeypoints.push_back(newCP);
-        cv::KeyPoint newKP(std::ceil(col*colStep), std::ceil(row*rowStep), 0.1);
+        cv::KeyPoint newKP(col*colStep, row*rowStep, 0.1);
         keypoints_ref.push_back(newKP);
         keypoints_tar.push_back(newKP);
       }

@@ -100,8 +100,8 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
 
     // Manual Keypoints
-    std::vector< std::vector< float > > refNewKPs  = {{28, 71}, {25, 91}, {27, 131}, {51, 174}, {111, 204}, {69, 142}, {71, 75}, {94, 64}, {113, 62}, {132, 68}, {145, 78}, {163, 101}, {172, 124}, {75, 70}, {101, 57}, {132, 60}};
-    std::vector< std::vector< float > > tarNewKPs  = {{28, 70}, {32, 109}, {33, 143}, {53, 182}, {113, 210}, {72, 152}, {57, 99}, {79, 79}, {105, 68}, {131, 73}, {148, 88}, {161, 109}, {166, 129}, {76, 69}, {102, 56}, {133, 59}};
+    std::vector< std::vector< float > > refNewKPs = {{27, 71}, {25, 91}, {27, 135}, {58, 178}, {111, 204}, {67, 141}, {58, 87}, {74, 74}, {94, 64}, {120, 64}, {143, 73}, {161, 98}, {172, 124}, {71, 73}, {95, 58}, {123, 56}, {138, 63}};
+    std::vector< std::vector< float > > tarNewKPs = {{28, 71}, {33, 110}, {32, 146}, {59, 184}, {113, 210}, {72, 150}, {58, 104}, {75, 82}, {95, 69}, {120, 68}, {142, 81}, {161, 107}, {166, 129}, {71, 73}, {94, 58}, {124, 57}, {148, 71}};
 
     fg.run();
 
@@ -217,19 +217,19 @@ int main(int argc, char** argv) {
       std::cout << "#Percentage = " << percentages[j] << std::endl;
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      // double ParallelTpsExecTime = (double)cv::getTickCount();
-      // tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
-      // parallelTPS.run();
-      // ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
-      // std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
+      double ParallelTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPS = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Parallel"+extension);
+      parallelTPS.run();
+      ParallelTpsExecTime = ((double)cv::getTickCount() - ParallelTpsExecTime)/cv::getTickFrequency();
+      std::cout << "Parallel TPS execution time: " << ParallelTpsExecTime << std::endl;
 
-      // std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
-      // double ParallelGridTpsExecTime = (double)cv::getTickCount();
-      // tps::ParallelTPS parallelTPSGrid = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], gridImage, outputNames[j]+"ParallelGrid"+extension);
-      // parallelTPSGrid.run();
-      // ParallelGridTpsExecTime = ((double)cv::getTickCount() - ParallelGridTpsExecTime)/cv::getTickFrequency();
-      // std::cout << "ParallelGrid TPS execution time: " << ParallelGridTpsExecTime << std::endl;
+      double ParallelGridTpsExecTime = (double)cv::getTickCount();
+      tps::ParallelTPS parallelTPSGrid = tps::ParallelTPS(referencesKPs[j], targetsKPs[j], gridImage, outputNames[j]+"ParallelGrid"+extension);
+      parallelTPSGrid.run();
+      ParallelGridTpsExecTime = ((double)cv::getTickCount() - ParallelGridTpsExecTime)/cv::getTickFrequency();
+      std::cout << "ParallelGrid TPS execution time: " << ParallelGridTpsExecTime << std::endl;
 
       std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
