@@ -100,25 +100,11 @@ void runFeatureGeneration(tps::Image referenceImage, tps::Image targetImage, flo
     tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage, targetImage, percentage);
 
     // Manual Keypoints
-    // std::vector< std::vector< float > > refNewKPs = {{3, 209}, {6, 235}, {16, 279}, {35, 311}, {84, 335}, {51, 280}, {50, 245}, {68, 223}, {88, 209}, {113, 197}, {140, 206}, {160, 230}, {157, 259}, {140, 286}, {49, 206}, {71, 189}, {95, 183}, {119, 191}, {13, 179}, {18, 196}, {23, 259}, {164, 217}, {143, 201}};
-    // std::vector< std::vector< float > > tarNewKPs = {{6, 209}, {10, 234}, {19, 278}, {38, 309}, {83, 333}, {50, 275}, {42, 217}, {69, 213}, {89, 210}, {115, 206}, {137, 210}, {155, 232}, {156, 259}, {139, 286}, {48, 205}, {71, 186}, {96, 183}, {123, 188}, {13, 179}, {18, 194}, {26, 258}, {167, 217}, {147, 195}};
+    std::vector< std::vector< float > > refNewKPs  = {{28, 71}, {25, 91}, {27, 131}, {51, 174}, {111, 204}, {69, 142}, {71, 75}, {94, 64}, {113, 62}, {132, 68}, {145, 78}, {163, 101}, {172, 124}, {75, 70}, {101, 57}, {132, 60}};
+    std::vector< std::vector< float > > tarNewKPs  = {{28, 70}, {32, 109}, {33, 143}, {53, 182}, {113, 210}, {72, 152}, {57, 99}, {79, 79}, {105, 68}, {131, 73}, {148, 88}, {161, 109}, {166, 129}, {76, 69}, {102, 56}, {133, 59}};
 
     fg.run();
 
-    cv::Rect rect(0, referenceImage.getHeight()/2, referenceImage.getHeight()/2, referenceImage.getWidth()/2);
-
-    std::cout << "distanceMetric = " << distanceMetric << std::endl;
-    std::cout << "nfeatures = " << nfeatures << std::endl;
-    std::cout << "nOctaveLayers = " << nOctaveLayers << std::endl;
-    std::cout << "contrastThreshold = " << contrastThreshold << std::endl;
-    std::cout << "edgeThreshold = " << edgeThreshold << std::endl;
-    std::cout << "sigma = " << sigma << std::endl;
-    tps::Sift fsift = tps::Sift(cvRefImg(rect), cvTarImg(rect), distanceMetric, nfeatures, nOctaveLayers, 
-                                contrastThreshold, edgeThreshold, sigma);
-    fsift.run();
-    // Manual Keypoints
-    std::vector< std::vector< float >> refNewKPs = addHeight(fsift.getReferenceKeypoints(), referenceImage.getHeight()/2);
-    std::vector< std::vector< float >> tarNewKPs = addHeight(fsift.getTargetKeypoints(), referenceImage.getHeight()/2);
     fg.addRefKeypoints(refNewKPs);
     fg.addTarKeypoints(tarNewKPs);
 

@@ -10,7 +10,7 @@ from pygame.locals import *
 import cairo
 
 # CONSTANTS
-SCREEN_SIZE = [1024, 750]
+SCREEN_SIZE = [1024, 1024]
 TRACK_SURFACE_SIZE = [2000, 2000]
 INITIAL_POINT = (TRACK_SURFACE_SIZE[0] / 2, TRACK_SURFACE_SIZE[1] / 2)
 TRACK_WIDTH = 13
@@ -358,8 +358,8 @@ def main():
     # draw_all(track_surface, data, clusters, points, right_points, left_points, \
     #         show_clusters, show_grid, show_edges, show_labels)
 
-    referencePoints = [[3, 209], [6, 235], [16, 279], [35, 311], [84, 335], [51, 280], [50, 245], [68, 223], [88, 209], [113, 197], [140, 206], [160, 230], [157, 259], [140, 286], [49, 206], [71, 189], [95, 183], [119, 191]]
-    targetPoints =    [[6, 209], [10, 234], [19, 278], [38, 309], [83, 333], [50, 275], [42, 217], [69, 213], [89, 210], [115, 206], [137, 210], [155, 232], [156, 259], [139, 286], [48, 205], [71, 186], [96, 183], [123, 188]]
+    referencePoints = []
+    targetPoints = []
     currentPoints = referencePoints
 
     for point in referencePoints:

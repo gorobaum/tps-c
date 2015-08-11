@@ -8,8 +8,8 @@
 #define NONRIGIDMASK 0
 
 void tps::FeatureGenerator::run() {
-  gridSizeCol = referenceImage_.getWidth()*percentage_ + 1;
-  gridSizeRow = referenceImage_.getHeight()*percentage_ + 1;
+  gridSizeCol = referenceImage_.getWidth()*percentage_;
+  gridSizeRow = referenceImage_.getHeight()*percentage_;
   colStep = referenceImage_.getWidth()*1.0/(gridSizeCol);
   rowStep = referenceImage_.getHeight()*1.0/(gridSizeRow);
   std::cout << "gridSizeCol = " << gridSizeCol << std::endl;
@@ -21,8 +21,8 @@ void tps::FeatureGenerator::run() {
 }
 
 bool tps::FeatureGenerator::checkSector(float col, float row) {
-  if (col < (referenceImage_.getWidth()/2))
-    if (row > (referenceImage_.getHeight()/2)-10)
+  if (col < 186)
+    if (row > 34)
       return false;
   return true;
 }
