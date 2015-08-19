@@ -24,6 +24,9 @@ public:
   float* getSolutionX() { return solutionX; };
   float* getSolutionY() { return solutionY; };
   float* getSolutionZ() { return solutionZ; };
+  void setSolutionX(std::vector<float> solution);
+  void setSolutionY(std::vector<float> solution);
+  void setSolutionZ(std::vector<float> solution);
   float* getKeypointX() { return keypointX; };
   float* getKeypointY() { return keypointY; };
   float* getKeypointZ() { return keypointZ; };

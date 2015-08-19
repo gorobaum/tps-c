@@ -66,6 +66,31 @@ std::vector<float> tps::CudaMemory::getHostSolZ() {
   return cudaToHost(solutionZ);
 }
 
+float* vectorToPointer(std::vector<float> input) {
+  float* output = (float*)malloc(input.size()*sizeof(float));
+  for (int i = 0; i < input.size(); i++)
+    output[i] = input[i];
+  return output;
+}
+
+void tps::CudaMemory::setSolutionX(std::vector<float> solution) {
+  float* solPointer = vectorToPointer(solution);
+  checkCuda(cudaMemcpy(solutionX, solPointer, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+  free(solPointer);
+}
+
+void tps::CudaMemory::setSolutionY(std::vector<float> solution) {
+  float* solPointer = vectorToPointer(solution);
+  checkCuda(cudaMemcpy(solutionY, solPointer, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+  free(solPointer);
+}
+
+void tps::CudaMemory::setSolutionZ(std::vector<float> solution) {
+  float* solPointer = vectorToPointer(solution);
+  checkCuda(cudaMemcpy(solutionZ, solPointer, systemDim*sizeof(float), cudaMemcpyHostToDevice));
+  free(solPointer);
+}
+
 std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
     float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
     cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);

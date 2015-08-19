@@ -26,7 +26,6 @@
 #include "cuda_runtime.h"
 #include "cuda_occupancy.h"
 
-
 bool createKeypointImages = true;
 
 void readConfigFile(std::string filename, std::vector< tps::Image >& targetImages, 
