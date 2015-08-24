@@ -4,6 +4,7 @@
 #include "tps.h"
 #include "linearsystem/cudalinearsystems.h"
 #include "linearsystem/armalinearsystems.h"
+#include "linearsystem/cudalinearsystems.h"
 #include "utils/cudamemory.h"
 
 namespace tps {
