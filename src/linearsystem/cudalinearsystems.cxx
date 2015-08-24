@@ -128,7 +128,7 @@ void tps::CudaLinearSystems::createBs() {
   bx = (float*)malloc(systemDimension*sizeof(float));
   by = (float*)malloc(systemDimension*sizeof(float));
   bz = (float*)malloc(systemDimension*sizeof(float));
-  for (uint j = 0; j < 3; j++) {
+  for (uint j = 0; j < 4; j++) {
     bx[j] = 0.0;
     by[j] = 0.0;
     bz[j] = 0.0;
@@ -152,4 +152,5 @@ void tps::CudaLinearSystems::freeResources() {
   free(A);
   free(bx);
   free(by);
+  free(bz);
 }

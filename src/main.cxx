@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
       // parallelTpsExecTime = ((double)cv::getTickCount() - parallelTpsExecTime)/cv::getTickFrequency();
       // std::cout << "Parallel TPS execution time: " << parallelTpsExecTime << std::endl;
 
-      std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+      // std::cout << "++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
       double CUDAcTpsExecTime = (double)cv::getTickCount();
       tps::CudaTPS CUDActps = tps::CudaTPS(referencesKPs[j], targetsKPs[j], targetImages[j], outputNames[j]+"Cuda"+extension, cudaMemories[j]);
