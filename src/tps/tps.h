@@ -3,10 +3,9 @@
 
 #include "image/image.h"
 #include "linearsystem/cplinearsystems.h"
-#include "../image/itkimagehandler.h"
+#include "image/itkimagehandler.h"
 
 #include <vector>
-
 
 namespace tps {
 

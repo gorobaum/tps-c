@@ -19,6 +19,7 @@ cuda_add_executable(tps
   src/image/imagedeformation.cxx
 
   src/utils/cudamemory.cxx
+  src/utils/tpsinstance.cxx
 
   src/feature/featuregenerator.cxx
 

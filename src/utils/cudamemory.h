@@ -13,6 +13,7 @@ namespace tps {
   
 class CudaMemory {
 public:
+  CudaMemory() {};
   CudaMemory(std::vector<int> dimensions, std::vector< std::vector<float> > referenceKeypoints) :
     imageSize(dimensions[0]*dimensions[1]*dimensions[2]),
     referenceKeypoints_(referenceKeypoints),

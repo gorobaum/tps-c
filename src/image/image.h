@@ -9,6 +9,7 @@ namespace tps {
 
 class Image {
 public:
+	Image() {};
 	Image(std::vector< std::vector< std::vector<short> > > matImage, std::vector<int> dimensions) :
 		dimensions_(dimensions) {
 			image = matImage;
