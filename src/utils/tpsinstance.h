@@ -4,15 +4,17 @@
 #include <iostream>
 
 #include "image/image.h"
+#include "image/imagehandler.h"
 #include "cudamemory.h"
 
 namespace tps {
   
 class TpsInstance {
 public:
-  TpsInstance(std::string configurationFile, tps::Image referenceImage) :
+  TpsInstance(std::string configurationFile, tps::Image referenceImage, tps::ImageHandler *imageHandler) :
     configurationFile_(configurationFile),
-    referenceImage_(referenceImage) {
+    referenceImage_(referenceImage),
+    imageHandler_(imageHandler) {
       readConfigurationFile();
       createKeyPoints();
     };
@@ -23,6 +25,7 @@ public:
 private:
   std::string configurationFile_;
   tps::Image referenceImage_;
+  tps::ImageHandler *imageHandler_;
   tps::Image targetImage;
   tps::CudaMemory cm;
   std::vector< std::vector<float> > referenceKPs;

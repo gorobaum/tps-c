@@ -8,7 +8,7 @@ typedef itk::Image<short, 3>  ImageType;
 typedef itk::ImageFileReader<ImageType> ReaderType;
 typedef itk::ImageFileWriter<ImageType> WriterType;
 
-static itk::ImageIOBase::Pointer tps::ITKImageHandler::getImageIO(std::string input) {
+itk::ImageIOBase::Pointer tps::ITKImageHandler::getImageIO(std::string input) {
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(input.c_str(), itk::ImageIOFactory::ReadMode);
  
   imageIO->SetFileName(input);
@@ -17,16 +17,10 @@ static itk::ImageIOBase::Pointer tps::ITKImageHandler::getImageIO(std::string in
   return imageIO;
 }
 
-static tps::Image tps::ITKImageHandler::loadImageData(std::string filename) { 
+tps::Image tps::ITKImageHandler::loadImageData(std::string filename) { 
  
   std::vector<int> dimensions;
   itk::ImageIOBase::Pointer imageIO = getImageIO(filename);
-
-  // std::cout << "Pixel Type is " << imageIO->GetComponentTypeAsString(pixelType)<< std::endl;
-  // std::cout << "numDimensions: " << numDimensions << std::endl;
-  // std::cout << "component size: " << imageIO->GetComponentSize() << std::endl;
-  // std::cout << "pixel type (string): " << imageIO->GetPixelTypeAsString(imageIO->GetPixelType()) << std::endl;
-  // std::cout << "pixel type: " << imageIO->GetPixelType() << std::endl;
 
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName(filename.c_str());
@@ -63,7 +57,7 @@ static tps::Image tps::ITKImageHandler::loadImageData(std::string filename) {
   return tps::Image(vecImage, dimensions);
 }
 
-static void tps::ITKImageHandler::saveImageData(tps::Image resultImage, std::string filename) {
+void tps::ITKImageHandler::saveImageData(tps::Image resultImage, std::string filename) {
   ImageType::Pointer image = ImageType::New();
   std::vector<int> dimensions = resultImage.getDimensions();
 

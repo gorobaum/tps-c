@@ -13,7 +13,6 @@ void tps::ImageDeformation::apply3DSinDeformation() {
         short newVoxel = image_.trilinearInterpolation(newPoint[0], newPoint[1], newPoint[2]);
         result.changePixelAt(x, y, z, newVoxel);
       }
-  tps::ITKImageHandler::saveImageData(result, outputName_);
 }
 
 std::vector<float> tps::ImageDeformation::newPointSinDef(int x, int y, int z) {

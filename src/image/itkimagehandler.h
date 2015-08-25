@@ -7,18 +7,17 @@
 #include <itkImageFileWriter.h>
 #include <itkImageRegionIterator.h>
 
-#include <string>
-
 #include "image.h"
+#include "imagehandler.h"
 
 namespace tps {
 
-class ITKImageHandler {
+class ITKImageHandler : public ImageHandler {
 public:
-  static tps::Image loadImageData(std::string filename);
-  static void saveImageData(tps::Image resultImage, std::string filename);
+  tps::Image loadImageData(std::string filename);
+  void saveImageData(tps::Image resultImage, std::string filename);
 private:
-  static itk::ImageIOBase::Pointer getImageIO(std::string input);
+  itk::ImageIOBase::Pointer getImageIO(std::string input);
 };
 
 } // namespace

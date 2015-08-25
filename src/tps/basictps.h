@@ -8,10 +8,10 @@ namespace tps {
 
 class BasicTPS : public TPS {
 public:
-  BasicTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage, std::string outputName) :
-    TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
+  BasicTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage) :
+    TPS(referenceKeypoints, targetKeypoints, targetImage),
     lienarSolver(referenceKeypoints, targetKeypoints) {};	
-  void run();
+  tps::Image run();
 private:
   tps::ArmaLinearSystems lienarSolver;
   std::vector<float> solutionX;

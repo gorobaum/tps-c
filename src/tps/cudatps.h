@@ -9,11 +9,11 @@ namespace tps {
 
 class CudaTPS : public TPS {
   public:
-    CudaTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage, std::string outputName, tps::CudaMemory& cm) :
-      TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
+    CudaTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage, tps::CudaMemory& cm) :
+      TPS(referenceKeypoints, targetKeypoints, targetImage),
       lienarSolver(referenceKeypoints, targetKeypoints),
       cm_(cm) {}; 
-    void run();
+    tps::Image run();
   private:
     tps::ArmaLinearSystems lienarSolver;
     tps::CudaMemory& cm_;

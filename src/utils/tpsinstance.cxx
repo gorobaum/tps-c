@@ -11,7 +11,7 @@ void tps::TpsInstance::readConfigurationFile() {
   std::string line;
   
   std::getline(infile, line);
-  targetImage = tps::ITKImageHandler::loadImageData(line);
+  targetImage = imageHandler_->loadImageData(line);
 
   std::size_t pos = line.find('.');
   extension = line.substr(pos);
@@ -37,15 +37,17 @@ std::string tps::TpsInstance::generateOutputName(std::string differentiator) {
 void tps::TpsInstance::runCudaTPS() {
   std::string filename = generateOutputName("Cuda");
   std::cout << "filename = " << filename << std::endl; 
-  tps::CudaTPS CUDActps = tps::CudaTPS(referenceKPs, targetKPs, targetImage, filename, cm);
-  CUDActps.run();
+  tps::CudaTPS CUDActps = tps::CudaTPS(referenceKPs, targetKPs, targetImage, cm);
+  tps::Image resultImage = CUDActps.run();
+  imageHandler_->saveImageData(resultImage, filename);
   cm.freeMemory();
 }
 
 void tps::TpsInstance::runParallelTPS() {
   std::string filename = generateOutputName("Parallel");
-  tps::ParallelTPS parallelTPS = tps::ParallelTPS(referenceKPs, targetKPs, targetImage, filename);
-  parallelTPS.run();
+  tps::ParallelTPS parallelTPS = tps::ParallelTPS(referenceKPs, targetKPs, targetImage);
+  tps::Image resultImage = parallelTPS.run();
+  imageHandler_->saveImageData(resultImage, filename);
 }
 
 size_t tps::TpsInstance::allocCudaMemory(size_t usedMemory) {

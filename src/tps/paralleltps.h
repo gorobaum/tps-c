@@ -13,10 +13,10 @@ namespace tps {
 class ParallelTPS : public TPS {
 public:
   ParallelTPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, 
-              tps::Image targetImage, std::string outputName) :
-    TPS(referenceKeypoints, targetKeypoints, targetImage, outputName),
+              tps::Image targetImage) :
+    TPS(referenceKeypoints, targetKeypoints, targetImage),
     lienarSolver(referenceKeypoints, targetKeypoints) {}; 
-  void run();
+  tps::Image run();
 private:
   tps::ArmaLinearSystems lienarSolver;
   uint numberOfThreads = std::thread::hardware_concurrency();

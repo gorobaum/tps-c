@@ -28,7 +28,7 @@ void tps::ParallelTPS::runThread(uint tid) {
 		}
 }
 
-void tps::ParallelTPS::run() {
+tps::Image tps::ParallelTPS::run() {
   lienarSolver.solveLinearSystems();
 	solutionX = lienarSolver.getSolutionX();
 	solutionY = lienarSolver.getSolutionY();
@@ -40,5 +40,5 @@ void tps::ParallelTPS::run() {
 
   for(uint i = 0; i < numberOfThreads; ++i) th[i].join();
 
-  tps::ITKImageHandler::saveImageData(registredImage, outputName_);
+  return registredImage;
 }
