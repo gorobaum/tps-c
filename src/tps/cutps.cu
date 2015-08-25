@@ -120,19 +120,12 @@ int getBlockSize() {
 
     activeWarps = numBlocks * blockSize / prop.warpSize;
     maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
-    std::cout << "blockSize: " << blockSize << std::endl;
-    std::cout << "activeWarps: " << activeWarps << std::endl;
-    std::cout << "maxWarps: " << maxWarps << std::endl;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
-    std::cout << "currentOccupancy: " << currentOccupancy << std::endl;
     if (maxOccupancy < currentOccupancy) {
       maxOccupancy = currentOccupancy;
       maxOccupancyBlockSize = blockSize;
     }
   }
-
-  std::cout << "Max occupancy at: " << maxOccupancy / 100 << std::endl;
-  std::cout << "Max maxOccupancyBlockSize at: " << maxOccupancyBlockSize / 100 << std::endl;
   return maxOccupancyBlockSize;
 }
 
