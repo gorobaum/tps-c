@@ -2,6 +2,7 @@
 #include "image/itkimagehandler.h"
 #include "image/opcvimagehandler.h"
 #include "image/imagehandler.h"
+#include "image/imagedeformation.h"
 #include "utils/tpsinstance.h"
 
 #include <string>
@@ -52,8 +53,11 @@ int main(int argc, char** argv) {
 
   tps::Image referenceImage = imageHandler->loadImageData(line);
 
-  // tps::ImageDeformation id = tps::ImageDeformation(referenceImage, "bio-Def.nii.gz");
-  // id.apply3DSinDeformation();
+  tps::ImageDeformation id = tps::ImageDeformation(referenceImage);
+  id.apply3DSinDeformation();
+  tps::Image deformedImage = id.getResult();
+  imageHandler->saveImageData(deformedImage, "result.png");
+
 
   std::vector< tps::TpsInstance > tpsInstances;
 

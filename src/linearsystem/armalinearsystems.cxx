@@ -8,8 +8,11 @@ void tps::ArmaLinearSystems::solveLinearSystems() {
   timer.tic();
 
   solutionX = solveLinearSystem(A, bx);
+  std::cout << "solutionX ok" << std::endl;
   solutionY = solveLinearSystem(A, by);
+  std::cout << "solutionY ok" << std::endl;
   solutionZ = solveLinearSystem(A, bz);
+  std::cout << "solutionZ ok" << std::endl;
 
   double time = timer.toc();
   std::cout << "Arma solver execution time: " << time << std::endl;
@@ -29,6 +32,7 @@ std::vector<float> tps::ArmaLinearSystems::solveLinearSystem(arma::mat A, arma::
 void tps::ArmaLinearSystems::createMatrixA() {
   A = arma::mat(systemDimension, systemDimension, arma::fill::zeros);
 
+
   for (uint j = 0; j < referenceKeypoints_.size(); j++) {
     A(0,j+4) = 1;
     A(1,j+4) = referenceKeypoints_[j][0];
@@ -47,6 +51,7 @@ void tps::ArmaLinearSystems::createMatrixA() {
                                 referenceKeypoints_[i][2], referenceKeypoints_[j][2]);
       if (r != 0.0) A(j+4,i+4) = r*log(r);
     }
+  std::cout << A << std::endl;
 }
 
 void tps::ArmaLinearSystems::createBs() {
@@ -58,4 +63,7 @@ void tps::ArmaLinearSystems::createBs() {
     by(i+4) = targetKeypoints_[i][1];
     bz(i+4) = targetKeypoints_[i][2];
   }
+  std::cout << bx << std::endl;
+  std::cout << by << std::endl;
+  std::cout << bz << std::endl;
 }

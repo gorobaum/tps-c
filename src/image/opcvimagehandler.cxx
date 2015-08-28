@@ -3,8 +3,7 @@
 tps::Image tps::OPCVImageHandler::loadImageData(std::string filename) {
   cv::Mat cvTarImg = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
 
-  std::vector<int> dimensions(3, 0);
-
+  std::vector<int> dimensions;
   dimensions.push_back(cvTarImg.size().width);
   dimensions.push_back(cvTarImg.size().height);
   dimensions.push_back(1);
@@ -13,12 +12,11 @@ tps::Image tps::OPCVImageHandler::loadImageData(std::string filename) {
                                                          std::vector< std::vector<short> >(dimensions[1],
                                                          std::vector<short>(dimensions[2], 0)));
 
+  for (int col = 0; col < dimensions[0]; col++)
+    for (int row = 0; row < dimensions[1]; row++)
+      vecImage[col][row][0] = cvTarImg.at<uchar>(row, col);
 
-    for (int col = 0; col < dimensions[0]; col++)
-      for (int row = 0; row < dimensions[1]; row++)
-        vecImage[col][row][0] = cvTarImg.at<uchar>(row, col);
-
-  tps::Image(vecImage, dimensions);
+  return tps::Image(vecImage, dimensions);
 }
 
 void tps::OPCVImageHandler::saveImageData(tps::Image resultImage, std::string filename) {
