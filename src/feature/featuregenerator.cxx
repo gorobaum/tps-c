@@ -26,9 +26,9 @@ void tps::FeatureGenerator::run() {
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {
-    for (int z = 0; z <= gridSizeZ; z++)
-      for (int x = 0; x <= gridSizeX; x++)
-        for (int y = 0; y <= gridSizeY; y++) {
+    for (int z = 0; z <= gridSizeZ+1; z++)
+      for (int x = 0; x <= gridSizeX+1; x++)
+        for (int y = 0; y <= gridSizeY+1; y++) {
         std::vector<float> newCP;
         newCP.push_back(x*xStep);
         newCP.push_back(y*yStep);
@@ -38,9 +38,9 @@ void tps::FeatureGenerator::createReferenceImageFeatures() {
 }
 
 void tps::FeatureGenerator::createTargetImageFeatures() {
-  for (int z = 0; z <= gridSizeZ; z++)
-    for (int x = 0; x <= gridSizeX; x++) 
-      for (int y = 0; y <= gridSizeY; y++) {
+  for (int z = 0; z <= gridSizeZ+1; z++)
+    for (int x = 0; x <= gridSizeX+1; x++) 
+      for (int y = 0; y <= gridSizeY+1; y++) {
         int pos = z*gridSizeX*gridSizeY+x*gridSizeY+y;
         std::vector<float> referenceCP = referenceKeypoints[pos];
         std::vector<float> newPoint = applySinDeformationTo(referenceCP[0], referenceCP[1], referenceCP[2]);
