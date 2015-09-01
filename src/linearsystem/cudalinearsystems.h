@@ -13,10 +13,10 @@ public:
 private:
   void solveLinearSystem(float *B, float *cudaSolution);
   std::vector<float> pointerToVector(float *pointer);
-  void createMatrixA();
-  void createBs();
+  void transferMatrixA();
+  void transferBs();
   void freeResources();
-  float *bx, *by, *bz, *A;
+  float *CLSbx, *CLSby, *CLSbz, *CLSA;
 };
 
 } //namepsace

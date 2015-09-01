@@ -11,7 +11,8 @@ namespace tps {
 
 class TPS {
 public:
-  TPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, tps::Image targetImage) :
+  TPS(std::vector< std::vector<float> > referenceKeypoints, std::vector< std::vector<float> > targetKeypoints, 
+      tps::Image targetImage) :
     referenceKeypoints_(referenceKeypoints),
     targetKeypoints_(targetKeypoints),
     targetImage_(targetImage),

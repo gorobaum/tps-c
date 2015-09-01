@@ -14,11 +14,11 @@ float* tps::CudaTPS::solutionPointer(std::vector<float> solution) {
 }
 
 tps::Image tps::CudaTPS::run() {
-  lienarSolver.solveLinearSystems(cm_);
+  lienarSolver.solveLinearSystems();
 
-  // cm_.setSolutionX(lienarSolver.getSolutionX());
-  // cm_.setSolutionY(lienarSolver.getSolutionY());
-  // cm_.setSolutionZ(lienarSolver.getSolutionZ());
+  cm_.setSolutionX(lienarSolver.getSolutionX());
+  cm_.setSolutionY(lienarSolver.getSolutionY());
+  cm_.setSolutionZ(lienarSolver.getSolutionZ());
 
   regImage = runTPSCUDA(cm_, dimensions_, referenceKeypoints_.size());
 

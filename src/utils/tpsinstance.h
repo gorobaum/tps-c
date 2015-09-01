@@ -14,18 +14,22 @@ public:
   TpsInstance(std::string configurationFile, tps::Image referenceImage, tps::ImageHandler *imageHandler) :
     configurationFile_(configurationFile),
     referenceImage_(referenceImage),
-    imageHandler_(imageHandler) {
+    imageHandler_(imageHandler),
+    twoDimension(false) {
       readConfigurationFile();
       createKeyPoints();
     };
   void runCudaTPS();
   void runParallelTPS();
+  void runBasicTPS();
+  bool isTwoDimension() {return twoDimension;};
   size_t allocCudaMemory(size_t usedMemory);
   std::string generateOutputName(std::string differentiator);
 private:
   std::string configurationFile_;
   tps::Image referenceImage_;
   tps::ImageHandler *imageHandler_;
+  bool twoDimension;
   tps::Image targetImage;
   tps::CudaMemory cm;
   std::vector< std::vector<float> > referenceKPs;

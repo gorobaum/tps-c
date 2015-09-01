@@ -53,10 +53,10 @@ int main(int argc, char** argv) {
 
   tps::Image referenceImage = imageHandler->loadImageData(line);
 
-  tps::ImageDeformation id = tps::ImageDeformation(referenceImage);
-  id.apply3DSinDeformation();
-  tps::Image deformedImage = id.getResult();
-  imageHandler->saveImageData(deformedImage, "result.png");
+  // tps::ImageDeformation id = tps::ImageDeformation(referenceImage);
+  // id.apply3DSinDeformation();
+  // tps::Image deformedImage = id.getResult();
+  // imageHandler->saveImageData(deformedImage, "result.png");
 
 
   std::vector< tps::TpsInstance > tpsInstances;
@@ -92,6 +92,7 @@ int main(int argc, char** argv) {
     // Execution of the TPS, both in the Host and in the Device
     for (int j = lastExecution; j < currentExecution; j++) {
       std::cout << "============================================" << std::endl;
+      // tpsInstances[j].runParallelTPS();
       tpsInstances[j].runCudaTPS();
     }
   }
