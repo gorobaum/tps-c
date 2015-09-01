@@ -32,7 +32,6 @@ std::vector<float> tps::ArmaLinearSystems::solveLinearSystem(arma::vec b) {
   std::vector<float> solution;
   arma::vec armaSol = arma::solve(ALSA, b);
 
-  std::cout << armaSol << std::endl;
 
   for (uint i = 0; i < systemDimension; i++)
     solution.push_back(armaSol(i));
@@ -47,7 +46,6 @@ void tps::ArmaLinearSystems::transferMatrixA() {
     for (uint j = 0; j < systemDimension; j++) {
       ALSA(i,j) = matrixA[i][j];
     }
-  std::cout << ALSA << std::endl;
 }
 
 void tps::ArmaLinearSystems::transferBs() {
@@ -59,8 +57,4 @@ void tps::ArmaLinearSystems::transferBs() {
     ALSby(i) = by[i];
     ALSbz(i) = bz[i];
   }
-  std::cout << "systemDimension = " << systemDimension  << std::endl;
-  std::cout << ALSbx << std::endl;
-  std::cout << ALSby << std::endl;
-  std::cout << ALSbz << std::endl;
 }

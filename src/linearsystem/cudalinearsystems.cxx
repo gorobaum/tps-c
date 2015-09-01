@@ -66,6 +66,8 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   float *d_work = NULL;
   float *d_tau = NULL;
   int *devInfo = NULL;
+  int *hostDevInfo = malloc(sizeof(int));
+
 
   cusolverStatus_t cusolver_status;
   cublasStatus_t cublas_status;
@@ -77,6 +79,7 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
 
   // step 1: copy A and B to device
   checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float)));
+
   checkCuda(cudaMemcpy(cudaA, CLSA, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice));
   checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice));
 
@@ -117,11 +120,11 @@ void tps::CudaLinearSystems::transferMatrixA() {
 
   for (uint i = 0; i < systemDimension; i++)
     for (uint j = 0; j < systemDimension; j++)
-      CLSA[i*systemDimension+j] = matrixA[i][j];
+      CLSA[i*systemDimension+j] = matrixA[j][i];
 
-  // for (uint i = 0; i < systemDimension; i++)
-  //   for (uint j = 0; j < systemDimension; j++)
-  //     std::cout << "CLSA[" << i << "][" << j << "] = " << CLSA[i*systemDimension+j] << std::endl;
+  for (uint i = 0; i < systemDimension; i++)
+    for (uint j = 0; j < systemDimension; j++)
+      std::cout << "CLSA[" << i << "][" << j << "] = " << CLSA[i*systemDimension+j] << std::endl;
 }
 
 void tps::CudaLinearSystems::transferBs() {

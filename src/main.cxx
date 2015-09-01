@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
     // Execution of the TPS, both in the Host and in the Device
     for (int j = lastExecution; j < currentExecution; j++) {
       std::cout << "============================================" << std::endl;
-      // tpsInstances[j].runParallelTPS();
-      tpsInstances[j].runCudaTPS();
+      tpsInstances[j].runParallelTPS();
+      // tpsInstances[j].runCudaTPS();
     }
   }
   cudaThreadExit();
