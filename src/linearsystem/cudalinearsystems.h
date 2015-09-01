@@ -11,12 +11,12 @@ using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems(tps::CudaMemory& cm);
 private:
-  void solveLinearSystem(float *B, float *cudaSolution);
-  std::vector<float> pointerToVector(float *pointer);
+  void solveLinearSystem(double *B, double *cudaSolution);
+  std::vector<float> pointerToVector(double *pointer);
   void transferMatrixA();
   void transferBs();
   void freeResources();
-  float *CLSbx, *CLSby, *CLSbz, *CLSA;
+  double *CLSbx, *CLSby, *CLSbz, *CLSA;
 };
 
 } //namepsace

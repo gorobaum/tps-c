@@ -49,25 +49,20 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   if (twoDimension_)
     adaptSolutionTo3D();
 
-  for (int i = 0; i < solutionX.size(); i++)
-    std::cout << "\t" << solutionX[i] << std::endl;
-
   freeResources();
 }
 
-void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
+void tps::CudaLinearSystems::solveLinearSystem(double *B, double *cudaSolution) {
   int lwork = 0;
   int info_gpu = 0;
 
   const int nrhs = 1;
-  const float one = 1;
+  const double one = 1;
 
-  float *cudaA = NULL;
-  float *d_work = NULL;
-  float *d_tau = NULL;
+  double *cudaA = NULL;
+  double *d_work = NULL;
+  double *d_tau = NULL;
   int *devInfo = NULL;
-  int *hostDevInfo = malloc(sizeof(int));
-
 
   cusolverStatus_t cusolver_status;
   cublasStatus_t cublas_status;
@@ -78,30 +73,30 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
   cublasCreate(&cublasH);
 
   // step 1: copy A and B to device
-  checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(float)));
+  checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(double)));
 
-  checkCuda(cudaMemcpy(cudaA, CLSA, systemDimension*systemDimension*sizeof(float), cudaMemcpyHostToDevice));
-  checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(float), cudaMemcpyHostToDevice));
+  checkCuda(cudaMemcpy(cudaA, CLSA, systemDimension*systemDimension*sizeof(double), cudaMemcpyHostToDevice));
+  checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(double), cudaMemcpyHostToDevice));
 
-  checkCuda(cudaMalloc((void**)&d_tau, sizeof(float) * systemDimension));
+  checkCuda(cudaMalloc((void**)&d_tau, sizeof(double) * systemDimension));
   checkCuda(cudaMalloc((void**)&devInfo, sizeof(int)));
 
   // step 2: query working space of geqrf and ormqr
-  cusolver_status = cusolverDnSgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
+  cusolver_status = cusolverDnDgeqrf_bufferSize(handle, systemDimension, systemDimension, cudaA, systemDimension, &lwork);
 
-  checkCuda(cudaMalloc((void**)&d_work, sizeof(float) * lwork));
+  checkCuda(cudaMalloc((void**)&d_work, sizeof(double) * lwork));
 
   // step 3: compute QR factorization
-  cusolver_status = cusolverDnSgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
+  cusolver_status = cusolverDnDgeqrf(handle, systemDimension, systemDimension, cudaA, systemDimension, d_tau, d_work, lwork, devInfo);
   cudaDeviceSynchronize();
   
   // step 4: compute Q^T*B
-  cusolver_status = cusolverDnSormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
+  cusolver_status = cusolverDnDormqr(handle, CUBLAS_SIDE_LEFT, CUBLAS_OP_T, systemDimension, nrhs, 
     systemDimension, cudaA, systemDimension, d_tau, cudaSolution, systemDimension, d_work, lwork, devInfo);
   cudaDeviceSynchronize();
 
   // step 5: compute x = R \ Q^T*B
-  cublas_status = cublasStrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
+  cublas_status = cublasDtrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
     CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaSolution, 
     systemDimension);
   cudaDeviceSynchronize();
@@ -116,21 +111,17 @@ void tps::CudaLinearSystems::solveLinearSystem(float *B, float *cudaSolution) {
 }
 
 void tps::CudaLinearSystems::transferMatrixA() {
-  CLSA = (float*)malloc(systemDimension*systemDimension*sizeof(float));
+  CLSA = (double*)malloc(systemDimension*systemDimension*sizeof(double));
 
   for (uint i = 0; i < systemDimension; i++)
     for (uint j = 0; j < systemDimension; j++)
-      CLSA[i*systemDimension+j] = matrixA[j][i];
-
-  for (uint i = 0; i < systemDimension; i++)
-    for (uint j = 0; j < systemDimension; j++)
-      std::cout << "CLSA[" << i << "][" << j << "] = " << CLSA[i*systemDimension+j] << std::endl;
+      CLSA[i*systemDimension+j] = matrixA[i][j];
 }
 
 void tps::CudaLinearSystems::transferBs() {
-  CLSbx = (float*)malloc(systemDimension*sizeof(float));
-  CLSby = (float*)malloc(systemDimension*sizeof(float));
-  CLSbz = (float*)malloc(systemDimension*sizeof(float));
+  CLSbx = (double*)malloc(systemDimension*sizeof(double));
+  CLSby = (double*)malloc(systemDimension*sizeof(double));
+  CLSbz = (double*)malloc(systemDimension*sizeof(double));
   for (uint i = 0; i < systemDimension; i++) {
     CLSbx[i] = bx[i];
     CLSby[i] = by[i];
@@ -138,7 +129,7 @@ void tps::CudaLinearSystems::transferBs() {
   }
 }
 
-std::vector<float> tps::CudaLinearSystems::pointerToVector(float *pointer) {
+std::vector<float> tps::CudaLinearSystems::pointerToVector(double *pointer) {
   std::vector<float> vector;
   for (int i = 0; i < systemDimension; i++) {
     vector.push_back(pointer[i]);
