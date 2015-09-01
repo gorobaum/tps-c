@@ -36,23 +36,23 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   arma::wall_clock timer;
   timer.tic();
 
-  solveLinearSystem(CLSbx, cm.getSolutionX());
-  solveLinearSystem(CLSby, cm.getSolutionY());
-  solveLinearSystem(CLSbz, cm.getSolutionZ());
+  solveLinearSystem(CLSbx, solutionX);
+  solveLinearSystem(CLSby, solutionY);
+  solveLinearSystem(CLSbz, solutionZ);
   double time = timer.toc();
   std::cout << "Cuda solver execution time: " << time << std::endl;
 
-  solutionX = cm.getHostSolX();
-  solutionY = cm.getHostSolY();
-  solutionZ = cm.getHostSolZ();
-
-  if (twoDimension_)
+  if (twoDimension_) {
     adaptSolutionTo3D();
+    cm.setSolutionX(solutionX);
+    cm.setSolutionY(solutionY);
+    cm.setSolutionZ(solutionZ);
+  }
 
   freeResources();
 }
 
-void tps::CudaLinearSystems::solveLinearSystem(double *B, double *cudaSolution) {
+void tps::CudaLinearSystems::solveLinearSystem(double *B, std::vector<float>& solution) {
   int lwork = 0;
   int info_gpu = 0;
 
@@ -62,6 +62,8 @@ void tps::CudaLinearSystems::solveLinearSystem(double *B, double *cudaSolution) 
   double *cudaA = NULL;
   double *d_work = NULL;
   double *d_tau = NULL;
+  double *cudaSolution = NULL;
+  double *hostSolution = malloc(systemDimension*sizeof(double));
   int *devInfo = NULL;
 
   cusolverStatus_t cusolver_status;
@@ -74,6 +76,7 @@ void tps::CudaLinearSystems::solveLinearSystem(double *B, double *cudaSolution) 
 
   // step 1: copy A and B to device
   checkCuda(cudaMalloc(&cudaA, systemDimension*systemDimension*sizeof(double)));
+  checkCuda(cudaMalloc(&cudaSolution, systemDimension*sizeof(double)));
 
   checkCuda(cudaMemcpy(cudaA, CLSA, systemDimension*systemDimension*sizeof(double), cudaMemcpyHostToDevice));
   checkCuda(cudaMemcpy(cudaSolution, B, systemDimension*sizeof(double), cudaMemcpyHostToDevice));
@@ -99,12 +102,18 @@ void tps::CudaLinearSystems::solveLinearSystem(double *B, double *cudaSolution) 
   cublas_status = cublasDtrsm(cublasH, CUBLAS_SIDE_LEFT, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N, 
     CUBLAS_DIAG_NON_UNIT, systemDimension, nrhs, &one, cudaA, systemDimension, cudaSolution, 
     systemDimension);
+  cudaMemcpy(hostSolution, cudaSolution, systemDimension*sizeof(double), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
 
+  for (int i = 0; i < systemDimension; i++)
+    solution.push_back(hostSolution[i]);
+
   checkCuda(cudaFree(cudaA));
+  checkCuda(cudaFree(cudaSolution));
   checkCuda(cudaFree(d_tau));
   checkCuda(cudaFree(devInfo));
   checkCuda(cudaFree(d_work));
+  delete(hostSolution);
 
   cublasDestroy(cublasH);   
   cusolverDnDestroy(handle);

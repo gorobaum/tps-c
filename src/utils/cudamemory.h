@@ -22,9 +22,9 @@ public:
   void freeMemory();
   void allocCudaMemory(tps::Image& image);
   double memoryEstimation();
-  double* getSolutionX() { return solutionX; };
-  double* getSolutionY() { return solutionY; };
-  double* getSolutionZ() { return solutionZ; };
+  float* getSolutionX() { return solutionX; };
+  float* getSolutionY() { return solutionY; };
+  float* getSolutionZ() { return solutionZ; };
   void setSolutionX(std::vector<float> solution);
   void setSolutionY(std::vector<float> solution);
   void setSolutionZ(std::vector<float> solution);
@@ -40,12 +40,12 @@ private:
   void allocCudaSolution();
   void allocCudaKeypoints();
   void allocCudaImagePixels(tps::Image& image);
-  std::vector<float> cudaToHost(double *cudaMemory);
+  std::vector<float> cudaToHost(float *cudaMemory);
   int imageSize;
   std::vector< std::vector<float> > referenceKeypoints_;
   int numberOfCps;
   int systemDim;
-  double *solutionX, *solutionY, *solutionZ;
+  float *solutionX, *solutionY, *solutionZ;
   float *keypointX, *keypointY, *keypointZ;
   short *targetImage, *regImage;
 };

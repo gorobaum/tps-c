@@ -11,7 +11,7 @@ using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems(tps::CudaMemory& cm);
 private:
-  void solveLinearSystem(double *B, double *cudaSolution);
+  void solveLinearSystem(double *B, std::vector<float>& solution);
   std::vector<float> pointerToVector(double *pointer);
   void transferMatrixA();
   void transferBs();

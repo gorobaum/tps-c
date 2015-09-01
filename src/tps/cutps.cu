@@ -57,8 +57,8 @@ __device__ short cudaTrilinearInterpolation(float x, float y, float z, short* im
 }
 
 // Kernel definition
-__global__ void tpsCuda(short* cudaImage, short* cudaRegImage, double* solutionX, double* solutionY, 
-                        double* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
+__global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX, float* solutionY, 
+                        float* solutionZ, int width, int height, int slices, float* keyX, float* keyY, 
                         float* keyZ, int numOfKeys) {
   int x = blockDim.x*blockIdx.x + threadIdx.x;
   int y = blockDim.y*blockIdx.y + threadIdx.y;

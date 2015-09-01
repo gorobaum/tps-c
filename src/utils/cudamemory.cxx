@@ -19,9 +19,9 @@ void tps::CudaMemory::allocCudaMemory(tps::Image& image) {
 }
 
 void tps::CudaMemory::allocCudaSolution() {
-  checkCuda(cudaMalloc(&solutionX, systemDim*sizeof(double)));
-  checkCuda(cudaMalloc(&solutionY, systemDim*sizeof(double)));
-  checkCuda(cudaMalloc(&solutionZ, systemDim*sizeof(double)));
+  checkCuda(cudaMalloc(&solutionX, systemDim*sizeof(float)));
+  checkCuda(cudaMalloc(&solutionY, systemDim*sizeof(float)));
+  checkCuda(cudaMalloc(&solutionZ, systemDim*sizeof(float)));
 }
 
 void tps::CudaMemory::allocCudaKeypoints() {
@@ -91,9 +91,9 @@ void tps::CudaMemory::setSolutionZ(std::vector<float> solution) {
   free(solPointer);
 }
 
-std::vector<float> tps::CudaMemory::cudaToHost(double *cudaMemory) {
-    double *hostSolPointer = (double*)malloc(systemDim*sizeof(double));
-    cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(double), cudaMemcpyDeviceToHost);
+std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
+    float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
+    cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);
     std::vector<float> hostSol;
     for (int i =0; i < systemDim; i++) 
       hostSol.push_back(hostSolPointer[i]);
