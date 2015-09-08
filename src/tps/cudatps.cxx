@@ -20,11 +20,10 @@ tps::Image tps::CudaTPS::run() {
   // cm_.setSolutionY(lienarSolver.getSolutionY());
   // cm_.setSolutionZ(lienarSolver.getSolutionZ());
 
-  regImage = runTPSCUDA(cm_, dimensions_, referenceKeypoints_.size());
+  short *regImage = runTPSCUDA(cm_, dimensions_, referenceKeypoints_.size());
 
   registredImage.setPixelVector(regImage);
   
+  delete(regImage);
   return registredImage;
-
-  free(regImage);
 }

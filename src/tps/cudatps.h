@@ -20,7 +20,6 @@ class CudaTPS : public TPS {
     tps::CudaLinearSystems lienarSolver;
     tps::CudaMemory& cm_;
     float* solutionPointer(std::vector<float> solution);
-    short *regImage;  
 };
 
 }
