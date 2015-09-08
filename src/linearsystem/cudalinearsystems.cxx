@@ -42,12 +42,11 @@ void tps::CudaLinearSystems::solveLinearSystems(tps::CudaMemory& cm) {
   double time = timer.toc();
   std::cout << "Cuda solver execution time: " << time << std::endl;
 
-  if (twoDimension_) {
+  if (twoDimension_)
     adaptSolutionTo3D();
-    cm.setSolutionX(solutionX);
-    cm.setSolutionY(solutionY);
-    cm.setSolutionZ(solutionZ);
-  }
+  cm.setSolutionX(solutionX);
+  cm.setSolutionY(solutionY);
+  cm.setSolutionZ(solutionZ);
 
   freeResources();
 }
