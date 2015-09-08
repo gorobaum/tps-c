@@ -1,13 +1,9 @@
 #include "image/image.h"
 #include "image/itkimagehandler.h"
+#include "image/opcvimagehandler.h"
+#include "image/imagehandler.h"
 #include "image/imagedeformation.h"
-#include "feature/featuregenerator.h"
-#include "utils/cudamemory.h"
 #include "utils/tpsinstance.h"
-#include "tps/tps.h"
-#include "tps/cudatps.h"
-#include "tps/basictps.h"
-#include "tps/paralleltps.h"
 
 #include <string>
 #include <sstream>
@@ -48,17 +44,27 @@ int main(int argc, char** argv) {
   std::size_t pos = line.find('.');
   std::string extension = line.substr(pos);
 
-  tps::Image referenceImage = tps::ITKImageHandler::loadImageData(line);
+  tps::ImageHandler *imageHandler;
 
-  // tps::ImageDeformation id = tps::ImageDeformation(referenceImage, "bio-Def.nii.gz");
+  if (extension.compare(".nii.gz") == 0)
+    imageHandler = new tps::ITKImageHandler();
+  else
+    imageHandler = new tps::OPCVImageHandler();
+
+  tps::Image referenceImage = imageHandler->loadImageData(line);
+
+  // tps::ImageDeformation id = tps::ImageDeformation(referenceImage);
   // id.apply3DSinDeformation();
+  // tps::Image deformedImage = id.getResult();
+  // imageHandler->saveImageData(deformedImage, "result.png");
+
 
   std::vector< tps::TpsInstance > tpsInstances;
 
   // Reading each iteration configuration file
   int nFiles = 0;
   for (line; std::getline(infile, line); infile.eof(), nFiles++) {
-    tps::TpsInstance newInstance(line, referenceImage);
+    tps::TpsInstance newInstance(line, referenceImage, imageHandler);
     tpsInstances.push_back(newInstance);
   }
 
@@ -71,11 +77,9 @@ int main(int argc, char** argv) {
 
   // Allocating the maximun possible of free memory in the GPU
   std::vector< tps::CudaMemory > cudaMemories;
-  std::cout << "============================================" << std::endl;
   for (int currentExecution = 0; currentExecution < nFiles; currentExecution++) {
     int lastExecution = currentExecution;
     while(used <= 1800) {
-      std::cout << "Entry number " << currentExecution << " will run." << std::endl;
       int newUsed = tpsInstances[currentExecution].allocCudaMemory(used);
       if (newUsed == used) break;
       else {
@@ -86,8 +90,9 @@ int main(int argc, char** argv) {
     }
 
     // Execution of the TPS, both in the Host and in the Device
-    std::cout << "============================================" << std::endl;
     for (int j = lastExecution; j < currentExecution; j++) {
+      std::cout << "============================================" << std::endl;
+      tpsInstances[j].runParallelTPS();
       tpsInstances[j].runCudaTPS();
     }
   }

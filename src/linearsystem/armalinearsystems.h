@@ -11,11 +11,11 @@ using CPLinearSystems::CPLinearSystems;
 public:
   void solveLinearSystems();
 private:
-  void createMatrixA();
-  void createBs();
-  std::vector<float> solveLinearSystem(arma::mat A, arma::vec b);
-  arma::mat A;
-  arma::vec bx, by, bz;
+  void transferMatrixA();
+  void transferBs();
+  std::vector<float> solveLinearSystem(arma::vec b);
+  arma::mat ALSA;
+  arma::vec ALSbx, ALSby, ALSbz;
 };
 
 } //namepsace

@@ -95,7 +95,8 @@ std::vector<float> tps::CudaMemory::cudaToHost(float *cudaMemory) {
     float *hostSolPointer = (float*)malloc(systemDim*sizeof(float));
     cudaMemcpy(hostSolPointer, cudaMemory, systemDim*sizeof(float), cudaMemcpyDeviceToHost);
     std::vector<float> hostSol;
-    for (int i =0; i < systemDim; i++) hostSol.push_back(hostSolPointer[i]);
+    for (int i =0; i < systemDim; i++) 
+      hostSol.push_back(hostSolPointer[i]);
     delete(hostSolPointer);
     return hostSol;
 }

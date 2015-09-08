@@ -9,12 +9,12 @@
 
 void tps::FeatureGenerator::run() {
   std::vector<int> dimensions = referenceImage_.getDimensions();
-  gridSizeX = dimensions[0]*percentage_;
-  gridSizeY = dimensions[1]*percentage_;
-  gridSizeZ = dimensions[2]*percentage_;
-  xStep = dimensions[0]*1.0/(gridSizeX-1);
-  yStep = dimensions[1]*1.0/(gridSizeY-1);
-  zStep = dimensions[2]*1.0/(gridSizeZ-1);
+  gridSizeX = dimensions[0]*percentage_ + 1;
+  gridSizeY = dimensions[1]*percentage_ + 1;
+  gridSizeZ = dimensions[2]*percentage_ + 1;
+  xStep = dimensions[0]*1.0/(std::max(1, gridSizeX-1));
+  yStep = dimensions[1]*1.0/(std::max(1, gridSizeY-1));
+  zStep = dimensions[2]*1.0/(std::max(1, gridSizeZ-1));
   std::cout << "gridSizeX = " << gridSizeX << std::endl;
   std::cout << "gridSizeY = " << gridSizeY << std::endl;
   std::cout << "gridSizeZ = " << gridSizeZ << std::endl;
@@ -38,20 +38,24 @@ void tps::FeatureGenerator::createReferenceImageFeatures() {
 }
 
 void tps::FeatureGenerator::createTargetImageFeatures() {
+  int pos = 0;
   for (int z = 0; z < gridSizeZ; z++)
     for (int x = 0; x < gridSizeX; x++) 
       for (int y = 0; y < gridSizeY; y++) {
-        int pos = z*gridSizeX*gridSizeY+x*gridSizeY+y;
         std::vector<float> referenceCP = referenceKeypoints[pos];
         std::vector<float> newPoint = applySinDeformationTo(referenceCP[0], referenceCP[1], referenceCP[2]);
         targetKeypoints.push_back(newPoint);
+        pos++;
       }
 }
 
 std::vector<float> tps::FeatureGenerator::applySinDeformationTo(float x, float y, float z) {
   std::vector<float> newPoint;
+  // newX = x - 2.0*std::sin(y/32.0) + 2.0*std::cos(z/16.0);
   float newX = x - 2.0*std::sin(y/32.0) + 2.0*std::cos(z/16.0);
+  // newY = y + 4.0*std::cos(z/8.0) - 8.0*std::sin(x/32.0);
   float newY = y + 4.0*std::cos(z/8.0) - 8.0*std::sin(x/32.0);
+  // newZ = z - 2.0*std::sin(x/16.0) + 4.0*std::cos(y/16.0);
   float newZ = z - 2.0*std::sin(x/16.0) + 4.0*std::cos(y/16.0);
   newPoint.push_back(newX);
   newPoint.push_back(newY);

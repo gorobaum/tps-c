@@ -13,18 +13,18 @@ float* tps::CudaTPS::solutionPointer(std::vector<float> solution) {
   return vector;
 }
 
-void tps::CudaTPS::run() {
-  lienarSolver.solveLinearSystems();
+tps::Image tps::CudaTPS::run() {
+  lienarSolver.solveLinearSystems(cm_);
 
-  cm_.setSolutionX(lienarSolver.getSolutionX());
-  cm_.setSolutionY(lienarSolver.getSolutionY());
-  cm_.setSolutionZ(lienarSolver.getSolutionZ());
+  // cm_.setSolutionX(lienarSolver.getSolutionX());
+  // cm_.setSolutionY(lienarSolver.getSolutionY());
+  // cm_.setSolutionZ(lienarSolver.getSolutionZ());
 
   regImage = runTPSCUDA(cm_, dimensions_, referenceKeypoints_.size());
 
   registredImage.setPixelVector(regImage);
   
-  tps::ITKImageHandler::saveImageData(registredImage, outputName_);
+  return registredImage;
 
   free(regImage);
 }

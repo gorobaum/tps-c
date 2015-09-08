@@ -16,6 +16,7 @@ cuda_add_executable(tps
 
   src/image/image.cxx
   src/image/itkimagehandler.cxx
+  src/image/opcvimagehandler.cxx
   src/image/imagedeformation.cxx
 
   src/utils/cudamemory.cxx
@@ -24,6 +25,7 @@ cuda_add_executable(tps
   src/feature/featuregenerator.cxx
 
   # src/linearsystem/OPCVlinearsystems.cxx
+  src/linearsystem/cplinearsystems.cxx
   src/linearsystem/cudalinearsystems.cxx
   src/linearsystem/armalinearsystems.cxx
 

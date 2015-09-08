@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-void tps::BasicTPS::run() {
+tps::Image tps::BasicTPS::run() {
 	lienarSolver.solveLinearSystems();
 	solutionX = lienarSolver.getSolutionX();
 	solutionY = lienarSolver.getSolutionY();
@@ -29,5 +29,5 @@ void tps::BasicTPS::run() {
 			registredImage.changePixelAt(x, y, z, value);
 		}
 
-		tps::ITKImageHandler::saveImageData(registredImage, outputName_);
+		return registredImage;
 }
