@@ -39,11 +39,11 @@ void tps::CPLinearSystems::createBs3D() {
   bx = std::vector<float>(systemDimension, 0.0);
   by = std::vector<float>(systemDimension, 0.0);
   bz = std::vector<float>(systemDimension, 0.0);
-  for (int j = Size3D, i = 0; j < targetKeypoints_.size(); i++, j++) {
+  for (int j = Size3D, i = 0; j < systemDimension; i++, j++) {
     bx[j] = targetKeypoints_[i][0];
     by[j] = targetKeypoints_[i][1];
     bz[j] = targetKeypoints_[i][2];
-  } 
+  }
 }
   
 void tps::CPLinearSystems::createMatrixA2D() {
@@ -71,7 +71,7 @@ void tps::CPLinearSystems::createBs2D() {
   by = std::vector<float>(systemDimension, 0.0);
   bz = std::vector<float>(systemDimension, 0.0);
 
-  for (int j = Size2D, i = 0; i < targetKeypoints_.size(); i++, j++) {
+  for (int j = Size2D, i = 0; j < systemDimension; i++, j++) {
     bx[j] = targetKeypoints_[i][0];
     by[j] = targetKeypoints_[i][1];
   } 

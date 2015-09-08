@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     for (int j = lastExecution; j < currentExecution; j++) {
       std::cout << "============================================" << std::endl;
       tpsInstances[j].runParallelTPS();
-      tpsInstances[j].runCudaTPS();
+      // tpsInstances[j].runCudaTPS();
     }
   }
   cudaThreadExit();
