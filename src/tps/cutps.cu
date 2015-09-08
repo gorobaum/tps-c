@@ -76,9 +76,10 @@ __global__ void tpsCuda(short* cudaImage, short* cudaRegImage, float* solutionX,
       newZ += r*log(r) * solutionZ[i+4];
     }
   }
-  if (z*height*width+x*height+y < width*height*slices) {
-    cudaRegImage[z*height*width+x*height+y] = cudaTrilinearInterpolation(newX, newY, newZ, cudaImage, width, height, slices);
-  }
+  if (x <= width-1 && x >= 0)
+    if (y <= height-1 && y >= 0)
+      if (z <= slices-1 && z >= 0)
+        cudaRegImage[z*height*width+x*height+y] = cudaTrilinearInterpolation(newX, newY, newZ, cudaImage, width, height, slices);
 }
 
 void startTimeRecord(cudaEvent_t *start, cudaEvent_t *stop) {
@@ -102,6 +103,13 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
+
+  std::cout << "dimensions[0] = " << dimensions[0] << std::endl;
+  std::cout << "dimensions[1] = " << dimensions[1] << std::endl;
+  std::cout << "dimensions[2] = " << dimensions[2] << std::endl;
+  std::cout << "numBlocks.x = " << numBlocks.x << std::endl;
+  std::cout << "numBlocks.y = " << numBlocks.y << std::endl;
+  std::cout << "numBlocks.z = " << numBlocks.z << std::endl;
 
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
