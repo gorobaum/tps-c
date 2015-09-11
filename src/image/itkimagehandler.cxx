@@ -45,12 +45,11 @@ tps::Image tps::ITKImageHandler::loadImageData(std::string filename) {
     dimensions.push_back(imageIO->GetDimensions(i));
   }
 
-  std::vector<std::vector<std::vector<short>>> vecImage(dimensions[0], std::vector<std::vector<short>>(dimensions[1], 
-                                                        std::vector<short>(dimensions[2], 0)));
+  short* vecImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
   while(!imageIterator.IsAtEnd()){
     ImageType::IndexType index = imageIterator.GetIndex();
-    vecImage[index[0]][index[1]][index[2]] = imageIterator.Value();
+    vecImage[index[1]+index[0]*dimensions[1]+index[2]*dimensions[1]*dimensions[0]] = imageIterator.Value();
     ++imageIterator;
   }
 

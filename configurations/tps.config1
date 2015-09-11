@@ -31,3 +31,8 @@ targetKeypoints:
 2319 1429
 3219 1867
 endKeypoints
+boundaries:
+2145 3454
+1017 2387
+1 1
+endBoundaries

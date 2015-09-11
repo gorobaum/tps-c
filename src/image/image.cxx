@@ -2,7 +2,7 @@
 
 void tps::Image::changePixelAt(int x, int y, int z, short value) {
   if (x >= 0 && x < dimensions_[0]-1 && y >= 0 && y < dimensions_[1]-1 && z >= 0 && z <= dimensions_[2]-1)
-    image[x][y][z] = value;
+    image[y+x*dimensions_[1]+z*dimensions_[0]*dimensions_[1]] = value;
 }
 
 std::vector<short> tps::Image::getMinMax() {
@@ -11,7 +11,7 @@ std::vector<short> tps::Image::getMinMax() {
   for (int z = 0; z < dimensions_[2]; z++)
     for (int x = 0; x < dimensions_[0]; x++)
       for (int y = 0; y < dimensions_[1]; y++) {
-        short value = image[x][y][z];
+        short value = getPixelAt(x, y, z);
         if (value < min) min = value;
         if (value > max) max = value;
       }
@@ -29,7 +29,7 @@ short tps::Image::getPixelAt(int x, int y, int z) {
   else if (z > dimensions_[2]-1 || z < 0)
     return 0;
   else {
-    return image[x][y][z];
+    return image[y+x*dimensions_[1]+z*dimensions_[0]*dimensions_[1]];
   }
 }
 
@@ -65,12 +65,7 @@ short tps::Image::NNInterpolation(float x, float y, float z) {
 }
 
 short* tps::Image::getPixelVector() {
-  short* vector = (short*)malloc(dimensions_[0]*dimensions_[1]*dimensions_[2]*sizeof(short));
-  for (int z = 0; z < dimensions_[2]; z++)
-    for (int x = 0; x < dimensions_[0]; x++)
-      for (int y = 0; y < dimensions_[1]; y++)
-        vector[z*dimensions_[1]*dimensions_[0]+x*dimensions_[1]+y] = (short)image[x][y][z];
-  return vector;
+  return image;
 }
 
 void tps::Image::setPixelVector(short* vector) {

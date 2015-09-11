@@ -36,12 +36,15 @@ private:
   tps::CudaMemory cm;
   std::vector< std::vector<float> > referenceKPs;
   std::vector< std::vector<float> > targetKPs;
+  std::vector< std::vector<int> > boundaries;
   std::string outputName;
   std::string extension;
   float percentage;
   void createKeyPoints();
   void readConfigurationFile();
+  void readBoundaries(std::ifstream& infile);
   void readKeypoints(std::ifstream& infile, std::vector< std::vector<float> >& kps);
+  void addNewKeypoints(std::vector< std::vector<float> >& keyPoints, std::vector< std::vector<float> > newKeyPoints);
 };
 
 } // namespace

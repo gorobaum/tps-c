@@ -8,15 +8,17 @@ tps::Image tps::OPCVImageHandler::loadImageData(std::string filename) {
   dimensions.push_back(cvTarImg.size().height);
   dimensions.push_back(1);
 
-  std::vector< std::vector< std::vector<short> > > vecImage(dimensions[0], 
-                                                         std::vector< std::vector<short> >(dimensions[1],
-                                                         std::vector<short>(dimensions[2], 0)));
+  short* vecImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
   for (int col = 0; col < dimensions[0]; col++)
     for (int row = 0; row < dimensions[1]; row++)
-      vecImage[col][row][0] = cvTarImg.at<uchar>(row, col);
+      vecImage[col*dimensions[1]+row] = cvTarImg.at<uchar>(row, col);
 
-  return tps::Image(vecImage, dimensions);
+  tps::Image image(vecImage, dimensions);
+
+  delete(vecImage);
+
+  return image;
 }
 
 void tps::OPCVImageHandler::saveImageData(tps::Image resultImage, std::string filename) {

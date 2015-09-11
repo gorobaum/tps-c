@@ -104,13 +104,6 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
 
-  std::cout << "dimensions[0] = " << dimensions[0] << std::endl;
-  std::cout << "dimensions[1] = " << dimensions[1] << std::endl;
-  std::cout << "dimensions[2] = " << dimensions[2] << std::endl;
-  std::cout << "numBlocks.x = " << numBlocks.x << std::endl;
-  std::cout << "numBlocks.y = " << numBlocks.y << std::endl;
-  std::cout << "numBlocks.z = " << numBlocks.z << std::endl;
-
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
   for (int slice = 0; slice < dimensions[2]; slice++)

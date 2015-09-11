@@ -7,6 +7,14 @@
 #define PI 3.14159265
 #define ANG PI/72.0
 
+bool tps::FeatureGenerator::checkBoundary(float x, float y, float z) {
+  if (x <= boundaries_[0][0] || x >= boundaries_[0][1])
+    if (y <= boundaries_[1][0] || y >= boundaries_[1][1])
+      if (z <= boundaries_[2][0] || z >= boundaries_[2][0])
+        return true;
+  return false;
+}
+
 void tps::FeatureGenerator::run() {
   std::vector<int> dimensions = referenceImage_.getDimensions();
   gridSizeX = dimensions[0]*percentage_ + 1;
@@ -21,8 +29,22 @@ void tps::FeatureGenerator::run() {
   std::cout << "xStep = " << xStep << std::endl;
   std::cout << "yStep = " << yStep << std::endl;
   std::cout << "zStep = " << zStep << std::endl;
-  createReferenceImageFeatures();
-  createTargetImageFeatures();
+  createUniformFeatures();
+}
+
+void tps::FeatureGenerator::createUniformFeatures() {
+    for (int z = 0; z < gridSizeZ; z++)
+      for (int x = 0; x < gridSizeX; x++)
+        for (int y = 0; y < gridSizeY; y++) {
+          if(checkBoundary(x*xStep, y*yStep, z*zStep)) {
+            std::vector<float> newCP;
+            newCP.push_back(x*xStep);
+            newCP.push_back(y*yStep);
+            newCP.push_back(z*zStep);
+            referenceKeypoints.push_back(newCP);
+            targetKeypoints.push_back(newCP);
+          }
+      }
 }
 
 void tps::FeatureGenerator::createReferenceImageFeatures() {

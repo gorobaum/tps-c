@@ -26,6 +26,33 @@ void tps::TpsInstance::readKeypoints(std::ifstream& infile, std::vector< std::ve
   }
 }
 
+void tps::TpsInstance::readBoundaries(std::ifstream& infile) {
+  std::string line;
+  int count = 0;
+  while(std::getline(infile, line)) {
+    if (line.compare("endBoundaries") != 0) {
+      std::stringstream stream(line);
+      float point;
+      std::vector<int> newBoundary;
+      for (int i = 0; i < 2; i++) {
+        stream >> point;
+        newBoundary.push_back(point);
+      }
+      count++;
+      boundaries.push_back(newBoundary);
+    } 
+    else break;
+  }
+  while (count < 3) {
+    std::vector<int> newBoundary;
+    newBoundary[0] = 0;
+    newBoundary[1] = targetImage.getDimensions()[count];
+    boundaries.push_back(newBoundary);
+    count++;
+  }
+  std::cout << "boundaries.size() = " << boundaries.size() << std::endl;
+}
+
 void tps::TpsInstance::readConfigurationFile() {
   std::ifstream infile;
   
@@ -50,16 +77,24 @@ void tps::TpsInstance::readConfigurationFile() {
       readKeypoints(infile, referenceKPs);
     else if (line.compare("targetKeypoints:") == 0)
       readKeypoints(infile, targetKPs);
+    else if (line.compare("boundaries:") == 0)
+      readBoundaries(infile);
     else break;
   }
+  std::cout << "boundaries.size() = " << boundaries.size() << std::endl;
+}
+
+void tps::TpsInstance::addNewKeypoints(std::vector< std::vector<float> >& keyPoints, std::vector< std::vector<float> > newKeyPoints) {
+  std::vector< std::vector<float> >::iterator it = keyPoints.begin();
+  keyPoints.insert(it, newKeyPoints.begin(), newKeyPoints.end());
 }
 
 void tps::TpsInstance::createKeyPoints() {
-  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage_, targetImage, percentage);
+  tps::FeatureGenerator fg = tps::FeatureGenerator(referenceImage_, targetImage, percentage, boundaries);
   fg.run();
 
-  referenceKPs = fg.getReferenceKeypoints();
-  targetKPs = fg.getTargetKeypoints();
+  addNewKeypoints(referenceKPs, fg.getReferenceKeypoints());
+  addNewKeypoints(targetKPs, fg.getTargetKeypoints());
 }
 
 std::string tps::TpsInstance::generateOutputName(std::string differentiator) {

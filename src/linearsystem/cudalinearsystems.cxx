@@ -62,7 +62,7 @@ void tps::CudaLinearSystems::solveLinearSystem(double *B, std::vector<float>& so
   double *d_work = NULL;
   double *d_tau = NULL;
   double *cudaSolution = NULL;
-  double *hostSolution = malloc(systemDimension*sizeof(double));
+  double *hostSolution = (double*)malloc(systemDimension*sizeof(double));
   int *devInfo = NULL;
 
   cusolverStatus_t cusolver_status;

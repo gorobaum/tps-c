@@ -10,15 +10,18 @@ namespace tps {
 class Image {
 public:
 	Image() {};
-	Image(std::vector< std::vector< std::vector<short> > > matImage, std::vector<int> dimensions) :
+	Image(short* matImage, std::vector<int> dimensions) :
 		dimensions_(dimensions) {
-			image = matImage;
-	};
+			image = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
+			for (int i = 0; i < dimensions[0]*dimensions[1]*dimensions[2]; i++)
+				image[i] = matImage[i];
+	}
 	Image(std::vector<int> dimensions) :
 		dimensions_(dimensions) {
-			image = std::vector< std::vector< std::vector<short> > >(dimensions[0], std::vector< std::vector<short> > (dimensions[1], std::vector<short>(dimensions[2], 0)));
-	};
-	std::vector< std::vector< std::vector<short> > > getImage() {return image;};
+			image = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
+			for (int i = 0; i < dimensions[0]*dimensions[1]*dimensions[2]; i++)
+				image[i] = 0;
+	}
 	std::vector<int> getDimensions() { return dimensions_; };
 	std::vector<short> getMinMax();
 	void changePixelAt(int x, int y, int z, short value);
@@ -28,7 +31,7 @@ public:
 	short* getPixelVector();
 	void setPixelVector(short* vector);
 private:
-	std::vector< std::vector< std::vector<short> > > image;
+	short* image;
 	std::vector<int> dimensions_;
 	int getNearestInteger(float number) {
 		if ((number - std::floor(number)) <= 0.5) return std::floor(number);
