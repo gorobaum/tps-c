@@ -2,6 +2,8 @@
 #define TPS_TPSINSTANCE_H_
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include "image/image.h"
 #include "image/imagehandler.h"
@@ -39,6 +41,7 @@ private:
   float percentage;
   void createKeyPoints();
   void readConfigurationFile();
+  void readKeypoints(std::ifstream& infile, std::vector< std::vector<float> >& kps);
 };
 
 } // namespace

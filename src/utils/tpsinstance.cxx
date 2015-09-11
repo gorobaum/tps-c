@@ -1,3 +1,6 @@
+#include <sstream>
+#include <armadillo>
+
 #include "tpsinstance.h"
 
 #include "feature/featuregenerator.h"
@@ -6,8 +9,26 @@
 #include "tps/paralleltps.h"
 #include "tps/basictps.h"
 
+void tps::TpsInstance::readKeypoints(std::ifstream& infile, std::vector< std::vector<float> >& kps) {
+  std::string line;
+  while(std::getline(infile, line)) {
+    if (line.compare("endKeypoints") != 0) {
+      std::stringstream stream(line);
+      float point;
+      std::vector<float> newKP;
+      for (int i = 0; i < 2; i++) {
+        stream >> point;
+        newKP.push_back(point);
+      }
+      kps.push_back(newKP);
+    } 
+    else break;
+  }
+}
+
 void tps::TpsInstance::readConfigurationFile() {
   std::ifstream infile;
+  
   infile.open(configurationFile_.c_str());
   std::string line;
   
@@ -23,6 +44,14 @@ void tps::TpsInstance::readConfigurationFile() {
 
   std::getline(infile, line);
   percentage = std::stof(line);
+
+  while (std::getline(infile, line)) {
+    if (line.compare("referenceKeypoints:") == 0)
+      readKeypoints(infile, referenceKPs);
+    else if (line.compare("targetKeypoints:") == 0)
+      readKeypoints(infile, targetKPs);
+    else break;
+  }
 }
 
 void tps::TpsInstance::createKeyPoints() {

@@ -87,7 +87,7 @@ def getTargetFileName():
 
 
 def getScaleFactor():
-    scale_factor = 1
+    scale_factor = 2
     if len(sys.argv) >= 4:
         scale_factor = float(sys.argv[3])
 
@@ -246,8 +246,8 @@ def handle_events(offset, scale, second_phase):
     running = True
     mousePos = (-1,-1)
     end_ref_phase = False
-    step = 1    # The amount of pixels offset will move.
-    factor = 0.1 # Proportion by which scale will increase/decrease.
+    step = 80   # The amount of pixels offset will move.
+    factor = 0.2 # Proportion by which scale will increase/decrease.
     segmentation_changed = False
     should_export_screenshot = False
 
@@ -306,8 +306,7 @@ def scale_points(points, scale):
 
 # PNG CARA
 def export_screenshot(surface, filename):
-    filename = os.path.splitext(filename)[0] + ".png"
-    filename = filename + "-result"
+    filename = os.path.splitext(filename)[0] + "-result-" + ".png"
 
     print("Exporting screenshot to file: " + filename)
     pygame.image.save(surface, filename)
@@ -316,11 +315,13 @@ def export_screenshot(surface, filename):
 def drawRedCrosshair(surface, mousePos):
   x = mousePos[0]
   y = mousePos[1]
-  surface.set_at((x,y), RED)
-  surface.set_at((x+1,y), RED)
-  surface.set_at((x-1,y), RED)
-  surface.set_at((x,y+1), RED)
-  surface.set_at((x,y-1), RED)
+  for i, j in enumerate(range(-15, 15)):
+    surface.set_at((x+i,y-j), RED)
+    surface.set_at((x+i+1,y-j), RED)
+    surface.set_at((x+i,y-j-1), RED)
+    surface.set_at((x+i,y+j), RED)
+    surface.set_at((x+i-1,y+j), RED)
+    surface.set_at((x+i,y+j+1), RED)
 
 def printVectorForC(vec):
   out = " = {"
