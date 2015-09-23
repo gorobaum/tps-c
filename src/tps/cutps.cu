@@ -115,8 +115,8 @@ int getBlockSize() {
         blockSize,
         0);
 
-    activeWarps = numBlocks * blockSize / prop.warpSize;
-    maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+    int activeWarps = numBlocks * blockSize / prop.warpSize;
+    int maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
     if (maxOccupancy < currentOccupancy) {
       maxOccupancy = currentOccupancy;
