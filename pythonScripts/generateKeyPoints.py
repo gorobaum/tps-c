@@ -324,11 +324,9 @@ def drawRedCrosshair(surface, mousePos):
     surface.set_at((x+i,y+j+1), RED)
 
 def printVectorForC(vec):
-  out = " = {"
+  out = ""
   for i in vec:
-    out += "{%s, %s}, " %tuple(i)
-  out = out[:-2]
-  out += "}"
+    out += "%s %s\n" %tuple(i)
   print out
 
 def main():
@@ -359,7 +357,7 @@ def main():
     # draw_all(track_surface, data, clusters, points, right_points, left_points, \
     #         show_clusters, show_grid, show_edges, show_labels)
 
-    referencePoints = []
+    referencePoints = [[2619, 1927], [2457, 2162], [2292, 2344], [2799, 1682], [2942, 1489], [3097, 1267], [3242, 1067], [2209, 1659], [2372, 1719], [2882, 2102], [3074, 2214], [2314, 1429], [3207, 1867]]
     targetPoints =    []
     currentPoints = referencePoints
 
@@ -367,7 +365,7 @@ def main():
       drawRedCrosshair(drawSurface, point)
 
     second_phase = False
-    currentKP = len(referencePoints)
+    currentKP = 0
 
     scale = 1.0
     window.blit(windowSurface, (0,0))
