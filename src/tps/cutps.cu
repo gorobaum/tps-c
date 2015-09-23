@@ -106,7 +106,7 @@ int getBlockSize() {
   cudaGetDevice(&device);
   cudaGetDeviceProperties(&prop, device);
 
-  for (int blockSize = 1; blockSize <= 512; blockSize++) {
+  for (int blockSize = 32; blockSize <= 512; blockSize += 32) {
     int numBlocks;        // Occupancy in terms of active blocks
     
     cudaOccupancyMaxActiveBlocksPerMultiprocessor(
@@ -118,7 +118,7 @@ int getBlockSize() {
     int activeWarps = numBlocks * blockSize / prop.warpSize;
     int maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
     float currentOccupancy = 1.0*activeWarps/maxWarps;
-    if (maxOccupancy < currentOccupancy) {
+    if (currentOccupancy >= maxOccupancy ) {
       maxOccupancy = currentOccupancy;
       maxOccupancyBlockSize = blockSize;
     }
@@ -126,13 +126,34 @@ int getBlockSize() {
   return maxOccupancyBlockSize;
 }
 
+dim3 calculateBestThreadsPerBlock(int blockSize) {
+  dim3 threadsPerBlock;
+  std::vector<int> threadsPerDim(3, 1);
+  int divisor = 8;
+
+  for (int i = 0; divisor > 1; i++) {
+    if (blockSize%divisor == 0) {
+      threadsPerDim[i%3] *= divisor;
+      blockSize /= divisor;
+    }
+    else {
+      divisor /= 2;
+    }
+  }
+
+  threadsPerBlock.x = threadsPerDim[0];
+  threadsPerBlock.y = threadsPerDim[1];
+  threadsPerBlock.z = threadsPerDim[2];
+
+  return threadsPerBlock;
+}
+
 short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
   int maxBlockSize = getBlockSize();
   
   short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
 
-  
-  dim3 threadsPerBlock(8, 8, 8);
+  dim3 threadsPerBlock = calculateBestThreadsPerBlock(maxBlockSize);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
