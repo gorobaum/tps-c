@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "image.h"
 
 void tps::Image::changePixelAt(int x, int y, int z, short value) {
@@ -73,25 +75,7 @@ float* tps::Image::getFloatPixelVector() {
     for (int x = 0; x < dimensions_[0]; x++)
       for (int y = 0; y < dimensions_[1]; y++)
         for (int z = 0; z < dimensions_[2]; z++)
-        vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z] = (float)image[x][y][z];
-  return vector;
-}
-
-float* tps::Image::getFloatPixelVector() {
-  float* vector = (float*)malloc(dimensions_[0]*dimensions_[1]*dimensions_[2]*sizeof(float));
-    for (int x = 0; x < dimensions_[0]; x++)
-      for (int y = 0; y < dimensions_[1]; y++)
-        for (int z = 0; z < dimensions_[2]; z++)
-        vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z] = (float)image[x][y][z];
-  return vector;
-}
-
-float* tps::Image::getFloatPixelVector() {
-  float* vector = (float*)malloc(dimensions_[0]*dimensions_[1]*dimensions_[2]*sizeof(float));
-    for (int x = 0; x < dimensions_[0]; x++)
-      for (int y = 0; y < dimensions_[1]; y++)
-        for (int z = 0; z < dimensions_[2]; z++)
-        vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z] = (float)image[x][y][z];
+          vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z] = image[y+x*dimensions_[1]+z*dimensions_[0]*dimensions_[1]];
   return vector;
 }
 
