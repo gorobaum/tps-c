@@ -83,7 +83,7 @@ void tps::Image::setPixelVector(short* vector) {
   for (int z = 0; z < dimensions_[2]; z++)
     for (int x = 0; x < dimensions_[0]; x++)
       for (int y = 0; y < dimensions_[1]; y++) {
-        short newValue = vector[z*dimensions_[1]*dimensions_[0]+x*dimensions_[1]+y];
+        short newValue = vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z];
         changePixelAt(x, y, z, newValue);
       }
 }

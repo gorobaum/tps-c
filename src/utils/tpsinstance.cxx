@@ -80,11 +80,13 @@ void tps::TpsInstance::readConfigurationFile() {
     else if (line.compare("boundaries:") == 0)
       readBoundaries(infile);
   }
-  for (int i = 0; i < 3; i++) {
-    std::vector<int> newBoundary;
-    newBoundary.push_back(0);
-    newBoundary.push_back(targetImage.getDimensions()[i]);
-    boundaries.push_back(newBoundary);
+  if (boundaries.empty()) {
+    for (int i = 0; i < 3; i++) {
+      std::vector<int> newBoundary;
+      newBoundary.push_back(0);
+      newBoundary.push_back(targetImage.getDimensions()[i]);
+      boundaries.push_back(newBoundary);
+    }
   }
   std::cout << "boundaries.size() = " << boundaries.size() << std::endl;
 }
