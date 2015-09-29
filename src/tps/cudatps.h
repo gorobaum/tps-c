@@ -15,7 +15,8 @@ class CudaTPS : public TPS {
       TPS(referenceKeypoints, targetKeypoints, targetImage),
       lienarSolver(referenceKeypoints, targetKeypoints, twoDimension),
       cm_(cm) {}; 
-    tps::Image run();
+    void run();
+    void loadImage();
   private:
     tps::CudaLinearSystems lienarSolver;
     tps::CudaMemory& cm_;

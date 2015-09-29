@@ -15,8 +15,8 @@ class MasterController {
 public:
   MasterController(std::vector<TpsInstance> executionInstances) :
     executionInstances_(executionInstances) {
-      execMemoryReady = -1;
-      execFinished = -1;
+      execMemoryReady = 0;
+      execFinished = 0;
     };
   void run();
   void loadGPUMemory();

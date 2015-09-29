@@ -18,7 +18,8 @@ public:
     targetImage_(targetImage),
     dimensions_(targetImage.getDimensions()),
     registredImage(targetImage.getDimensions()) {};
-  virtual tps::Image run() = 0;
+  virtual void run() = 0;
+  tps::Image getResult() {return registredImage; };
 protected:
   std::vector< std::vector<float> > referenceKeypoints_;
   std::vector< std::vector<float> > targetKeypoints_;

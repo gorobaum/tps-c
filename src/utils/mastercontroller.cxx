@@ -8,33 +8,25 @@
 
 void tps::MasterController::run() {
   int numberOfExecs = executionInstances_.size();
-  std::cout << "numberOfExecs = " << numberOfExecs << std::endl;
-  while (execFinished < numberOfExecs-1) {
-    std::cout << "execFinished = " << execFinished << std::endl; 
-    std::cout << "execMemoryReady = " << execMemoryReady << std::endl; 
+  while (execFinished < numberOfExecs) {
     loadGPUMemory();
-    std::cout << "execFinished = " << execFinished << std::endl; 
-    std::cout << "execMemoryReady = " << execMemoryReady << std::endl; 
     executeInstances(false);
-    std::cout << "execFinished = " << execFinished << std::endl; 
-    std::cout << "execMemoryReady = " << execMemoryReady << std::endl; 
   }
 }
 
 void tps::MasterController::loadGPUMemory() {
-  int count = execFinished+1;
-  while (executionInstances_[count].canAllocGPUMemory()) {
-    executionInstances_[count].allocCudaMemory();
+  int numberOfExecs = executionInstances_.size();
+  while (execMemoryReady < numberOfExecs) {
+    if (!executionInstances_[execMemoryReady].canAllocGPUMemory()) break;
+    executionInstances_[execMemoryReady].allocCudaMemory();
     execMemoryReady++;
-    count++;
   }
 }
 
 void tps::MasterController::executeInstances(bool cpu) {
   while (execFinished < execMemoryReady) {
-    int currentExec = execFinished + 1;
-    if (cpu) executionInstances_[currentExec].runParallelTPS();
-    executionInstances_[currentExec].runCudaTPS();
+    if (cpu) executionInstances_[execFinished].runParallelTPS();
+    executionInstances_[execFinished].runCudaTPS();
     execFinished++;
   }
 }

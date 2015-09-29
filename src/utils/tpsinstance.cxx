@@ -104,8 +104,10 @@ std::string tps::TpsInstance::generateOutputName(std::string differentiator) {
 void tps::TpsInstance::runCudaTPS() {
   std::string filename = generateOutputName("Cuda");
   std::cout << "filename = " << filename << std::endl; 
-  tps::CudaTPS CUDActps = tps::CudaTPS(referenceKPs, targetKPs, targetImage, cm, twoDimension);
-  tps::Image resultImage = CUDActps.run();
+  tps::CudaTPS CUDAtps = tps::CudaTPS(referenceKPs, targetKPs, targetImage, cm, twoDimension);
+  CUDAtps.run();
+  CUDAtps.loadImage();
+  tps::Image resultImage = CUDAtps.getResult();
   imageHandler_->saveImageData(resultImage, filename);
   cm.freeMemory();
 }
@@ -113,14 +115,16 @@ void tps::TpsInstance::runCudaTPS() {
 void tps::TpsInstance::runBasicTPS() {
   std::string filename = generateOutputName("Basic");
   tps::BasicTPS basic = tps::BasicTPS(referenceKPs, targetKPs, targetImage, twoDimension);
-  tps::Image resultImage = basic.run();
+  basic.run();
+  tps::Image resultImage = basic.getResult();
   imageHandler_->saveImageData(resultImage, filename);
 }
 
 void tps::TpsInstance::runParallelTPS() {
   std::string filename = generateOutputName("Parallel");
   tps::ParallelTPS parallelTPS = tps::ParallelTPS(referenceKPs, targetKPs, targetImage, twoDimension);
-  tps::Image resultImage = parallelTPS.run();
+  parallelTPS.run();
+  tps::Image resultImage = parallelTPS.getResult();
   imageHandler_->saveImageData(resultImage, filename);
 }
 
