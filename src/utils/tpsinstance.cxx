@@ -124,15 +124,42 @@ void tps::TpsInstance::runParallelTPS() {
   imageHandler_->saveImageData(resultImage, filename);
 }
 
-size_t tps::TpsInstance::allocCudaMemory(size_t usedMemory) {
-  cm = tps::CudaMemory(targetImage.getDimensions(), referenceKPs);
-  if (usedMemory+cm.memoryEstimation() > 1800) return usedMemory;
-  cm.allocCudaMemory(targetImage);
+size_t tps::TpsInstance::getAllocatedGPUMemory() {
   size_t avail;
   size_t total;
   cudaMemGetInfo( &avail, &total );
-  size_t used = (total - avail)/(1024*1024);
-  return used;
+  size_t usedMemory = (total - avail)/(1024*1024);
+  return usedMemory;
 }
 
+bool tps::TpsInstance::canAllocGPUMemory() {
+  int usedMemory = getAllocatedGPUMemory();
 
+  int floatSize = sizeof(float);
+  int doubleSize = sizeof(double);
+  int ucharSize = sizeof(short);
+  bool ret = false;
+
+  int numberOfCps = referenceKPs.size();
+  int systemDim = numberOfCps + 4;
+  int imageSize = targetImage.getNumberofPixels();
+
+  double solutionsMemory = 3.0*systemDim*floatSize/(1024*1024);
+  // std::cout << "solutionsMemory = " << solutionsMemory << std::endl;
+  double keypointsMemory = 3.0*numberOfCps*floatSize/(1024*1024);
+  // std::cout << "keypointsMemory = " << keypointsMemory << std::endl;
+  double pixelsMemory = 2.0*imageSize*ucharSize/(1024*1024);
+  // std::cout << "pixelsMemory = " << pixelsMemory << std::endl;
+
+  double totalMemory = solutionsMemory+keypointsMemory+pixelsMemory;
+
+  if (usedMemory+totalMemory <= 1800) ret = true;
+
+  return ret;
+}
+
+void tps::TpsInstance::allocCudaMemory() {
+  int usedMemory = getAllocatedGPUMemory();
+  cm = tps::CudaMemory(targetImage.getDimensions(), referenceKPs);
+  cm.allocCudaMemory(targetImage);
+}

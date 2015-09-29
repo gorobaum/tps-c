@@ -25,7 +25,8 @@ public:
   void runParallelTPS();
   void runBasicTPS();
   bool isTwoDimension() {return twoDimension;};
-  size_t allocCudaMemory(size_t usedMemory);
+  void allocCudaMemory();
+  bool canAllocGPUMemory();
   std::string generateOutputName(std::string differentiator);
 private:
   std::string configurationFile_;
@@ -42,6 +43,7 @@ private:
   float percentage;
   void createKeyPoints();
   void readConfigurationFile();
+  size_t getAllocatedGPUMemory();
   void readBoundaries(std::ifstream& infile);
   void readKeypoints(std::ifstream& infile, std::vector< std::vector<float> >& kps);
   void addNewKeypoints(std::vector< std::vector<float> >& keyPoints, std::vector< std::vector<float> > newKeyPoints);

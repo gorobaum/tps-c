@@ -23,6 +23,7 @@ public:
 				image[i] = 0;
 	}
 	std::vector<int> getDimensions() { return dimensions_; };
+	int getNumberofPixels() { return dimensions_[0]*dimensions_[1]*dimensions_[2]; };
 	std::vector<short> getMinMax();
 	void changePixelAt(int x, int y, int z, short value);
 	short getPixelAt(int x, int y, int z);

@@ -21,6 +21,7 @@ cuda_add_executable(tps
 
   src/utils/cudamemory.cxx
   src/utils/tpsinstance.cxx
+  src/utils/mastercontroller.cxx
 
   src/feature/featuregenerator.cxx
 
