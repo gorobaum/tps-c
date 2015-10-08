@@ -16,7 +16,7 @@ public:
               tps::Image targetImage, bool twoDimension) :
     TPS(referenceKeypoints, targetKeypoints, targetImage),
     lienarSolver(referenceKeypoints, targetKeypoints, twoDimension) {}; 
-  tps::Image run();
+  void run();
 private:
   tps::ArmaLinearSystems lienarSolver;
   uint numberOfThreads = std::thread::hardware_concurrency();

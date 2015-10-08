@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-tps::Image tps::BasicTPS::run() {
+void tps::BasicTPS::run() {
 	lienarSolver.solveLinearSystems();
 	solutionX = lienarSolver.getSolutionX();
 	solutionY = lienarSolver.getSolutionY();
@@ -28,6 +28,4 @@ tps::Image tps::BasicTPS::run() {
 			short value = targetImage_.trilinearInterpolation(newX, newY, newZ);
 			registredImage.changePixelAt(x, y, z, value);
 		}
-
-		return registredImage;
 }

@@ -98,18 +98,11 @@ void showExecutionTime(cudaEvent_t *start, cudaEvent_t *stop, std::string output
   std::cout << output << elapsedTime << " ms\n";
 }
 
-short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
+void runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfCPs) {
   dim3 threadsPerBlock(8, 8, 8);
   dim3 numBlocks(std::ceil(1.0*dimensions[0]/threadsPerBlock.x),
                  std::ceil(1.0*dimensions[1]/threadsPerBlock.y),
                  std::ceil(1.0*dimensions[2]/threadsPerBlock.z));
-
-  short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
-
-  for (int slice = 0; slice < dimensions[2]; slice++)
-    for (int col = 0; col < dimensions[0]; col++)
-      for (int row = 0; row < dimensions[1]; row++)
-        regImage[slice*dimensions[1]*dimensions[0]+col*dimensions[1]+row] = 0;
 
   cudaEvent_t start, stop;
   startTimeRecord(&start, &stop);
@@ -118,8 +111,18 @@ short* runTPSCUDA(tps::CudaMemory cm, std::vector<int> dimensions, int numberOfC
                                           cm.getSolutionZ(), dimensions[0], dimensions[1], dimensions[2], cm.getKeypointX(), 
                                           cm.getKeypointY(), cm.getKeypointZ(), numberOfCPs);
   checkCuda(cudaDeviceSynchronize());
-  checkCuda(cudaMemcpy(regImage, cm.getRegImage(), dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short), cudaMemcpyDeviceToHost));
 
   showExecutionTime(&start, &stop, "callKernel execution time = ");
+}
+
+short* getGPUResult(tps::CudaMemory cm, std::vector<int> dimensions) {
+  short* regImage = (short*)malloc(dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short));
+
+  for (int slice = 0; slice < dimensions[2]; slice++)
+    for (int col = 0; col < dimensions[0]; col++)
+      for (int row = 0; row < dimensions[1]; row++)
+        regImage[slice*dimensions[1]*dimensions[0]+col*dimensions[1]+row] = 0;
+
+  checkCuda(cudaMemcpy(regImage, cm.getRegImage(), dimensions[0]*dimensions[1]*dimensions[2]*sizeof(short), cudaMemcpyDeviceToHost));
   return regImage;
 }
