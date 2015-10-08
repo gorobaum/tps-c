@@ -8,6 +8,7 @@
 #define ANG PI/72.0
 
 bool tps::FeatureGenerator::checkBoundary(float x, float y, float z) {
+  if (boundaries_.empty()) return true;
   if (x <= boundaries_[0][0] || x >= boundaries_[0][1])
     if (y <= boundaries_[1][0] || y >= boundaries_[1][1])
       if (z <= boundaries_[2][0] || z >= boundaries_[2][0])
