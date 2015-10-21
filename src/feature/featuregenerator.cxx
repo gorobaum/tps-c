@@ -30,7 +30,8 @@ void tps::FeatureGenerator::run() {
   std::cout << "xStep = " << xStep << std::endl;
   std::cout << "yStep = " << yStep << std::endl;
   std::cout << "zStep = " << zStep << std::endl;
-  createUniformFeatures();
+  createReferenceImageFeatures();
+  createTargetImageFeatures();
 }
 
 void tps::FeatureGenerator::createUniformFeatures() {
