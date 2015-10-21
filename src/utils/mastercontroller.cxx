@@ -59,9 +59,6 @@ void tps::MasterController::executeInstances(void* data) {
   int execMemoryReady = threadData->endPoint;
   int numInstancesForNow = execMemoryReady - execFinished;
 
-  std::cout << "threadData->tId = " << threadData->tId << std::endl;
-  std::cout << "numInstancesForNow = " << numInstancesForNow << std::endl;
-
   for (int i = threadData->tId; i < numInstancesForNow; i += 4) {
     threadData->executionInstances[execFinished+i].runCudaTPS();
   }
