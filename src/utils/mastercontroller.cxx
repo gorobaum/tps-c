@@ -9,22 +9,24 @@
 struct ThreadData {
   int tId;
   std::vector<tps::TpsInstance> executionInstances;
-  int numInstancesForNow;
+  int startPoint;
+  int endPoint;
 };
 
 void tps::MasterController::run() {
   int numberOfExecs = executionInstances_.size();
+  std::cout << "numberOfExecs = " << numberOfExecs << std::endl;
   while (execFinished < numberOfExecs) {
     loadGPUMemory();
     
     pthread_t threads[numberOfThreads];
-    int numInstancesForNow = execMemoryReady - execFinished;
 
     for (int i = 0; i < numberOfThreads; i++) {
         ThreadData* data = new ThreadData;
         data->tId = i;
         data->executionInstances = executionInstances_;
-        data->numInstancesForNow = numInstancesForNow;
+        data->startPoint = execFinished;
+        data->endPoint = execMemoryReady;
         if (pthread_create(&threads[i], NULL, executeInstances, static_cast<void*>(data))) {
             fprintf(stderr, "Error creating threadn");
             return 1;
@@ -37,6 +39,7 @@ void tps::MasterController::run() {
             return 2;
         }
     }
+    execFinished = execMemoryReady;
   }
 }
 
@@ -51,8 +54,15 @@ void tps::MasterController::loadGPUMemory() {
 
 void tps::MasterController::executeInstances(void* data) {
   ThreadData* threadData = static_cast<ThreadData*>(data);
-  threadData->tId;
-  std::cout << threadData->tId << std::endl;
-  threadData->executionInstances;
-  threadData->numInstancesForNow;
+
+  int execFinished = threadData->startPoint;
+  int execMemoryReady = threadData->endPoint;
+  int numInstancesForNow = execMemoryReady - execFinished;
+
+  std::cout << "threadData->tId = " << threadData->tId << std::endl;
+  std::cout << "numInstancesForNow = " << numInstancesForNow << std::endl;
+
+  for (int i = threadData->tId; i < numInstancesForNow; i += 4) {
+    threadData->executionInstances[execFinished+i].runCudaTPS();
+  }
 }

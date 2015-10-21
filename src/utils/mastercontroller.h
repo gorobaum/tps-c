@@ -24,7 +24,7 @@ public:
 private:
   std::vector<tps::TpsInstance> executionInstances_;
   std::vector<tps::CudaStream> streams;
-  const int numberOfThreads = 4;
+  static const int numberOfThreads = 4;
   int execMemoryReady;
   int execFinished;
 };
