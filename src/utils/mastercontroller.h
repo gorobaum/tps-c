@@ -20,10 +20,11 @@ public:
     };
   void run();
   void loadGPUMemory();
-  void executeInstances(bool cpu);
+  static void executeInstances(void* data);
 private:
   std::vector<tps::TpsInstance> executionInstances_;
   std::vector<tps::CudaStream> streams;
+  const int numberOfThreads = 4;
   int execMemoryReady;
   int execFinished;
 };
