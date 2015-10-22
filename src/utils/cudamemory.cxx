@@ -72,12 +72,6 @@ void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
 
   struct cudaTextureDesc texDesc;
   memset(&texDesc, 0, sizeof(texDesc));
-  texDesc.addressMode[0]   = cudaAddressModeMirror;
-  texDesc.addressMode[1]   = cudaAddressModeMirror;
-  texDesc.addressMode[2]   = cudaAddressModeMirror;
-  texDesc.filterMode       = cudaFilterModeLinear;
-  texDesc.readMode         = cudaReadModeElementType;
-  texDesc.normalizedCoords = 0;
 
   // Create texture object
   texObj = 0;
