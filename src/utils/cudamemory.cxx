@@ -72,6 +72,7 @@ void tps::CudaMemory::allocCudaImagePixels(tps::Image& image) {
 
   struct cudaTextureDesc texDesc;
   memset(&texDesc, 0, sizeof(texDesc));
+  texDesc.filterMode       = cudaFilterModeLinear;
 
   // Create texture object
   texObj = 0;

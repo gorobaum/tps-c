@@ -75,7 +75,7 @@ float* tps::Image::getFloatPixelVector() {
     for (int x = 0; x < dimensions_[0]; x++)
       for (int y = 0; y < dimensions_[1]; y++)
         for (int z = 0; z < dimensions_[2]; z++)
-          vector[x*dimensions_[2]*dimensions_[1]+y*dimensions_[2]+z] = image[y+x*dimensions_[1]+z*dimensions_[0]*dimensions_[1]];
+          vector[z*dimensions_[0]*dimensions_[1]+y*dimensions_[0]+x] = image[y+x*dimensions_[1]+z*dimensions_[0]*dimensions_[1]];
   return vector;
 }
 

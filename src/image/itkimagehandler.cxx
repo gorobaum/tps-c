@@ -80,7 +80,7 @@ void tps::ITKImageHandler::saveImageData(tps::Image resultImage, std::string fil
 
   while(!imageIterator.IsAtEnd()){
     ImageType::IndexType index = imageIterator.GetIndex();
-    imageIterator.Set(resultImage.getPixelAt(index[2], index[1], index[0]));
+    imageIterator.Set(resultImage.getPixelAt(index[0], index[1], index[2]));
     ++imageIterator;
   }
 
