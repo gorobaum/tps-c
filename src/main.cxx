@@ -16,8 +16,6 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
-#include <opencv2/nonfree/features2d.hpp>
 
 #include "cuda.h"
 #include "cuda_runtime.h"
@@ -27,7 +25,7 @@ bool createKeypointImages = true;
 
 int main(int argc, char** argv) {
   if (argc < 1) {
-    std::cout << "Precisa passar o arquivo de configuração coração! \n";    
+    std::cout << "Precisa passar o arquivo de configuração coração! \n";
     return 0;
   }
 
@@ -38,7 +36,7 @@ int main(int argc, char** argv) {
   std::ifstream infile;
   infile.open(argv[1]);
 
-  std::string line; 
+  std::string line;
   std::getline(infile, line);
 
   std::size_t pos = line.find('.');
